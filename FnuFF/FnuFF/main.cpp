@@ -77,6 +77,16 @@ int update( void* args )
 
 	client.start();
 
+	DebugSphere sphere;
+	sphere.position = glm::vec3( 0.0f );
+	sphere.radius = 1.0f;
+	sphere.color = glm::vec4( 0.0f, 1.0f, 0.0f, 1.0f );
+
+	Camera* camera = data->coreData->graphics->getPerspectiveCamera();
+	camera->updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
+	camera->setPosition( glm::vec3( 0, 5, -10 ) );
+	camera->setDirection( glm::vec3( 0.0f, 0.0f, 1.0f ) );
+
 	while( *data->coreData->running )
 	{
 		int result = SDL_SemWaitTimeout( data->renderDone, THREAD_UPDATE_WAIT );
@@ -124,6 +134,19 @@ int update( void* args )
 			// update subsystems
 			//script.update( deltaTime );
 			//script.render();
+			data->coreData->debugShapes->addSphere( sphere, false );
+
+			for( int x=0; x<=10; x++ )
+			{
+				DebugLine line = { glm::vec3( x, 0, 0 ), glm::vec3( x, 0, 10 ), glm::vec4( 1.0f ) };
+				data->coreData->debugShapes->addLine( line, false );
+			}
+
+			for( int z=0; z<=10; z++ )
+			{
+				DebugLine line = { glm::vec3( 0, 0, z ), glm::vec3( 10, 0, z ), glm::vec4( 1.0f ) };
+				data->coreData->debugShapes->addLine( line, false );
+			}
 
 			if( data->coreData->input->keyReleased( SDL_SCANCODE_F1 ) )
 			{
@@ -195,7 +218,7 @@ int main( int argc, char* argv[] )
 		windowTitle = "FnuFF - Client";
 	}
 
-	SDL_Window* window = SDL_CreateWindow( windowTitle, windowX, windowY, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
+	SDL_Window* window = SDL_CreateWindow( windowTitle, WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
 	if( window )
 	{
 		LOG_INFO( "Window created." );
