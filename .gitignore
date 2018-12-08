@@ -48,7 +48,6 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
 [Dd]ebug*/
 *.sbr
 obj/
@@ -58,3 +57,6 @@ _ReSharper*/
 .vs/
 #Nuget packages folder
 packages/
+
+*.VC.db
+*.opendb
