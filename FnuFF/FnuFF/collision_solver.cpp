@@ -138,6 +138,42 @@ bool CollisionSolver::ray( const Ray& ray, const Plane& plane, Hit* hit )
 	return false;
 }
 
+bool CollisionSolver::ray( const Ray& ray, const Triangle& triangle, Hit* hit )
+{
+	glm::vec3 edge1 = triangle.v[1] - triangle.v[0];
+	glm::vec3 edge2 = triangle.v[2] - triangle.v[0];
+
+	glm::vec3 pvec = glm::cross( ray.direction, edge2 );
+	float det = glm::dot( edge1, pvec );
+
+	if( det < EPSILON )
+		return false;
+
+	glm::vec3 tvec = ray.start - triangle.v[0];
+	float u = glm::dot( tvec, pvec );
+	if( u < 0 || u > det )
+		return false;
+
+	glm::vec3 qvec = glm::cross( tvec, edge1 );
+	float v = glm::dot( ray.direction, qvec );
+	if( v < 0 || u + v > det )
+		return false;
+
+	float t = glm::dot( edge2, qvec ) / det;
+
+	if( ray.length > 0 && t > ray.length )
+		return false;
+
+	if( hit )
+	{
+		hit->length = t;
+		hit->position = ray.start + ray.direction * t;
+		hit->normal = glm::normalize( glm::cross( edge1, edge2 ) );
+	}
+
+	return true;
+}
+
 bool CollisionSolver::sphere( const Sphere& a, const Sphere& b, Hit* hit )
 {
 	float distance = glm::distance( a.center, b.center );

@@ -27,6 +27,11 @@ namespace Physics
 		float offset;
 	};
 
+	struct Triangle
+	{
+		glm::vec3 v[3];
+	};
+
 	struct Hit
 	{
 		glm::vec3 position;
@@ -43,6 +48,7 @@ namespace Physics
 		bool ray( const Ray& ray, const Sphere& sphere, Hit* hit = NULL );
 		bool ray( const Ray& ray, const AABB& aabb, Hit* hit = NULL );
 		bool ray( const Ray& ray, const Plane& plane, Hit* hit = NULL );
+		bool ray( const Ray& ray, const Triangle& triangle, Hit* hit = NULL );
 
 		bool sphere( const Sphere& a, const Sphere& b, Hit* hit = NULL );
 

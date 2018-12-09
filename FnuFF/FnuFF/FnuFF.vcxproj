@@ -157,6 +157,7 @@
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="instanced_model.cpp" />
+    <ClCompile Include="level.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="graphics.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="instanced_model.h" />
+    <ClInclude Include="level.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="message.h" />

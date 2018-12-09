@@ -11,6 +11,7 @@
 #include "collision_solver.h"
 #include "server.h"
 #include "client.h"
+#include "level.h"
 
 using namespace System;
 using namespace Physics;
@@ -68,6 +69,7 @@ int update( void* args )
 	Input& input = *data->coreData->input;
 	//Script& script = *data->script;
 	Client& client = *data->coreData->client;
+	DebugShapes& debugShapes = *data->coreData->debugShapes;
 
 	uint64_t lastTick = SDL_GetTicks();
 	uint64_t lastClientTick = SDL_GetTicks();
@@ -86,6 +88,13 @@ int update( void* args )
 	camera->updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
 	camera->setPosition( glm::vec3( 0, 5, -10 ) );
 	camera->setDirection( glm::vec3( 0.0f, 0.0f, 1.0f ) );
+
+	Level level;
+	level.load( "./assets/levels/level01.txt" );
+
+	Ray ray;
+	Triangle triangle;
+	glm::vec3 hitPoint;
 
 	while( *data->coreData->running )
 	{
@@ -114,6 +123,37 @@ int update( void* args )
 					for( int i=0; i<iterations; i++ )
 					{
 						//script.fixedUpdate( TIMESTEP_MS );
+
+						glm::vec3 cameraMovement( 0.0f );
+
+						if( input.keyDown( SDL_SCANCODE_W ) )
+							cameraMovement.z += 1.0f;
+						if( input.keyDown( SDL_SCANCODE_S ) )
+							cameraMovement.z -= 1.0f;
+						if( input.keyDown( SDL_SCANCODE_D ) )
+							cameraMovement.x += 1.0f;
+						if( input.keyDown( SDL_SCANCODE_A ) )
+							cameraMovement.x -= 1.0f;
+
+						camera->relativeMovement( cameraMovement );
+
+						if( input.buttonDown( SDL_BUTTON_LEFT ) )
+						{
+							Point deltaMouse = input.getMouseDelta();
+							camera->updateDirection( deltaMouse.x, deltaMouse.y );
+						}
+
+						if( input.buttonPressed( SDL_BUTTON_RIGHT ) )
+						{
+							ray.start = camera->getPosition();
+							ray.length = 10.0f;
+							ray.direction = glm::normalize( camera->getDirection() );
+
+							int triangleIndex = level.raytrace( ray, hitPoint );
+							const Triangle* t = level.getTriangle( triangleIndex );
+							if( t )
+								triangle = *t;
+						}
 					}
 
 					if( input.keyPressed( SDL_SCANCODE_G ) )
@@ -134,7 +174,21 @@ int update( void* args )
 			// update subsystems
 			//script.update( deltaTime );
 			//script.render();
-			data->coreData->debugShapes->addSphere( sphere, false );
+
+			glm::vec4 green( 0.0f, 1.0f, 0.0f, 1.0f );
+			debugShapes.addLine( { ray.start, ray.start + ray.direction * ray.length, green }, false );
+
+			for( int i=0; i<3; i++ )
+			{
+				int second = i+1;
+				if( second > 2 )
+					second = 0;
+				debugShapes.addLine( { triangle.v[i], triangle.v[second], green }, true );
+			}
+
+			debugShapes.addSphere( { hitPoint, 0.5f, green }, false );
+
+			level.render();
 
 			for( int x=0; x<=10; x++ )
 			{
@@ -257,6 +311,7 @@ int main( int argc, char* argv[] )
 			bool reload = false;
 
 			Input input;
+			input.setUpdateBound( true );
 
 			DebugShapes debugShapes;
 			if( !debugShapes.load() )

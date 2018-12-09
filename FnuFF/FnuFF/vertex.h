@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "glm\gtc\epsilon.hpp"
 
 namespace Rendering
 {
@@ -12,4 +13,14 @@ namespace Rendering
 		glm::vec3 tangent;
 		glm::vec3 bitangent;
 	};
+
+	inline bool sameVertex( const Vertex& a, const Vertex& b )
+	{
+		return
+		(
+			fabs( a.position.x - b.position.x ) < EPSILON &&
+			fabs( a.position.y - b.position.y ) < EPSILON &&
+			fabs( a.position.z - b.position.z ) < EPSILON
+		);
+	}
 }

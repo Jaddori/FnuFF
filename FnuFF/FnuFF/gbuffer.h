@@ -6,7 +6,7 @@
 #include "assets.h"
 #include "billboard.h"
 
-#define GBUFFER_SPHERE_MESH_PATH "./assets/models/sphere.mesh"
+#define GBUFFER_SPHERE_MESH_PATH "./assets/meshes/sphere.mesh"
 #define GBUFFER_SHADOW_MAP_RESOLUTION 10.0f
 
 namespace Rendering
