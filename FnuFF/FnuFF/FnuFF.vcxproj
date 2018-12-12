@@ -164,6 +164,7 @@
     <ClCompile Include="message.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="network_message.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="prop.cpp" />
     <ClCompile Include="ray.cpp" />
     <ClCompile Include="server.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="network_message.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="prop.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="ray.h" />

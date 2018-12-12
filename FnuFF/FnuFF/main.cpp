@@ -12,6 +12,7 @@
 #include "server.h"
 #include "client.h"
 #include "level.h"
+#include "player.h"
 
 using namespace System;
 using namespace Physics;
@@ -96,6 +97,9 @@ int update( void* args )
 	Triangle triangle;
 	glm::vec3 hitPoint;
 
+	Player player;
+	player.setLevel( &level );
+
 	while( *data->coreData->running )
 	{
 		int result = SDL_SemWaitTimeout( data->renderDone, THREAD_UPDATE_WAIT );
@@ -124,7 +128,7 @@ int update( void* args )
 					{
 						//script.fixedUpdate( TIMESTEP_MS );
 
-						glm::vec3 cameraMovement( 0.0f );
+						/*glm::vec3 cameraMovement( 0.0f );
 
 						if( input.keyDown( SDL_SCANCODE_W ) )
 							cameraMovement.z += 1.0f;
@@ -153,7 +157,9 @@ int update( void* args )
 							const Triangle* t = level.getTriangle( triangleIndex );
 							if( t )
 								triangle = *t;
-						}
+						}*/
+
+						player.update();
 					}
 
 					if( input.keyPressed( SDL_SCANCODE_G ) )

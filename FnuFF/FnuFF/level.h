@@ -17,6 +17,7 @@ public:
 	int raytrace( const Physics::Ray& ray, glm::vec3& hitPoint );
 
 	const Physics::Triangle* getTriangle( int index ) const;
+	int getTriangleCount() const;
 
 private:
 	Transform transform;

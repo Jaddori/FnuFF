@@ -1,1 +1,1 @@
-./assets/meshes/room.mesh
+./assets/meshes/arena.mesh

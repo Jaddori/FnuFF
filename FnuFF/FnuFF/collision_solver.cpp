@@ -1,6 +1,9 @@
 #include "collision_solver.h"
 using namespace Physics;
 
+#define fmin( a, b ) (a < b ? a : b)
+#define fmax( a, b ) (a > b ? a : b)
+
 CollisionSolver::CollisionSolver()
 {
 }
@@ -186,6 +189,90 @@ bool CollisionSolver::sphere( const Sphere& a, const Sphere& b, Hit* hit )
 		}
 
 		return true;
+	}
+
+	return false;
+}
+
+bool CollisionSolver::sphere( const Sphere& a, const Triangle& triangle, Hit* hit )
+{
+	// face
+	glm::vec3 edge1 = triangle.v[1] - triangle.v[0];
+	glm::vec3 edge2 = triangle.v[2] - triangle.v[0];
+	glm::vec3 edge3 = triangle.v[2] - triangle.v[1];
+	glm::vec3 normal = glm::normalize( glm::cross( edge1, edge2 ) );
+	float d = glm::dot( triangle.v[0], normal );
+
+	float sphered = glm::dot( a.center, normal );
+	if( fabs( sphered - d ) < a.radius )
+	{
+		glm::vec3 p = normal * d;
+		return true;
+	}
+
+	// edges
+	glm::vec3 e1 = glm::normalize( edge1 );
+	glm::vec3 o = a.center - triangle.v[1];
+	float dd = glm::dot( e1, o );
+	glm::vec3 f = e1 * dd;
+	glm::vec3 edgePoint = triangle.v[1] + f;
+	if( glm::length( edgePoint - a.center ) < a.radius )
+	{
+		float d1 = glm::dot( triangle.v[1], e1 );
+		float d2 = glm::dot( triangle.v[0], e1 );
+
+		float dmin = fmin( d1, d2 );
+		float dmax = fmax( d1, d2 );
+
+		float df = glm::dot( edgePoint, e1 );
+
+		if( df >= dmin && df <= dmax )
+			return true;
+	}
+
+	glm::vec3 e2 = glm::normalize( edge2 );
+	o = a.center - triangle.v[2];
+	dd = glm::dot( e2, o );
+	f = e2 * dd;
+	edgePoint = triangle.v[2] + f;
+	if( glm::length( edgePoint - a.center ) < a.radius )
+	{
+		float d1 = glm::dot( triangle.v[2], e1 );
+		float d2 = glm::dot( triangle.v[0], e1 );
+
+		float dmin = fmin( d1, d2 );
+		float dmax = fmax( d1, d2 );
+
+		float df = glm::dot( edgePoint, e1 );
+
+		if( df >= dmin && df <= dmax )
+			return true;
+	}
+
+	glm::vec3 e3 = glm::normalize( edge3 );
+	o = a.center - triangle.v[0];
+	dd = glm::dot( e3, o );
+	f = e3 * dd;
+	edgePoint = triangle.v[0] + f;
+	if( glm::length( edgePoint - a.center ) < a.radius )
+	{
+		float d1 = glm::dot( triangle.v[2], e1 );
+		float d2 = glm::dot( triangle.v[1], e1 );
+
+		float dmin = fmin( d1, d2 );
+		float dmax = fmax( d1, d2 );
+
+		float df = glm::dot( edgePoint, e1 );
+
+		if( df >= dmin && df <= dmax )
+			return true;
+	}
+
+	// vertices
+	for( int i=0; i<3; i++ )
+	{
+		if( glm::distance( triangle.v[i], a.center ) < a.radius )
+			return true;
 	}
 
 	return false;

@@ -10,6 +10,18 @@ namespace Physics
 		float length;
 	};
 
+	inline Ray rayFromPoints( const glm::vec3& a, const glm::vec3& b )
+	{
+		Ray ray;
+
+		ray.start = a;
+		ray.direction = b-a;
+		ray.length = glm::length( ray.direction );
+		ray.direction /= ray.length;
+
+		return ray;
+	}
+
 	struct Sphere
 	{
 		glm::vec3 center;
@@ -51,6 +63,7 @@ namespace Physics
 		bool ray( const Ray& ray, const Triangle& triangle, Hit* hit = NULL );
 
 		bool sphere( const Sphere& a, const Sphere& b, Hit* hit = NULL );
+		bool sphere( const Sphere& a, const Triangle& triangle, Hit* hit = NULL );
 
 		bool aabb( const AABB& a, const AABB& b );
 	};

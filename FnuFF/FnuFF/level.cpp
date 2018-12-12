@@ -85,3 +85,8 @@ const Triangle* Level::getTriangle( int index ) const
 
 	return result;
 }
+
+int Level::getTriangleCount() const
+{
+	return triangleCount;
+}
