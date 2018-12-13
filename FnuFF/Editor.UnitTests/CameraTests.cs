@@ -96,14 +96,14 @@ namespace Editor.UnitTests
 
             var p1 = new Point( 0, 0 );
             var p1global = _sut.ToGlobal( p1 );
-            Assert.AreEqual( new Point( 1, 1 ), p1global );
+            Assert.AreEqual( new Point( 100, 100 ), p1global );
 
             _sut.Position = new Point( 100, 100 );
             _sut.Zoom = 2.0f;
 
             var p2 = new Point( 10, 10 );
             var p2global = _sut.ToGlobal( p2 );
-            Assert.AreEqual( new Point( 55, 55 ), p2global ); 
+            Assert.AreEqual( new Point( 220, 220 ), p2global ); 
         }
 
         [TestMethod]
@@ -114,11 +114,11 @@ namespace Editor.UnitTests
 
             var p1 = new Point( 0, 0 );
             var p1global = _sut.ToGlobal( p1 );
-            Assert.AreEqual( new Point( -1, -1 ), p1global );
+            Assert.AreEqual( new Point( -100, -100 ), p1global );
 
             var p2 = new Point( 20, 20 );
             var p2global = _sut.ToGlobal( p2 );
-            Assert.AreEqual( new Point( 1, 1 ), p2global );
+            Assert.AreEqual( new Point( 100, 100 ), p2global );
         }
 
         [TestMethod]

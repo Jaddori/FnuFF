@@ -27,6 +27,7 @@ namespace Editor
         };
 
         private static float[] GRID_SIZES = new float[]{ 0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 8.0f, 10.0f, 15.0f, 20.0f };
+		private const int GRID_MAX_LINES = 100;
 
         private Camera2D _camera;
 
@@ -42,8 +43,11 @@ namespace Editor
         private Point _endPosition;
         private bool _snapToGrid;
         private bool _lmbDown;
+		private bool _spaceDown;
         private int _directionType;
 		private Point _hoverPosition;
+
+		private Point _previousMousePosition;
 
         public int Direction
         {
@@ -85,6 +89,15 @@ namespace Editor
             Geometry.OnSolidChange += () => Invalidate();
         }
 
+		private Point SnapToGrid( Point point )
+		{
+			var result = _camera.ToGlobal( point );
+			result = _camera.Snap( _gridGap, result );
+			result = _camera.ToLocal( result );
+
+			return result;
+		}
+
 		protected override void OnCreateControl()
 		{
 			base.OnCreateControl();
@@ -101,27 +114,36 @@ namespace Editor
             // paint background
             g.FillRectangle( _backgroundBrush, rect );
 
-            // paint grid
-            var factor = _gridGap / _camera.Zoom;
+			// paint grid
+			for( int x = -GRID_MAX_LINES; x <= GRID_MAX_LINES; x++ )
+			{
+				var p1 = new Point( x * _gridGap, -GRID_MAX_LINES*_gridGap );
+				var p2 = new Point( p1.X, GRID_MAX_LINES * _gridGap );
 
-            float x = (-_camera.Position.X / _camera.Zoom) % factor;
-            while( x < Size.Width )
-            {
-                g.DrawLine( _gridPen, x, 0, x, Size.Height );
-                x += factor;
-            }
+				var g1 = _camera.ToLocal( p1 );
+				var g2 = _camera.ToLocal( p2 );
 
-            float y = (-_camera.Position.Y / _camera.Zoom) % factor;
-            while( y < Size.Height )
-            {
-                g.DrawLine( _gridPen, 0, y, Size.Width, y);
-                y += factor;
-            }
+				if( g1.X > 0 && g1.X < Size.Width )
+					g.DrawLine( _gridPen, g1, g2 );
+			}
+			
+			for( int y = -GRID_MAX_LINES; y <= GRID_MAX_LINES; y++ )
+			{
+				var p1 = new Point( -GRID_MAX_LINES * _gridGap, y*_gridGap );
+				var p2 = new Point( GRID_MAX_LINES * _gridGap, p1.Y );
+
+				var g1 = _camera.ToLocal( p1 );
+				var g2 = _camera.ToLocal( p2 );
+
+				if( g1.Y > 0 && g1.Y < Size.Height )
+					g.DrawLine( _gridPen, g1, g2 );
+			}
 
 			// paint origo
 			var origo = _camera.ToLocal( Point.Empty );
-			g.DrawLine( _gridHighlightPen, new Point( origo.X, origo.Y-_gridGap * 3 ), new Point( origo.X, origo.Y+_gridGap * 3 ) );
-			g.DrawLine( _gridHighlightPen, new Point( origo.X-_gridGap * 3, origo.Y ), new Point( origo.X+_gridGap * 3, origo.Y ) );
+			var origoExtent = _gridGap * 3;
+			g.DrawLine( _gridHighlightPen, _camera.ToLocal(new Point(0, -origoExtent)), _camera.ToLocal(new Point(0, origoExtent)) );
+			g.DrawLine( _gridHighlightPen, _camera.ToLocal(new Point(-origoExtent, 0)), _camera.ToLocal(new Point(origoExtent, 0)) );
 
             // paint outline of new solid
             if( _lmbDown )
@@ -176,9 +198,7 @@ namespace Editor
 
                 if( _snapToGrid )
                 {
-                    _startPosition = _camera.Snap( _gridGap, _startPosition );
-					_startPosition.X -= _camera.Position.X % _gridGap;
-					_startPosition.Y -= _camera.Position.Y % _gridGap;
+					_startPosition = SnapToGrid( _startPosition );
 				}
 
                 _endPosition = _startPosition;
@@ -197,9 +217,7 @@ namespace Editor
 
 				if( _snapToGrid )
 				{
-					_endPosition = _camera.Snap( _gridGap, _endPosition );
-					_endPosition.X -= _camera.Position.X % _gridGap;
-					_endPosition.Y -= _camera.Position.Y % _gridGap;
+					_endPosition = SnapToGrid( _endPosition );
 				}
 
                 _lmbDown = false;
@@ -236,32 +254,38 @@ namespace Editor
         {
             base.OnMouseMove( e );
 
-            if( _lmbDown )
-            {
-                _endPosition = e.Location;
+			if( e.Location == _previousMousePosition )
+				return;
+
+			if( _lmbDown )
+			{
+				_endPosition = e.Location;
 
 				if( _snapToGrid )
 				{
-					_endPosition = _camera.Snap( _gridGap, _endPosition );
-					_endPosition.X -= _camera.Position.X % _gridGap;
-					_endPosition.Y -= _camera.Position.Y % _gridGap;
+					_endPosition = SnapToGrid( _endPosition );
 				}
 
 				Invalidate();
-            }
+			}
+			else if( _spaceDown )
+			{
+				var mouseDelta = new Point( e.X - _previousMousePosition.X, e.Y - _previousMousePosition.Y );
+				_camera.Move( mouseDelta.X, mouseDelta.Y );
+			}
 
 			_hoverPosition = e.Location;
 
 			if( _snapToGrid )
 			{
 				_hoverPosition = _camera.ToGlobal( _hoverPosition );
-				//_hoverPosition.X = (int)((_hoverPosition.X + _camera.Position.X) * _camera.Zoom);
-				//_hoverPosition.Y = (int)((_hoverPosition.Y + _camera.Position.Y) * _camera.Zoom);
 				_hoverPosition = _camera.Snap( _gridGap, _hoverPosition );
 				_hoverPosition = _camera.ToLocal( _hoverPosition );
 			}
 
 			Invalidate();
+
+			_previousMousePosition = e.Location;
 		}
 
         protected override bool ProcessCmdKey( ref Message msg, Keys keyData )
@@ -292,6 +316,9 @@ namespace Editor
                 Invalidate();
             }
 
+			if( e.KeyCode == Keys.Space )
+				_spaceDown = true;
+
             // grid manipulation
             if( e.Alt )
             {
@@ -314,6 +341,9 @@ namespace Editor
         protected override void OnKeyUp( KeyEventArgs e )
         {
             base.OnKeyUp( e );
+
+			if( e.KeyCode == Keys.Space )
+				_spaceDown = false;
         }
     }
 }
