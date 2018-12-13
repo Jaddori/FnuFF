@@ -18,6 +18,7 @@ namespace Editor
         public static Color SELECTED_HOVERED = Color.FromArgb( 255, 66, 72 );
         public static Color SELECTED_PRESSED = Color.FromArgb( 96, 25, 27 );
         public static Color GRID = Color.FromArgb( 34, 34, 34 );
-        public static Color GRID_BLUEPRINT = Color.FromArgb( 95, 137, 197 );
+		public static Color GRID_HIGHLIGHT = Color.FromArgb( 60, 60, 60 );
+		public static Color GRID_BLUEPRINT = Color.FromArgb( 95, 137, 197 );
     }
 }

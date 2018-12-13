@@ -18,5 +18,24 @@ namespace Editor
             Y = y;
             Z = z;
         }
+
+        public override bool Equals( object obj )
+        {
+            var result = false;
+
+            if( obj is Triple )
+            {
+                var triple = (Triple)obj;
+
+                result =
+                (
+                    X == triple.X &&
+                    Y == triple.Y &&
+                    Z == triple.Z
+                );
+            }
+
+            return result;
+        }
     }
 }
