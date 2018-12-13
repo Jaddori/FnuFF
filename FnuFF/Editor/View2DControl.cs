@@ -85,7 +85,15 @@ namespace Editor
             Geometry.OnSolidChange += () => Invalidate();
         }
 
-        protected override void OnPaint( PaintEventArgs e )
+		protected override void OnCreateControl()
+		{
+			base.OnCreateControl();
+
+			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
+			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
+		}
+
+		protected override void OnPaint( PaintEventArgs e )
         {
             var g = e.Graphics;
             var rect = new Rectangle( 0, 0, Size.Width, Size.Height );
@@ -141,6 +149,9 @@ namespace Editor
 				g.DrawLine( pen, new Point( _hoverPosition.X - 4, _hoverPosition.Y ), new Point( _hoverPosition.X + 4, _hoverPosition.Y ) );
 				g.DrawLine( pen, new Point( _hoverPosition.X, _hoverPosition.Y - 4 ), new Point( _hoverPosition.X, _hoverPosition.Y + 4 ) );
 			}
+
+			// (DEBUG) paint log
+			Log.Paint( Name, g );
         }
 
         protected override void OnMouseEnter( EventArgs e )
@@ -244,6 +255,8 @@ namespace Editor
 			if( _snapToGrid )
 			{
 				_hoverPosition = _camera.ToGlobal( _hoverPosition );
+				//_hoverPosition.X = (int)((_hoverPosition.X + _camera.Position.X) * _camera.Zoom);
+				//_hoverPosition.Y = (int)((_hoverPosition.Y + _camera.Position.Y) * _camera.Zoom);
 				_hoverPosition = _camera.Snap( _gridGap, _hoverPosition );
 				_hoverPosition = _camera.ToLocal( _hoverPosition );
 			}

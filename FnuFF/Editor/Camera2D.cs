@@ -49,7 +49,11 @@ namespace Editor
 
 		public Point ToLocal( Point point )
 		{
-			return new Point( (int)( ( point.X - _position.X ) / _zoom ), (int)( ( point.Y - _position.Y ) / _zoom ) );
+			return new Point
+			(
+				(int)( point.X / _zoom ) - _position.X,
+				(int)( point.Y / _zoom ) - _position.Y
+			);
 		}
 
 		public Point ToGlobal( Point point )
@@ -86,7 +90,7 @@ namespace Editor
 
 		public float Snap( int gapSize, float value )
 		{
-			var gap = gapSize / _zoom;
+			var gap = gapSize;// / _zoom;
 
 			if( value < 0 )
 				value -= gapSize; // TODO: Change to gap
