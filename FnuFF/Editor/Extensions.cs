@@ -50,20 +50,44 @@ namespace Editor
 			return result;
 		}
 
-		public static void MinMax( ref Point a, ref Point b )
+		public static void MinMax( ref Point min, ref Point max )
 		{
-			if( a.X < b.X )
+			if( min.X > max.X )
 			{
-				int temp = b.X;
-				b.X = a.X;
-				a.X = temp;
+				var temp = max.X;
+				max.X = min.X;
+				min.X = temp;
 			}
 
-			if( a.Y < b.Y )
+			if( min.Y > max.Y )
 			{
-				int temp = b.Y;
-				b.Y = a.Y;
-				a.Y = temp;
+				var temp = max.Y;
+				max.Y = min.Y;
+				min.Y = temp;
+			}
+		}
+
+		public static void MinMax( ref Triple min, ref Triple max )
+		{
+			if( min.X > max.X )
+			{
+				var temp = max.X;
+				max.X = min.X;
+				min.X = temp;
+			}
+
+			if( min.Y > max.Y )
+			{
+				var temp = max.Y;
+				max.Y = min.Y;
+				min.Y = temp;
+			}
+
+			if( min.Z > max.Z )
+			{
+				var temp = max.Z;
+				max.Z = min.Z;
+				min.Z = temp;
 			}
 		}
 	}

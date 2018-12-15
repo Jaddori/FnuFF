@@ -8,11 +8,15 @@ using System.Windows.Forms;
 using System.Windows.Forms.ComponentModel;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Drawing.Drawing2D;
 
 namespace Editor
 {
     public class View2DControl : Control
     {
+		public delegate void GlobalInvalidationHandler();
+		public event GlobalInvalidationHandler OnGlobalInvalidation;
+
         private static Keys[] CMD_KEYS =
         {
             Keys.Left,
@@ -103,6 +107,7 @@ namespace Editor
             _gridGap = 64;
 			
             _solidPen = new Pen( Color.White );
+			_solidPen.DashPattern = new[] { 2.0f, 2.0f };
 
             _snapToGrid = true;
 
@@ -178,9 +183,9 @@ namespace Editor
 				var p3 = _camera.Project( new Triple( 0, 0, gizmoExtent ) );
 			}
 
-			g.DrawLine( EditorColors.PEN_DASH_FADED_RED, origo, xproj );
-			g.DrawLine( EditorColors.PEN_DASH_FADED_GREEN, origo, yproj );
-			g.DrawLine( EditorColors.PEN_DASH_FADED_BLUE, origo, zproj );
+			g.DrawLine( EditorColors.PEN_FADED_RED, origo, xproj );
+			g.DrawLine( EditorColors.PEN_FADED_GREEN, origo, yproj );
+			g.DrawLine( EditorColors.PEN_FADED_BLUE, origo, zproj );
 
             // paint outline of new solid
             if( _lmbDown )
@@ -202,11 +207,16 @@ namespace Editor
 
 				var srect = Extensions.FromMinMax( lmin, lmax );
 
-				var color = solid.Color;
-				if( true )
-				{
-					color = Color.FromArgb( 64, color.R, color.G, color.B );
-				}
+				var color = Color.FromArgb( EditorColors.FADE, solid.Color );
+				if( solid.Selected )
+					color = Color.White;
+				else if(solid.Hovered)
+					color = solid.Color;
+
+				if( solid.Selected || solid.Hovered )
+					_solidPen.DashStyle = DashStyle.Solid;
+				else
+					_solidPen.DashStyle = DashStyle.Dash;
 
 				_solidPen.Color = color;
 				g.DrawRectangle( _solidPen, srect );
@@ -256,6 +266,8 @@ namespace Editor
 					_endPosition = _startPosition;
 					_lmbDown = true;
 					Invalidate();
+
+					OnGlobalInvalidation?.Invoke();
 				}
 			}
         }
@@ -287,8 +299,59 @@ namespace Editor
 					var minTriple = _camera.Unproject( gmin, 0 );
 					var maxTriple = _camera.Unproject( gmax, 64 );
 
+					Extensions.MinMax( ref minTriple, ref maxTriple );
+
 					var solid = new GeometrySolid( minTriple, maxTriple );
 					_level.AddSolid( solid );
+
+					OnGlobalInvalidation?.Invoke();
+				}
+			}
+			else if( EditorTool.Current == EditorTools.Select )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					var hadSelection = false;
+					var minDepth = 99999;
+					GeometrySolid minSolid = null;
+					foreach( var solid in _level.Solids )
+					{
+						if( solid.Selected )
+							hadSelection = true;
+
+						solid.Selected = false;
+
+						var min = _camera.Project( solid.Min );
+						var max = _camera.Project( solid.Max );
+
+						var lmin = _camera.ToLocal( min );
+						var lmax = _camera.ToLocal( max );
+						
+						var depth = (int)Math.Min(_camera.Direction.Dot( solid.Min ), _camera.Direction.Dot(solid.Max));
+						if( depth < minDepth || minSolid == null )
+						{
+							var bounds = Extensions.FromMinMax( lmin, lmax );
+
+							if( bounds.Contains( e.Location ) )
+							{
+								minDepth = depth;
+								minSolid = solid;
+							}
+						}
+					}
+
+					if( minSolid != null )
+					{
+						minSolid.Selected = true;
+
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
+					else if( hadSelection )
+					{
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
 				}
 			}
         }
@@ -320,6 +383,8 @@ namespace Editor
 			{
 				var mouseDelta = new Point( e.X - _previousMousePosition.X, e.Y - _previousMousePosition.Y );
 				_camera.Move( mouseDelta.X, mouseDelta.Y );
+
+				Invalidate();
 			}
 			else
 			{
@@ -347,6 +412,50 @@ namespace Editor
 					}
 
 					Invalidate();
+				}
+				else if( EditorTool.Current == EditorTools.Select )
+				{
+					var hadHover = false;
+					var minDepth = 99999;
+					GeometrySolid minSolid = null;
+					foreach( var solid in _level.Solids )
+					{
+						if( solid.Hovered )
+							hadHover = true;
+
+						solid.Hovered = false;
+
+						var min = _camera.Project( solid.Min );
+						var max = _camera.Project( solid.Max );
+
+						var lmin = _camera.ToLocal( min );
+						var lmax = _camera.ToLocal( max );
+						
+						var depth = (int)Math.Min( _camera.Direction.Dot( solid.Min ), _camera.Direction.Dot( solid.Max ) );
+						if( depth < minDepth || minSolid == null )
+						{
+							var bounds = Extensions.FromMinMax( lmin, lmax );
+
+							if( bounds.Contains( e.Location ) )
+							{
+								minDepth = depth;
+								minSolid = solid;
+							}
+						}
+					}
+
+					if( minSolid != null )
+					{
+						minSolid.Hovered = true;
+
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
+					else if( hadHover )
+					{
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
 				}
 			}
 
@@ -400,7 +509,9 @@ namespace Editor
                 _gridSize = GRID_SIZES[_gridSizeIndex];
 
                 Invalidate();
-            }
+
+				OnGlobalInvalidation?.Invoke();
+			}
         }
 
         protected override void OnKeyUp( KeyEventArgs e )

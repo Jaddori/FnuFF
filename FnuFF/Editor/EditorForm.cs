@@ -37,7 +37,11 @@ namespace Editor
 			view_topRight.Level = _level;
 			view_bottomLeft.Level = _level;
 			view_bottomRight.Level = _level;
-        }
+
+			view_topRight.OnGlobalInvalidation += ViewGlobalInvalidation;
+			view_bottomLeft.OnGlobalInvalidation += ViewGlobalInvalidation;
+			view_bottomRight.OnGlobalInvalidation += ViewGlobalInvalidation;
+		}
 
         private void toolbarButton_Click( object sender, EventArgs e )
         {
@@ -55,6 +59,13 @@ namespace Editor
 		private void newToolStripMenuItem_Click( object sender, EventArgs e )
 		{
 			_level.Reset();
+		}
+
+		private void ViewGlobalInvalidation()
+		{
+			view_topRight.Invalidate();
+			view_bottomLeft.Invalidate();
+			view_bottomRight.Invalidate();
 		}
 
 		private void loadToolStripMenuItem_Click( object sender, EventArgs e )

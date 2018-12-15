@@ -16,6 +16,8 @@ namespace Editor
         private Triple _min;
         private Triple _max;
 		private Color _color;
+		private bool _hovered;
+		private bool _selected;
 
         public Triple Min { get { return _min; } set { _min = value; } }
         public Triple Max { get { return _max; } set { _max = value; } }
@@ -23,10 +25,18 @@ namespace Editor
 		[XmlIgnore]
 		public Color Color { get { return _color; } set { _color = value; } }
 
+		[XmlIgnore]
+		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
+		
+		[XmlIgnore]
+		public bool Selected { get { return _selected; } set { _selected = value; } }
+
 		public GeometrySolid()
 		{
 			_min = new Triple();
 			_max = new Triple();
+
+			_hovered = _selected = false;
 
 			GenerateColor();
 		}
@@ -35,6 +45,8 @@ namespace Editor
         {
             _min = min;
             _max = max;
+
+			_hovered = _selected = false;
 
 			GenerateColor();
         }

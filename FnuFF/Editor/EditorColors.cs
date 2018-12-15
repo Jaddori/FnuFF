@@ -32,6 +32,10 @@ namespace Editor
 		public static Pen PEN_GREEN = new Pen( Color.Green );
 		public static Pen PEN_YELLOW = new Pen( Color.Yellow );
 
+		public static Pen PEN_FADED_RED = new Pen( Color.FromArgb( 128, Color.Red ) );
+		public static Pen PEN_FADED_GREEN = new Pen( Color.FromArgb( 128, Color.Green ) );
+		public static Pen PEN_FADED_BLUE = new Pen( Color.FromArgb( 128, Color.Blue ) );
+
 		public static Pen PEN_DASH_RED = new Pen( Color.Red ) { DashPattern = new[] { 2.0f, 2.0f } };
 		public static Pen PEN_DASH_GREEN = new Pen( Color.Green ) { DashPattern = new[] { 2.0f, 2.0f } };
 		public static Pen PEN_DASH_BLUE = new Pen( Color.Blue ) { DashPattern = new[] { 2.0f, 2.0f } };
@@ -39,5 +43,9 @@ namespace Editor
 		public static Pen PEN_DASH_FADED_RED = new Pen( Color.FromArgb( 128, Color.Red ) ) { DashPattern = new[] { 2.0f, 2.0f } };
 		public static Pen PEN_DASH_FADED_GREEN = new Pen( Color.FromArgb( 128, Color.Green ) ) { DashPattern = new[] { 2.0f, 2.0f } };
 		public static Pen PEN_DASH_FADED_BLUE = new Pen( Color.FromArgb( 128, Color.Blue ) ) { DashPattern = new[] { 2.0f, 2.0f } };
+
+		// values
+		public static int FADE = 64;
+		public static float[] DASH_PATTERN = { 2.0f, 2.0f };
 	}
 }
