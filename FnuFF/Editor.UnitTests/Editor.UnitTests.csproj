@@ -53,6 +53,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CameraTests.cs" />
+    <Compile Include="CommandStackTestCommand.cs" />
+    <Compile Include="CommandStackTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
