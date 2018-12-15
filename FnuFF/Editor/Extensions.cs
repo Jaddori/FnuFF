@@ -38,6 +38,11 @@ namespace Editor
 			return result;
 		}
 
+		public static Rectangle FromPoint( Point center, int size )
+		{
+			return new Rectangle( center.X - size / 2, center.Y - size / 2, size, size );
+		}
+
 		public static Point Min( Point a, Point b )
 		{
 			var result = new Point( Math.Min( a.X, b.X ), Math.Min( a.Y, b.Y ) );

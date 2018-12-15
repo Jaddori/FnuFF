@@ -23,6 +23,8 @@ namespace Editor
 		public static Color GRID_BLUEPRINT = Color.FromArgb( 95, 137, 197 );
 
 		// brushes
+		public static Brush BRUSH_WHITE = Brushes.White;
+		public static Brush BRUSH_HANDLE = Brushes.White;
 
 		// pens
 		public static Pen PEN_WHITE = new Pen( Color.White );
@@ -43,6 +45,8 @@ namespace Editor
 		public static Pen PEN_DASH_FADED_RED = new Pen( Color.FromArgb( 128, Color.Red ) ) { DashPattern = new[] { 2.0f, 2.0f } };
 		public static Pen PEN_DASH_FADED_GREEN = new Pen( Color.FromArgb( 128, Color.Green ) ) { DashPattern = new[] { 2.0f, 2.0f } };
 		public static Pen PEN_DASH_FADED_BLUE = new Pen( Color.FromArgb( 128, Color.Blue ) ) { DashPattern = new[] { 2.0f, 2.0f } };
+
+		public static Pen PEN_HANDLE_OUTLINE = Pens.Black;
 
 		// values
 		public static int FADE = 64;

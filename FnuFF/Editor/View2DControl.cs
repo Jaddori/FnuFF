@@ -47,6 +47,7 @@ namespace Editor
         private Point _endPosition;
         private bool _snapToGrid;
         private bool _lmbDown;
+		private bool _mmbDown;
 		private bool _spaceDown;
         private int _directionType;
 		private Point _hoverPosition;
@@ -220,6 +221,50 @@ namespace Editor
 
 				_solidPen.Color = color;
 				g.DrawRectangle( _solidPen, srect );
+
+				if( solid.Selected )
+				{
+					var topleft = new Point( srect.Left, srect.Top );
+					var topright = new Point( srect.Right, srect.Top );
+					var bottomleft = new Point( srect.Left, srect.Bottom );
+					var bottomright = new Point( srect.Right, srect.Bottom );
+					var midleft = new Point( srect.Left, srect.Top + srect.Height / 2 );
+					var midright = new Point( srect.Right, srect.Top + srect.Height / 2 );
+					var midtop = new Point( srect.Left + srect.Width / 2, srect.Top );
+					var midbottom = new Point( srect.Left + srect.Width / 2, srect.Bottom );
+
+					var r = Extensions.FromPoint( topleft, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+
+					r = Extensions.FromPoint( topright, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+
+					r = Extensions.FromPoint( bottomleft, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+
+					r = Extensions.FromPoint( bottomright, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+
+					r = Extensions.FromPoint( midleft, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+
+					r = Extensions.FromPoint( midright, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+
+					r = Extensions.FromPoint( midtop, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+
+					r = Extensions.FromPoint( midbottom, 8 );
+					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
+					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+				}
 			}
 
 			if( !DesignMode )
@@ -252,6 +297,9 @@ namespace Editor
         {
             base.OnMouseDown( e );
 
+			if( e.Button == MouseButtons.Middle )
+				_mmbDown = true;
+
 			if( EditorTool.Current == EditorTools.Solid )
 			{
 				if( e.Button == MouseButtons.Left )
@@ -275,6 +323,9 @@ namespace Editor
         protected override void OnMouseUp( MouseEventArgs e )
         {
             base.OnMouseUp( e );
+
+			if( e.Button == MouseButtons.Middle )
+				_mmbDown = false;
 
 			if( EditorTool.Current == EditorTools.Solid )
 			{
@@ -379,10 +430,10 @@ namespace Editor
 			if( e.Location == _previousMousePosition )
 				return;
 
-			if( _spaceDown )
+			if( _spaceDown || _mmbDown )
 			{
 				var mouseDelta = new Point( e.X - _previousMousePosition.X, e.Y - _previousMousePosition.Y );
-				_camera.Move( mouseDelta.X, mouseDelta.Y );
+				_camera.Move( -mouseDelta.X, -mouseDelta.Y );
 
 				Invalidate();
 			}
