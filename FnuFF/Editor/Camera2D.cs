@@ -98,18 +98,19 @@ namespace Editor
 		{
 			var gap = gapSize;// / _zoom;
 
-			if( value < 0 )
-				value -= gapSize; // TODO: Change to gap
+			//if( value < 0 )
+				//value -= gapSize; // TODO: Change to gap
 
-			return (int)( (int)( value / gap ) * gap );
+			//return (int)( (int)( value / gap ) * gap );
+			return (int)( Math.Round( (float)value / gap ) * gap );
 		}
 
 		public float Snap( int gapSize, float value )
 		{
 			var gap = gapSize;// / _zoom;
 
-			if( value < 0 )
-				value -= gapSize; // TODO: Change to gap
+			//if( value < 0 )
+				//value -= gapSize; // TODO: Change to gap
 
 			return (int)( value / gap ) * gap;
 		}

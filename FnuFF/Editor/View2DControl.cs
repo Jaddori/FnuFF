@@ -242,49 +242,55 @@ namespace Editor
         {
             base.OnMouseDown( e );
 
-            if( e.Button == MouseButtons.Left )
-            {
-                _startPosition = e.Location;
+			if( EditorTool.Current == EditorTools.Solid )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					_startPosition = e.Location;
 
-                if( _snapToGrid )
-                {
-					_startPosition = SnapToGrid( _startPosition );
+					if( _snapToGrid )
+					{
+						_startPosition = SnapToGrid( _startPosition );
+					}
+
+					_endPosition = _startPosition;
+					_lmbDown = true;
+					Invalidate();
 				}
-
-                _endPosition = _startPosition;
-                _lmbDown = true;
-                Invalidate();
-            }
+			}
         }
 
         protected override void OnMouseUp( MouseEventArgs e )
         {
             base.OnMouseUp( e );
 
-            if( e.Button == MouseButtons.Left )
-            {
-                _endPosition = e.Location;
-
-				if( _snapToGrid )
+			if( EditorTool.Current == EditorTools.Solid )
+			{
+				if( e.Button == MouseButtons.Left )
 				{
-					_endPosition = SnapToGrid( _endPosition );
+					_endPosition = e.Location;
+
+					if( _snapToGrid )
+					{
+						_endPosition = SnapToGrid( _endPosition );
+					}
+
+					_lmbDown = false;
+					Invalidate();
+
+					var min = new Point( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
+					var max = new Point( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
+
+					var gmin = _camera.ToGlobal( min );
+					var gmax = _camera.ToGlobal( max );
+
+					var minTriple = _camera.Unproject( gmin, 0 );
+					var maxTriple = _camera.Unproject( gmax, 64 );
+
+					var solid = new GeometrySolid( minTriple, maxTriple );
+					_level.AddSolid( solid );
 				}
-
-                _lmbDown = false;
-                Invalidate();
-
-                var min = new Point( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
-                var max = new Point( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
-
-				var gmin = _camera.ToGlobal( min );
-				var gmax = _camera.ToGlobal( max );
-
-				var minTriple = _camera.Unproject( gmin, 0 );
-				var maxTriple = _camera.Unproject( gmax, 64 );
-
-                var solid = new GeometrySolid( minTriple, maxTriple );
-                _level.AddSolid( solid );
-            }
+			}
         }
 
         protected override void OnMouseWheel( MouseEventArgs e )
@@ -310,33 +316,39 @@ namespace Editor
 			if( e.Location == _previousMousePosition )
 				return;
 
-			if( _lmbDown )
-			{
-				_endPosition = e.Location;
-
-				if( _snapToGrid )
-				{
-					_endPosition = SnapToGrid( _endPosition );
-				}
-
-				Invalidate();
-			}
-			else if( _spaceDown )
+			if( _spaceDown )
 			{
 				var mouseDelta = new Point( e.X - _previousMousePosition.X, e.Y - _previousMousePosition.Y );
 				_camera.Move( mouseDelta.X, mouseDelta.Y );
 			}
-
-			_hoverPosition = e.Location;
-
-			if( _snapToGrid )
+			else
 			{
-				_hoverPosition = _camera.ToGlobal( _hoverPosition );
-				_hoverPosition = _camera.Snap( _gridGap, _hoverPosition );
-				_hoverPosition = _camera.ToLocal( _hoverPosition );
-			}
+				if( EditorTool.Current == EditorTools.Solid )
+				{
+					if( _lmbDown )
+					{
+						_endPosition = e.Location;
 
-			Invalidate();
+						if( _snapToGrid )
+						{
+							_endPosition = SnapToGrid( _endPosition );
+						}
+
+						Invalidate();
+					}
+
+					_hoverPosition = e.Location;
+
+					if( _snapToGrid )
+					{
+						_hoverPosition = _camera.ToGlobal( _hoverPosition );
+						_hoverPosition = _camera.Snap( _gridGap, _hoverPosition );
+						_hoverPosition = _camera.ToLocal( _hoverPosition );
+					}
+
+					Invalidate();
+				}
+			}
 
 			_previousMousePosition = e.Location;
 		}
