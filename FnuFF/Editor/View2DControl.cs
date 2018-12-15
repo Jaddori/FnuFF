@@ -49,6 +49,9 @@ namespace Editor
 
 		private Point _previousMousePosition;
 
+		private Level _level;
+		private Level.ChangeHandler _invalidateAction;
+
         public int Direction
         {
             get { return _directionType; }
@@ -69,6 +72,23 @@ namespace Editor
             }
         }
 
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public Level Level
+		{
+			get { return _level; }
+			set
+			{
+				if( _level != null )
+					_level.OnSolidChange -= _invalidateAction;
+
+				_level = value;
+				_level.OnSolidChange += _invalidateAction;
+
+				Invalidate();
+			}
+		}
+
         public View2DControl()
         {
             DoubleBuffered = true;
@@ -81,12 +101,12 @@ namespace Editor
             _gridSizeIndex = 2;
             _gridSize = GRID_SIZES[_gridSizeIndex];
             _gridGap = 64;
-
+			
             _solidPen = new Pen( Color.White );
 
             _snapToGrid = true;
 
-            Geometry.OnSolidChange += () => Invalidate();
+			_invalidateAction = new Level.ChangeHandler( () => Invalidate() );
         }
 
 		private Point SnapToGrid( Point point )
@@ -102,6 +122,8 @@ namespace Editor
 		{
 			base.OnCreateControl();
 
+			_camera.Position = new Point( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.75f) );
+
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
 		}
@@ -113,6 +135,9 @@ namespace Editor
 
             // paint background
             g.FillRectangle( _backgroundBrush, rect );
+
+			if( DesignMode )
+				return;
 
 			// paint grid
 			for( int x = -GRID_MAX_LINES; x <= GRID_MAX_LINES; x++ )
@@ -139,11 +164,6 @@ namespace Editor
 					g.DrawLine( _gridPen, g1, g2 );
 			}
 
-			// paint origo
-			//var origoExtent = _gridGap * 3;
-			//g.DrawLine( _gridHighlightPen, _camera.ToLocal(new Point(0, -origoExtent)), _camera.ToLocal(new Point(0, origoExtent)) );
-			//g.DrawLine( _gridHighlightPen, _camera.ToLocal(new Point(-origoExtent, 0)), _camera.ToLocal(new Point(origoExtent, 0)) );
-
 			// paint axis gizmo
 			var gizmoExtent = _gridGap * 3;
 			var origo = _camera.ToLocal( _camera.Project( new Triple(0,0,0) ) );
@@ -158,9 +178,9 @@ namespace Editor
 				var p3 = _camera.Project( new Triple( 0, 0, gizmoExtent ) );
 			}
 
-			g.DrawLine( EditorColors.PEN_RED, origo, xproj );
-			g.DrawLine( EditorColors.PEN_GREEN, origo, yproj );
-			g.DrawLine( EditorColors.PEN_BLUE, origo, zproj );
+			g.DrawLine( EditorColors.PEN_DASH_FADED_RED, origo, xproj );
+			g.DrawLine( EditorColors.PEN_DASH_FADED_GREEN, origo, yproj );
+			g.DrawLine( EditorColors.PEN_DASH_FADED_BLUE, origo, zproj );
 
             // paint outline of new solid
             if( _lmbDown )
@@ -168,15 +188,12 @@ namespace Editor
                 var minPoint = new Point( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
                 var maxPoint = new Point( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
                 var solidRect = new Rectangle( minPoint, new Size( maxPoint.X - minPoint.X, maxPoint.Y - minPoint.Y ) );
-                g.DrawRectangle( _solidPen, solidRect );
+                g.DrawRectangle( EditorColors.PEN_WHITE, solidRect );
             }
 
-            // paint solids
-            foreach( var solid in Geometry.Solids )
-            {
-				//var gmin = _camera.ToLocal(_camera.Project( solid.Min ));
-				//var gmax = _camera.ToLocal(_camera.Project( solid.Max ));
-
+			// paint solids
+			foreach( var solid in _level.Solids )
+			{
 				var minproj = _camera.Project( solid.Min );
 				var maxproj = _camera.Project( solid.Max );
 
@@ -185,18 +202,28 @@ namespace Editor
 
 				var srect = Extensions.FromMinMax( lmin, lmax );
 
-				g.DrawRectangle( _solidPen, srect );
-            }
+				var color = solid.Color;
+				if( true )
+				{
+					color = Color.FromArgb( 64, color.R, color.G, color.B );
+				}
 
-			// (DEBUG) paint hover position
-			using( var pen = new Pen( Color.Blue ) )
-			{
-				g.DrawLine( pen, new Point( _hoverPosition.X - 4, _hoverPosition.Y ), new Point( _hoverPosition.X + 4, _hoverPosition.Y ) );
-				g.DrawLine( pen, new Point( _hoverPosition.X, _hoverPosition.Y - 4 ), new Point( _hoverPosition.X, _hoverPosition.Y + 4 ) );
+				_solidPen.Color = color;
+				g.DrawRectangle( _solidPen, srect );
 			}
 
-			// (DEBUG) paint log
-			Log.Paint( Name, g );
+			if( !DesignMode )
+			{
+				// (DEBUG) paint hover position
+				using( var pen = new Pen( Color.Blue ) )
+				{
+					g.DrawLine( pen, new Point( _hoverPosition.X - 4, _hoverPosition.Y ), new Point( _hoverPosition.X + 4, _hoverPosition.Y ) );
+					g.DrawLine( pen, new Point( _hoverPosition.X, _hoverPosition.Y - 4 ), new Point( _hoverPosition.X, _hoverPosition.Y + 4 ) );
+				}
+
+				// (DEBUG) paint log
+				Log.Paint( Name, g );
+			}
         }
 
         protected override void OnMouseEnter( EventArgs e )
@@ -249,9 +276,6 @@ namespace Editor
                 var min = new Point( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
                 var max = new Point( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
 
-				//var minTriple = _camera.Unproject( _camera.ToGlobal( min ), -32 );
-				//var maxTriple = _camera.Unproject( _camera.ToGlobal( max ), 32 );
-
 				var gmin = _camera.ToGlobal( min );
 				var gmax = _camera.ToGlobal( max );
 
@@ -259,7 +283,7 @@ namespace Editor
 				var maxTriple = _camera.Unproject( gmax, 64 );
 
                 var solid = new GeometrySolid( minTriple, maxTriple );
-                Geometry.AddSolid( solid );
+                _level.AddSolid( solid );
             }
         }
 

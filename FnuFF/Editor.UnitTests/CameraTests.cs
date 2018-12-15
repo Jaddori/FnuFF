@@ -233,21 +233,6 @@ namespace Editor.UnitTests
 		{
 			_sut.Direction = new Triple( 1, 0, 0 );
 
-			/*var min = new Point( 0, -10 );
-			var max = new Point( 10, 0 );
-
-			var gmin = _sut.Unproject( min, 0 );
-			var gmax = _sut.Unproject( max, 10 );
-
-			Assert.AreEqual( new Triple( 0, 10, 0 ), gmin );
-			Assert.AreEqual( new Triple( 10, 0, 10 ), gmax );
-
-			var lmin = _sut.Project( gmin );
-			var lmax = _sut.Project( gmax );
-
-			Assert.AreEqual( new Point( 0, -10 ), lmin );
-			Assert.AreEqual( new Point( 10, 0 ), lmax );*/
-
 			var min = new Point( 0, 0 );
 			var max = new Point( 10, 10 );
 

@@ -25,9 +25,19 @@ namespace Editor
 		// brushes
 
 		// pens
+		public static Pen PEN_WHITE = new Pen( Color.White );
+		public static Pen PEN_BLACK = new Pen( Color.Black );
 		public static Pen PEN_RED = new Pen( Color.Red );
 		public static Pen PEN_BLUE = new Pen( Color.Blue );
 		public static Pen PEN_GREEN = new Pen( Color.Green );
 		public static Pen PEN_YELLOW = new Pen( Color.Yellow );
-    }
+
+		public static Pen PEN_DASH_RED = new Pen( Color.Red ) { DashPattern = new[] { 2.0f, 2.0f } };
+		public static Pen PEN_DASH_GREEN = new Pen( Color.Green ) { DashPattern = new[] { 2.0f, 2.0f } };
+		public static Pen PEN_DASH_BLUE = new Pen( Color.Blue ) { DashPattern = new[] { 2.0f, 2.0f } };
+
+		public static Pen PEN_DASH_FADED_RED = new Pen( Color.FromArgb( 128, Color.Red ) ) { DashPattern = new[] { 2.0f, 2.0f } };
+		public static Pen PEN_DASH_FADED_GREEN = new Pen( Color.FromArgb( 128, Color.Green ) ) { DashPattern = new[] { 2.0f, 2.0f } };
+		public static Pen PEN_DASH_FADED_BLUE = new Pen( Color.FromArgb( 128, Color.Blue ) ) { DashPattern = new[] { 2.0f, 2.0f } };
+	}
 }

@@ -75,9 +75,10 @@
     <Compile Include="FlatButtonControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Geometry.cs" />
     <Compile Include="GeometrySolid.cs" />
+    <Compile Include="Level.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Triple.cs" />
     <Compile Include="View3DControl.cs">
       <SubType>Component</SubType>
