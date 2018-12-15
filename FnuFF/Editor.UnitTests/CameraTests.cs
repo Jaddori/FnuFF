@@ -129,7 +129,7 @@ namespace Editor.UnitTests
 
             var result = _sut.Project( point );
 
-            Assert.AreEqual( new Point( 3, 2 ), result );
+            Assert.AreEqual( new Point( 3, -2 ), result );
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace Editor.UnitTests
 
             var result = _sut.Project( point );
 
-            Assert.AreEqual( new Point( 1, 3 ), result );
+            Assert.AreEqual( new Point( 1, -3 ), result );
         }
 
         [TestMethod]
@@ -151,10 +151,162 @@ namespace Editor.UnitTests
 
             var result = _sut.Project( point );
 
-            Assert.AreEqual( new Point( 1, 2 ), result );
+            Assert.AreEqual( new Point( 1, -2 ), result );
         }
 
-        [TestMethod]
+		[TestMethod]
+		public void Project_AxisX_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 1, 0, 0 );
+			var x = new Triple( 1, 0, 0 );
+			var y = new Triple( 0, 1, 0 );
+			var z = new Triple( 0, 0, 1 );
+
+			var rx = _sut.Project( x );
+			var ry = _sut.Project( y );
+			var rz = _sut.Project( z );
+
+			Assert.AreEqual( new Point( 0, 0 ), rx );
+			Assert.AreEqual( new Point( 0, -1 ), ry );
+			Assert.AreEqual( new Point( 1, 0 ), rz );
+		}
+
+		[TestMethod]
+		public void Project_AxisY_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 0, 1, 0 );
+			var x = new Triple( 1, 0, 0 );
+			var y = new Triple( 0, 1, 0 );
+			var z = new Triple( 0, 0, 1 );
+
+			var rx = _sut.Project( x );
+			var ry = _sut.Project( y );
+			var rz = _sut.Project( z );
+
+			Assert.AreEqual( new Point( 1, 0 ), rx );
+			Assert.AreEqual( new Point( 0, 0 ), ry );
+			Assert.AreEqual( new Point( 0, -1 ), rz );
+		}
+
+		[TestMethod]
+		public void Project_AxisZ_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 0, 0, 1 );
+			var x = new Triple( 1, 0, 0 );
+			var y = new Triple( 0, 1, 0 );
+			var z = new Triple( 0, 0, 1 );
+
+			var rx = _sut.Project( x );
+			var ry = _sut.Project( y );
+			var rz = _sut.Project( z );
+
+			Assert.AreEqual( new Point( 1, 0 ), rx );
+			Assert.AreEqual( new Point( 0, -1 ), ry );
+			Assert.AreEqual( new Point( 0, 0 ), rz );
+		}
+
+		[TestMethod]
+		public void Project_Box01_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 0, 1, 0 );
+
+			var min = new Triple( 64, -32, 64 );
+			var max = new Triple( 128, 32, 128 );
+
+			var rmin = _sut.Project( min );
+			var rmax = _sut.Project( max );
+
+			Assert.AreEqual( new Point( 64, -64 ), rmin );
+			Assert.AreEqual( new Point( 128, -128 ), rmax );
+
+			_sut.Position = new Point( 0, -128 );
+
+			var lmin = _sut.ToLocal( rmin );
+			var lmax = _sut.ToLocal( rmax );
+
+			Assert.AreEqual( new Point( 64, 64 ), lmin );
+			Assert.AreEqual( new Point( 128, 0 ), lmax );
+		}
+
+		[TestMethod]
+		public void UnprojectProject_DirectionX_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 1, 0, 0 );
+
+			/*var min = new Point( 0, -10 );
+			var max = new Point( 10, 0 );
+
+			var gmin = _sut.Unproject( min, 0 );
+			var gmax = _sut.Unproject( max, 10 );
+
+			Assert.AreEqual( new Triple( 0, 10, 0 ), gmin );
+			Assert.AreEqual( new Triple( 10, 0, 10 ), gmax );
+
+			var lmin = _sut.Project( gmin );
+			var lmax = _sut.Project( gmax );
+
+			Assert.AreEqual( new Point( 0, -10 ), lmin );
+			Assert.AreEqual( new Point( 10, 0 ), lmax );*/
+
+			var min = new Point( 0, 0 );
+			var max = new Point( 10, 10 );
+
+			var gmin = _sut.Unproject( min, 0 );
+			var gmax = _sut.Unproject( max, 10 );
+
+			Assert.AreEqual( new Triple( 0, 0, 0 ), gmin );
+			Assert.AreEqual( new Triple( 10, -10, 10 ), gmax );
+
+			var lmin = _sut.Project( gmin );
+			var lmax = _sut.Project( gmax );
+
+			Assert.AreEqual( new Point( 0, 0 ), lmin );
+			Assert.AreEqual( new Point( 10, 10 ), lmax );
+		}
+
+		[TestMethod]
+		public void UnprojectProject_DirectionY_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 0, 1, 0 );
+
+			var min = new Point( 0, 0 );
+			var max = new Point( 10, 10 );
+
+			var gmin = _sut.Unproject( min, 0 );
+			var gmax = _sut.Unproject( max, 10 );
+
+			Assert.AreEqual( new Triple( 0, 0, 0 ), gmin );
+			Assert.AreEqual( new Triple( 10, 10, -10 ), gmax );
+
+			var lmin = _sut.Project( gmin );
+			var lmax = _sut.Project( gmax );
+
+			Assert.AreEqual( new Point( 0, 0 ), lmin );
+			Assert.AreEqual( new Point( 10, 10 ), lmax );
+		}
+
+		[TestMethod]
+		public void UnprojectProject_DirectionZ_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 0, 0, 1 );
+
+			var min = new Point( 0, 0 );
+			var max = new Point( 10, 10 );
+
+			var gmin = _sut.Unproject( min, 0 );
+			var gmax = _sut.Unproject( max, 10 );
+
+			Assert.AreEqual( new Triple( 0, 0, 0 ), gmin );
+			Assert.AreEqual( new Triple( 10, -10, 10 ), gmax );
+
+			var lmin = _sut.Project( gmin );
+			var lmax = _sut.Project( gmax );
+
+			Assert.AreEqual( new Point( 0, 0 ), lmin );
+			Assert.AreEqual( new Point( 10, 10 ), lmax );
+		}
+
+		[TestMethod]
         public void Unproject_DirectionX_ReturnsCorrect()
         {
             _sut.Direction = new Triple( 1, 0, 0 );
@@ -162,7 +314,7 @@ namespace Editor.UnitTests
 
             var result = _sut.Unproject( point );
 
-            Assert.AreEqual( new Triple( 0, 2, 1 ), result );
+            Assert.AreEqual( new Triple( 0, -2, 1 ), result );
         }
 
         [TestMethod]
@@ -173,7 +325,7 @@ namespace Editor.UnitTests
 
             var result = _sut.Unproject( point );
 
-            Assert.AreEqual( new Triple( 1, 0, 2 ), result );
+            Assert.AreEqual( new Triple( 1, 0, -2 ), result );
 		}
 
         [TestMethod]
@@ -184,7 +336,7 @@ namespace Editor.UnitTests
 
             var result = _sut.Unproject( point );
 
-            Assert.AreEqual( new Triple( 1, 2, 0 ), result );
+            Assert.AreEqual( new Triple( 1, -2, 0 ), result );
         }
 
 		[TestMethod]
@@ -195,7 +347,7 @@ namespace Editor.UnitTests
 
 			var result = _sut.Unproject( point, 3 );
 
-			Assert.AreEqual( new Triple( 1, 2, 3 ), result );
+			Assert.AreEqual( new Triple( 1, -2, 3 ), result );
 		}
 
 		[TestMethod]
@@ -209,13 +361,13 @@ namespace Editor.UnitTests
 			var r2 = _sut.Unproject( p2, 32 );
 
 			Assert.AreEqual( new Triple( 0, -32, 0 ), r1 );
-			Assert.AreEqual( new Triple( 128, 32, 128 ), r2 );
+			Assert.AreEqual( new Triple( 128, 32, -128 ), r2 );
 
 			var p3 = _sut.Project( r1 );
 			var p4 = _sut.Project( r2 );
 
-			Assert.AreEqual( p1, p3 );
-			Assert.AreEqual( p2, p4 );
+			Assert.AreEqual( Point.Empty, p3 );
+			Assert.AreEqual( new Point(128,128), p4 );
 		}
 
 		[TestMethod]
@@ -228,14 +380,72 @@ namespace Editor.UnitTests
 			var r1 = _sut.Unproject( p1, -32 );
 			var r2 = _sut.Unproject( p2, 32 );
 
-			Assert.AreEqual( new Triple( 64, -32, 64 ), r1 );
-			Assert.AreEqual( new Triple( 128, 32, 128 ), r2 );
+			Assert.AreEqual( new Triple( 64, -32, -64 ), r1 );
+			Assert.AreEqual( new Triple( 128, 32, -128 ), r2 );
 
 			var p3 = _sut.Project( r1 );
 			var p4 = _sut.Project( r2 );
 
-			Assert.AreEqual( p1, p3 );
-			Assert.AreEqual( p2, p4 );
+			Assert.AreEqual( new Point(64,64), p3 );
+			Assert.AreEqual( new Point(128,128), p4 );
+		}
+
+		[TestMethod]
+		public void Unproject_AxisX_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 1, 0, 0 );
+
+			var x = new Point( 1, 0 );
+			var y = new Point( 0, 1 );
+
+			var rx = _sut.Unproject( x );
+			var ry = _sut.Unproject( y );
+
+			Assert.AreEqual( new Triple( 0, 0, 1 ), rx );
+			Assert.AreEqual( new Triple( 0, -1, 0 ), ry );
+		}
+
+		[TestMethod]
+		public void Unproject_AxisY_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 0, 1, 0 );
+
+			var x = new Point( 1, 0 );
+			var y = new Point( 0, 1 );
+
+			var rx = _sut.Unproject( x );
+			var ry = _sut.Unproject( y );
+
+			Assert.AreEqual( new Triple( 1, 0, 0 ), rx );
+			Assert.AreEqual( new Triple( 0, 0, -1 ), ry );
+		}
+
+		[TestMethod]
+		public void Unproject_AxisZ_ReturnsCorrect()
+		{
+			_sut.Direction = new Triple( 0, 0, 1 );
+
+			var x = new Point( 1, 0 );
+			var y = new Point( 0, 1 );
+
+			var rx = _sut.Unproject( x );
+			var ry = _sut.Unproject( y );
+
+			Assert.AreEqual( new Triple( 1, 0, 0 ), rx );
+			Assert.AreEqual( new Triple( 0, -1, 0 ), ry );
+		}
+
+		[TestMethod]
+		public void ProjectUnproject_Consistent()
+		{
+			_sut.Direction = new Triple( 0, 0, 1 );
+
+			var p1 = new Triple( 1, 0, 0 );
+
+			var r1 = _sut.Project( p1 );
+			var r2 = _sut.Unproject( r1 );
+
+			Assert.AreEqual( p1, r2 );
 		}
 
 		[TestMethod]

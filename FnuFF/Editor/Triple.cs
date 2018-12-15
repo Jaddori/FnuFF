@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Editor
 {
-    public struct Triple
+	[DebuggerDisplay( "X = {X}, Y = {Y}, Z = {Z}" )]
+	public struct Triple
     {
-        public float X { get; set; }
+		public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
 

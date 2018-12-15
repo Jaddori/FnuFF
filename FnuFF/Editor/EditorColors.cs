@@ -9,6 +9,7 @@ namespace Editor
 {
     public static class EditorColors
     {
+		// colors
         public static Color BACKGROUND_HIGH = Color.FromArgb( 45, 45, 48 );
         public static Color BACKGROUND_LOW = Color.FromArgb( 28, 28, 28 );
         public static Color BACKGROUND_LOW_BLUEPRINT = Color.FromArgb( 43, 113, 183 );
@@ -20,5 +21,13 @@ namespace Editor
         public static Color GRID = Color.FromArgb( 34, 34, 34 );
 		public static Color GRID_HIGHLIGHT = Color.FromArgb( 60, 60, 60 );
 		public static Color GRID_BLUEPRINT = Color.FromArgb( 95, 137, 197 );
+
+		// brushes
+
+		// pens
+		public static Pen PEN_RED = new Pen( Color.Red );
+		public static Pen PEN_BLUE = new Pen( Color.Blue );
+		public static Pen PEN_GREEN = new Pen( Color.Green );
+		public static Pen PEN_YELLOW = new Pen( Color.Yellow );
     }
 }

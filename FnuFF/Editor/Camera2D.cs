@@ -63,19 +63,35 @@ namespace Editor
 
 		public Point Project( Triple point )
 		{
-			var xproj = ( point.Z / ( point.X == 0 ? 1.0f : point.X ) ) * _direction.X + ( 1 - _direction.X );
-			var yproj = ( point.Z / ( point.Y == 0 ? 1.0f : point.Y ) ) * _direction.Y + ( 1 - _direction.Y );
+			var bx = _direction.Y * point.X;
+			var az = _direction.X * point.Z;
+			var cx = _direction.Z * point.X;
 
-			return new Point( (int)( xproj * point.X ), (int)( yproj * point.Y ) );
+			var ay = _direction.X * point.Y;
+			var bz = _direction.Y * point.Z;
+			var cy = _direction.Z * point.Y;
+
+			var x = bx + az + cx;
+			var y = -(ay + bz + cy);
+
+			return new Point( (int)x, (int)y );
 		}
 
 		public Triple Unproject( Point point, int depth = 0 )
 		{
-			var xproj = point.X - _direction.X * point.X + _direction.X * depth;
-			var yproj = point.Y - _direction.Y * point.Y + _direction.Y * depth;
-			var zproj = _direction.X * point.X + _direction.Y * point.Y + _direction.Z * depth;
+			var bx = _direction.Y * point.X;
+			var cx = _direction.Z * point.X;
+			var ad = _direction.X * depth;
 
-			return new Triple( xproj, yproj, zproj );
+			var ay = _direction.X * point.Y;
+			var cy = _direction.Z * point.Y;
+			var bd = _direction.Y * depth;
+
+			var ax = _direction.X * point.X;
+			var by = _direction.Y * point.Y;
+			var cd = _direction.Z * depth;
+
+			return new Triple( bx + cx + ad, bd - ay - cy, ax - by + cd );
 		}
 
 		public int Snap( int gapSize, int value )
