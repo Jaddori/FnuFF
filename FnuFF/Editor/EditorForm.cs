@@ -34,6 +34,7 @@ namespace Editor
             _toolbarButtons.Add( btn_select );
             _toolbarButtons.Add( btn_solid );
 
+			view_3d.Level = _level;
 			view_topRight.Level = _level;
 			view_bottomLeft.Level = _level;
 			view_bottomRight.Level = _level;
@@ -63,6 +64,7 @@ namespace Editor
 
 		private void ViewGlobalInvalidation()
 		{
+			view_3d.Invalidate();
 			view_topRight.Invalidate();
 			view_bottomLeft.Invalidate();
 			view_bottomRight.Invalidate();

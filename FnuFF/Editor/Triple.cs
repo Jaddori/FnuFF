@@ -21,9 +21,37 @@ namespace Editor
 			Z = z;
 		}
 
+		public static Triple operator +( Triple a, Triple b )
+		{
+			return new Triple( a.X + b.X, a.Y + b.Y, a.Z + b.Z );
+		}
+
+		public static Triple operator -( Triple a, Triple b )
+		{
+			return new Triple( a.X - b.X, a.Y - b.Y, a.Z - b.Z );
+		}
+
 		public float Dot( Triple t )
 		{
 			return ( X * t.X + Y * t.Y + Z * t.Z );
+		}
+
+		public Triple Cross( Triple t )
+		{
+			return new Triple
+			(
+				Y*t.Z - Z*t.Y,
+				Z*t.X - X*t.Z,
+				X*t.Y - Y*t.X
+			);
+		}
+
+		public void Normalize()
+		{
+			var magnitude = (float)Math.Sqrt( X * X + Y * Y + Z * Z );
+			X /= magnitude;
+			Y /= magnitude;
+			Z /= magnitude;
 		}
 
         public override bool Equals( object obj )

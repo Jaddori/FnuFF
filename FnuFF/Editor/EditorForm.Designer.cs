@@ -40,14 +40,14 @@
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnl_left = new System.Windows.Forms.Panel();
+			this.btn_solid = new Editor.FlatButtonControl();
+			this.btn_select = new Editor.FlatButtonControl();
 			this.pnl_right = new System.Windows.Forms.Panel();
 			this.ws_viewports = new Editor.WorkspaceControl();
 			this.view_bottomLeft = new Editor.View2DControl();
 			this.view_bottomRight = new Editor.View2DControl();
-			this.view3DControl1 = new Editor.View3DControl();
+			this.view_3d = new Editor.View3DControl();
 			this.view_topRight = new Editor.View2DControl();
-			this.btn_solid = new Editor.FlatButtonControl();
-			this.btn_select = new Editor.FlatButtonControl();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.status_editor.SuspendLayout();
@@ -160,6 +160,34 @@
 			this.pnl_left.Size = new System.Drawing.Size(58, 702);
 			this.pnl_left.TabIndex = 3;
 			// 
+			// btn_solid
+			// 
+			this.btn_solid.Hovered = false;
+			this.btn_solid.Image = global::Editor.Properties.Resources.icon_solid;
+			this.btn_solid.Location = new System.Drawing.Point(0, 44);
+			this.btn_solid.Name = "btn_solid";
+			this.btn_solid.Pressed = false;
+			this.btn_solid.Selected = false;
+			this.btn_solid.Size = new System.Drawing.Size(58, 32);
+			this.btn_solid.TabIndex = 2;
+			this.btn_solid.Tag = "";
+			this.btn_solid.UseVisualStyleBackColor = true;
+			this.btn_solid.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
+			// btn_select
+			// 
+			this.btn_select.Hovered = false;
+			this.btn_select.Image = global::Editor.Properties.Resources.icon_select;
+			this.btn_select.Location = new System.Drawing.Point(0, 12);
+			this.btn_select.Name = "btn_select";
+			this.btn_select.Pressed = false;
+			this.btn_select.Selected = true;
+			this.btn_select.Size = new System.Drawing.Size(58, 32);
+			this.btn_select.TabIndex = 1;
+			this.btn_select.Tag = "";
+			this.btn_select.UseVisualStyleBackColor = true;
+			this.btn_select.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
 			// pnl_right
 			// 
 			this.pnl_right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
@@ -194,7 +222,7 @@
 			// 
 			// ws_viewports.Top Left
 			// 
-			this.ws_viewports.PanelTopLeft.Controls.Add(this.view3DControl1);
+			this.ws_viewports.PanelTopLeft.Controls.Add(this.view_3d);
 			this.ws_viewports.PanelTopLeft.Location = new System.Drawing.Point(1, 1);
 			this.ws_viewports.PanelTopLeft.Name = "Top Left";
 			this.ws_viewports.PanelTopLeft.Size = new System.Drawing.Size(488, 349);
@@ -231,15 +259,15 @@
 			this.view_bottomRight.Size = new System.Drawing.Size(488, 349);
 			this.view_bottomRight.TabIndex = 0;
 			// 
-			// view3DControl1
+			// view_3d
 			// 
-			this.view3DControl1.BackColor = System.Drawing.Color.Black;
-			this.view3DControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.view3DControl1.Location = new System.Drawing.Point(0, 0);
-			this.view3DControl1.Name = "view3DControl1";
-			this.view3DControl1.Size = new System.Drawing.Size(488, 349);
-			this.view3DControl1.TabIndex = 0;
-			this.view3DControl1.Text = "view3DControl1";
+			this.view_3d.BackColor = System.Drawing.Color.Black;
+			this.view_3d.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.view_3d.Location = new System.Drawing.Point(0, 0);
+			this.view_3d.Name = "view_3d";
+			this.view_3d.Size = new System.Drawing.Size(488, 349);
+			this.view_3d.TabIndex = 0;
+			this.view_3d.Text = "view3DControl1";
 			// 
 			// view_topRight
 			// 
@@ -250,34 +278,6 @@
 			this.view_topRight.Name = "view_topRight";
 			this.view_topRight.Size = new System.Drawing.Size(488, 349);
 			this.view_topRight.TabIndex = 0;
-			// 
-			// btn_solid
-			// 
-			this.btn_solid.Hovered = false;
-			this.btn_solid.Image = global::Editor.Properties.Resources.icon_solid;
-			this.btn_solid.Location = new System.Drawing.Point(0, 44);
-			this.btn_solid.Name = "btn_solid";
-			this.btn_solid.Pressed = false;
-			this.btn_solid.Selected = false;
-			this.btn_solid.Size = new System.Drawing.Size(58, 32);
-			this.btn_solid.TabIndex = 2;
-			this.btn_solid.Tag = "";
-			this.btn_solid.UseVisualStyleBackColor = true;
-			this.btn_solid.Click += new System.EventHandler(this.toolbarButton_Click);
-			// 
-			// btn_select
-			// 
-			this.btn_select.Hovered = false;
-			this.btn_select.Image = global::Editor.Properties.Resources.icon_select;
-			this.btn_select.Location = new System.Drawing.Point(0, 12);
-			this.btn_select.Name = "btn_select";
-			this.btn_select.Pressed = false;
-			this.btn_select.Selected = true;
-			this.btn_select.Size = new System.Drawing.Size(58, 32);
-			this.btn_select.TabIndex = 1;
-			this.btn_select.Tag = "";
-			this.btn_select.UseVisualStyleBackColor = true;
-			this.btn_select.Click += new System.EventHandler(this.toolbarButton_Click);
 			// 
 			// openFileDialog
 			// 
@@ -327,7 +327,7 @@
         private View2DControl view_topRight;
         private View2DControl view_bottomLeft;
         private View2DControl view_bottomRight;
-        private View3DControl view3DControl1;
+        private View3DControl view_3d;
 		private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;

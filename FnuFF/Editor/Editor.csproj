@@ -37,6 +37,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -76,8 +77,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GeometrySolid.cs" />
+    <Compile Include="GL\GL.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="Plane.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Triple.cs" />
     <Compile Include="UndoRedo\CommandNewLevel.cs" />

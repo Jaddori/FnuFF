@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -55,7 +56,10 @@
     <Compile Include="CameraTests.cs" />
     <Compile Include="CommandStackTestCommand.cs" />
     <Compile Include="CommandStackTests.cs" />
+    <Compile Include="GeometrySolidTests.cs" />
+    <Compile Include="PlaneTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TripleTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Editor\Editor.csproj">
