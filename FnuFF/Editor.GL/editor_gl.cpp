@@ -52,7 +52,7 @@ EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
 			glLoadIdentity();
 
 			glDisable( GL_CULL_FACE );
-			glDisable( GL_DEPTH_TEST );
+			glEnable( GL_DEPTH_TEST );
 		}
 		else
 		{

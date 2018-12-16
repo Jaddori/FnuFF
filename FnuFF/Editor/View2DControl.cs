@@ -31,15 +31,16 @@ namespace Editor
         };
 
 		//private static float[] GRID_SIZES = new float[]{ 0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 8.0f, 10.0f, 15.0f, 20.0f };
-		private static float[] GRID_SIZES = new float[] { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 10.0f };
+		private static int[] GRID_SIZES = new int[] { 1, 2, 3, 4, 5, 10 };
 		private const int GRID_MAX_LINES = 100;
+		private const int GRID_GAP_BASE = 64;
 
         private Camera2D _camera;
 
         private Brush _backgroundBrush;
         private Pen _gridPen;
 		private Pen _gridHighlightPen;
-        private float _gridSize;
+        private int _gridSize;
         private int _gridGap;
         private int _gridSizeIndex;
 
@@ -213,6 +214,12 @@ namespace Editor
 				maxproj.X *= _gridGap;
 				maxproj.Y *= _gridGap;
 
+				minproj.X /= _gridSize;
+				minproj.Y /= _gridSize;
+
+				maxproj.X /= _gridSize;
+				maxproj.Y /= _gridSize;
+
 				var lmin = _camera.ToLocal( minproj );
 				var lmax = _camera.ToLocal( maxproj );
 
@@ -360,7 +367,7 @@ namespace Editor
 						var gmax = _camera.ToGlobal( max );
 
 						var minTriple = _camera.Unproject( gmin, 0 );
-						var maxTriple = _camera.Unproject( gmax, 64 );
+						var maxTriple = _camera.Unproject( gmax, _gridGap );
 
 						Extensions.MinMax( ref minTriple, ref maxTriple );
 
@@ -399,6 +406,12 @@ namespace Editor
 
 						max.X *= _gridGap;
 						max.Y *= _gridGap;
+
+						min.X /= _gridSize;
+						min.Y /= _gridSize;
+
+						max.X /= _gridSize;
+						max.Y /= _gridSize;
 
 						var lmin = _camera.ToLocal( min );
 						var lmax = _camera.ToLocal( max );
@@ -514,6 +527,12 @@ namespace Editor
 						max.X *= _gridGap;
 						max.Y *= _gridGap;
 
+						min.X /= _gridSize;
+						min.Y /= _gridSize;
+
+						max.X /= _gridSize;
+						max.Y /= _gridSize;
+
 						var lmin = _camera.ToLocal( min );
 						var lmax = _camera.ToLocal( max );
 						
@@ -596,6 +615,7 @@ namespace Editor
                     _gridSizeIndex = GRID_SIZES.Length-1;
 
                 _gridSize = GRID_SIZES[_gridSizeIndex];
+				_gridGap = (int)(GRID_GAP_BASE * _gridSize);
 
                 Invalidate();
 
