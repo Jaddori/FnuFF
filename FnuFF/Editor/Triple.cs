@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace Editor
 {
@@ -52,6 +53,22 @@ namespace Editor
 			X /= magnitude;
 			Y /= magnitude;
 			Z /= magnitude;
+		}
+
+		public Point Project( Triple t )
+		{
+			var bx = t.Y * X;
+			var az = t.X * Z;
+			var cx = t.Z * X;
+
+			var ay = t.X * Y;
+			var bz = t.Y * Z;
+			var cy = t.Z * Y;
+
+			var x = bx + az + cx;
+			var y = ay + bz + cy;
+
+			return new Point( (int)x, (int)y );
 		}
 
         public override bool Equals( object obj )

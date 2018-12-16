@@ -277,7 +277,8 @@ namespace Editor
 				}
 
 				// (DEBUG) paint log
-				Log.Paint( Name, g );
+				//Log.Paint( Name, g );
+				Log.Paint( "view_3d", g );
 			}
         }
 
@@ -469,10 +470,14 @@ namespace Editor
 					var hadHover = false;
 					var minDepth = 99999;
 					GeometrySolid minSolid = null;
+					GeometrySolid prevHover = null;
 					foreach( var solid in _level.Solids )
 					{
 						if( solid.Hovered )
+						{
 							hadHover = true;
+							prevHover = solid;
+						}
 
 						solid.Hovered = false;
 
@@ -499,8 +504,11 @@ namespace Editor
 					{
 						minSolid.Hovered = true;
 
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
+						if( minSolid != prevHover )
+						{
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
+						}
 					}
 					else if( hadHover )
 					{

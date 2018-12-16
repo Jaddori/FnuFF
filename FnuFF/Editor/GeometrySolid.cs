@@ -181,7 +181,7 @@ namespace Editor
 						_indices.AddRange( new[] { v0, v1, v2 } );
 					}*/
 
-					var innerIndices = new List<int>();
+					/*var innerIndices = new List<int>();
 					innerIndices.Add( pointsOnPlane[0] );
 					for( int i = 0; i < pointsOnPlane.Count; i++ )
 					{
@@ -237,6 +237,84 @@ namespace Editor
 						var vi2 = innerIndices[i + 1];
 
 						_indices.AddRange( new[] { vi0, vi1, vi2 } );
+					}*/
+
+					var projectedPoints = new List<Point>();
+					for(int i=0; i<pointsOnPlane.Count; i++)
+					{
+						var projectedPoint = _points[pointsOnPlane[i]].Project( plane.Normal );
+						projectedPoints.Add( projectedPoint );
+					}
+
+					var startIndex = 0;
+					var bottomLeft = projectedPoints[startIndex];
+					for( int i = 1; i < projectedPoints.Count; i++ )
+					{
+						var point = projectedPoints[i];
+						if( Math.Abs( point.X - bottomLeft.X ) < 0.001f )
+						{
+							if( point.Y < bottomLeft.Y )
+							{
+								bottomLeft = point;
+								startIndex = i;
+							}
+						}
+						else if( point.X < bottomLeft.X )
+						{
+							bottomLeft = point;
+							startIndex = i;
+						}
+					}
+
+					var index = startIndex;
+					var innerIndices = new List<int>();
+					innerIndices.Add( index );
+
+					for( int i = 0; i < projectedPoints.Count-1; i++ )
+					{
+						//if( i != index )
+						{
+							var outerPoint = projectedPoints[index];
+
+							var nextIndex = i;
+							var smallestAngle = 9999.0f;
+							for( int j = 0; j < projectedPoints.Count; j++ )
+							{
+								if( j != index )
+								{
+									var innerPoint = projectedPoints[j];
+
+									//var angle = (float)Math.Atan2( outerPoint.Y, outerPoint.X ) - (float)Math.Atan2( innerPoint.Y, innerPoint.X );
+									var angle = (float)Math.Atan2( innerPoint.Y-outerPoint.Y, innerPoint.X- outerPoint.X );
+
+									if( angle < 0 )
+										angle += (float)(Math.PI * 2);
+
+									if( angle < smallestAngle )
+									{
+										nextIndex = j;
+										smallestAngle = angle;
+									}
+								}
+							}
+
+							//innerIndices.Add( pointsOnPlane[nextIndex] );
+							innerIndices.Add( nextIndex );
+							index = nextIndex;
+						}
+					}
+
+					var vi0 = innerIndices[0];
+					for( int i = 1; i < innerIndices.Count - 1; i++ )
+					{
+						var vi1 = innerIndices[i];
+						var vi2 = innerIndices[i + 1];
+
+						var ai0 = pointsOnPlane[vi0];
+						var ai1 = pointsOnPlane[vi1];
+						var ai2 = pointsOnPlane[vi2];
+
+						_indices.AddRange( new[] { ai0, ai1, ai2 } );
 					}
 				}
 			}
@@ -245,6 +323,11 @@ namespace Editor
 		public void Paint3D()
 		{
 			GL.Begin();
+
+			float r = _color.R / 255.0f;
+			float g = _color.G / 255.0f;
+			float b = _color.B / 255.0f;
+			float a = 1.0f;
 
 			for( int i = 0; i < _indices.Count; i += 3 )
 			{
@@ -256,8 +339,13 @@ namespace Editor
 				var v2 = _points[i2];
 				var v3 = _points[i3];
 
+				GL.Color4f( r, g, b, a );
 				GL.Vertex3f( v1.X, v1.Y, v1.Z );
+
+				GL.Color4f( r, g, b, a );
 				GL.Vertex3f( v2.X, v2.Y, v2.Z );
+
+				GL.Color4f( r, g, b, a );
 				GL.Vertex3f( v3.X, v3.Y, v3.Z );
 			}
 

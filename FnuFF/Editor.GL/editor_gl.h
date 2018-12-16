@@ -16,4 +16,6 @@ EXPORT void swapBuffers( HWND windowHandle );
 
 EXPORT void begin();
 EXPORT void end();
+EXPORT void vertex2f( float u, float v );
 EXPORT void vertex3f( float x, float y, float z );
+EXPORT void color4f( float r, float g, float b, float a );

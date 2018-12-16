@@ -33,7 +33,13 @@ namespace Editor
 		private extern static void end();
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void vertex2f( float u, float v );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void vertex3f( float x, float y, float z );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void color4f( float r, float g, float b, float a );
 
 		private static IntPtr _context;
 		
@@ -68,9 +74,19 @@ namespace Editor
 			end();
 		}
 
+		public static void Vertex2f( float u, float v )
+		{
+			vertex2f( u, v );
+		}
+
 		public static void Vertex3f( float x, float y, float z )
 		{
 			vertex3f( x, y, z );
+		}
+
+		public static void Color4f( float r, float g, float b, float a )
+		{
+			color4f( r, g, b, a );
 		}
 	}
 }

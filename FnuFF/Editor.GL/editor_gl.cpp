@@ -28,6 +28,7 @@ EXPORT void setPixelFormat( HWND windowHandle )
 	int pixelFormat = ChoosePixelFormat( deviceHandle, &pfd );
 
 	SetPixelFormat( deviceHandle, pixelFormat, &pfd );
+	ReleaseDC( windowHandle, deviceHandle );
 }
 
 EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
@@ -69,6 +70,8 @@ EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
 		MessageBoxA( NULL, str, "GL - Create context Error", MB_OK );
 	}
 
+	ReleaseDC( windowHandle, deviceHandle );
+
 	return context;
 }
 
@@ -81,7 +84,7 @@ EXPORT void destroyContext( HGLRC context )
 EXPORT void clearColor( float r, float g, float b, float a )
 {
 	glClearColor( r, g, b, a );
-	glClear( GL_COLOR_BUFFER_BIT );// | GL_DEPTH_BUFFER_BIT );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 EXPORT void swapBuffers( HWND windowHandle )
@@ -96,6 +99,8 @@ EXPORT void swapBuffers( HWND windowHandle )
 		_snprintf( str, 128, "Error code: %d", error );
 		MessageBoxA( NULL, str, "GL - Swap buffers Error", MB_OK );
 	}
+
+	ReleaseDC( windowHandle, deviceHandle );
 }
 
 EXPORT void begin()
@@ -108,7 +113,17 @@ EXPORT void end()
 	glEnd();
 }
 
+EXPORT void vertex2f( float u, float v )
+{
+	glVertex2f( u, v );
+}
+
 EXPORT void vertex3f( float x, float y, float z )
 {
 	glVertex3f( x, y, z );
+}
+
+EXPORT void color4f( float r, float g, float b, float a )
+{
+	glColor4f( r, g, b, a );
 }
