@@ -30,7 +30,8 @@ namespace Editor
             Keys.Alt
         };
 
-        private static float[] GRID_SIZES = new float[]{ 0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 8.0f, 10.0f, 15.0f, 20.0f };
+		//private static float[] GRID_SIZES = new float[]{ 0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 8.0f, 10.0f, 15.0f, 20.0f };
+		private static float[] GRID_SIZES = new float[] { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 10.0f };
 		private const int GRID_MAX_LINES = 100;
 
         private Camera2D _camera;
@@ -103,7 +104,7 @@ namespace Editor
             _backgroundBrush = new SolidBrush( EditorColors.BACKGROUND_LOW );
             _gridPen = new Pen( EditorColors.GRID );
 			_gridHighlightPen = new Pen( EditorColors.GRID_HIGHLIGHT );
-            _gridSizeIndex = 2;
+            _gridSizeIndex = 0;
             _gridSize = GRID_SIZES[_gridSizeIndex];
             _gridGap = 64;
 			
@@ -128,10 +129,13 @@ namespace Editor
 		{
 			base.OnCreateControl();
 
-			_camera.Position = new Point( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.75f) );
+			if(_directionType == 1 )
+				_camera.Position = new Point( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.75f) );
 
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
+			Log.AddFunctor( Name, () => "Grid size: " + _gridSize.ToString() );
+			Log.AddFunctor( Name, () => "Grid gap: " + _gridGap.ToString() );
 		}
 
 		protected override void OnPaint( PaintEventArgs e )
@@ -202,6 +206,12 @@ namespace Editor
 			{
 				var minproj = _camera.Project( solid.Min );
 				var maxproj = _camera.Project( solid.Max );
+
+				minproj.X *= _gridGap;
+				minproj.Y *= _gridGap;
+
+				maxproj.X *= _gridGap;
+				maxproj.Y *= _gridGap;
 
 				var lmin = _camera.ToLocal( minproj );
 				var lmax = _camera.ToLocal( maxproj );
@@ -277,8 +287,7 @@ namespace Editor
 				}
 
 				// (DEBUG) paint log
-				//Log.Paint( Name, g );
-				Log.Paint( "view_3d", g );
+				Log.Paint( Name, g );
 			}
         }
 
@@ -345,18 +354,27 @@ namespace Editor
 					var min = new Point( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
 					var max = new Point( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
 
-					var gmin = _camera.ToGlobal( min );
-					var gmax = _camera.ToGlobal( max );
+					if( max.X - min.X > Extensions.EPSILON && max.Y - min.Y > Extensions.EPSILON )
+					{
+						var gmin = _camera.ToGlobal( min );
+						var gmax = _camera.ToGlobal( max );
 
-					var minTriple = _camera.Unproject( gmin, 0 );
-					var maxTriple = _camera.Unproject( gmax, 64 );
+						var minTriple = _camera.Unproject( gmin, 0 );
+						var maxTriple = _camera.Unproject( gmax, 64 );
 
-					Extensions.MinMax( ref minTriple, ref maxTriple );
+						Extensions.MinMax( ref minTriple, ref maxTriple );
 
-					var solid = new GeometrySolid( minTriple, maxTriple );
-					_level.AddSolid( solid );
+						minTriple /= _gridGap;
+						minTriple *= _gridSize;
 
-					OnGlobalInvalidation?.Invoke();
+						maxTriple /= _gridGap;
+						maxTriple *= _gridSize;
+
+						var solid = new GeometrySolid( minTriple, maxTriple );
+						_level.AddSolid( solid );
+
+						OnGlobalInvalidation?.Invoke();
+					}
 				}
 			}
 			else if( EditorTool.Current == EditorTools.Select )
@@ -375,6 +393,12 @@ namespace Editor
 
 						var min = _camera.Project( solid.Min );
 						var max = _camera.Project( solid.Max );
+
+						min.X *= _gridGap;
+						min.Y *= _gridGap;
+
+						max.X *= _gridGap;
+						max.Y *= _gridGap;
 
 						var lmin = _camera.ToLocal( min );
 						var lmax = _camera.ToLocal( max );
@@ -483,6 +507,12 @@ namespace Editor
 
 						var min = _camera.Project( solid.Min );
 						var max = _camera.Project( solid.Max );
+
+						min.X *= _gridGap;
+						min.Y *= _gridGap;
+
+						max.X *= _gridGap;
+						max.Y *= _gridGap;
 
 						var lmin = _camera.ToLocal( min );
 						var lmax = _camera.ToLocal( max );

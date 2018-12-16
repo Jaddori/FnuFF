@@ -53,7 +53,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="CameraTests.cs" />
+    <Compile Include="Camera2DTests.cs" />
     <Compile Include="CommandStackTestCommand.cs" />
     <Compile Include="CommandStackTests.cs" />
     <Compile Include="GeometrySolidTests.cs" />

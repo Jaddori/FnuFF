@@ -71,8 +71,8 @@ namespace Editor
 			var bz = _direction.Y * point.Z;
 			var cy = _direction.Z * point.Y;
 
-			var x = bx + az + cx;
-			var y = -(ay + bz + cy);
+			var x = az + bx + cx;
+			var y = bz - ay - cy;
 
 			return new Point( (int)x, (int)y );
 		}
@@ -90,8 +90,12 @@ namespace Editor
 			var ax = _direction.X * point.X;
 			var by = _direction.Y * point.Y;
 			var cd = _direction.Z * depth;
-
-			return new Triple( bx + cx + ad, bd - ay - cy, ax - by + cd );
+			
+			var x = ad + bx + cx;
+			var y = -ay + bd - cy;
+			var z = ax + by + cd;
+			
+			return new Triple( x, y, z );
 		}
 
 		public int Snap( int gapSize, int value )
