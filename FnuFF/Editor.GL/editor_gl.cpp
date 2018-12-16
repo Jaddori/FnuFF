@@ -51,7 +51,7 @@ EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
 			glMatrixMode( GL_MODELVIEW );
 			glLoadIdentity();
 
-			glDisable( GL_CULL_FACE );
+			glEnable( GL_CULL_FACE );
 			glEnable( GL_DEPTH_TEST );
 		}
 		else

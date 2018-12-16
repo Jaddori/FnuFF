@@ -144,7 +144,6 @@ namespace Editor
 
 								if( allBehind )
 								{
-									//_indices.AddRange( new[] { i, j, k } );
 									var newPlane = true;
 									for( int a = 0; a < planes.Count && newPlane; a++ )
 									{
@@ -172,73 +171,6 @@ namespace Editor
 
 				if( pointsOnPlane.Count > 0 )
 				{
-					/*var v0 = pointsOnPlane[0];
-					for( int i = 1; i < pointsOnPlane.Count-1; i++ )
-					{
-						var v1 = pointsOnPlane[i];
-						var v2 = pointsOnPlane[i + 1];
-
-						_indices.AddRange( new[] { v0, v1, v2 } );
-					}*/
-
-					/*var innerIndices = new List<int>();
-					innerIndices.Add( pointsOnPlane[0] );
-					for( int i = 0; i < pointsOnPlane.Count; i++ )
-					{
-						var i0 = pointsOnPlane[i];
-						var v0 = _points[i0];
-
-						var added = false;
-						for( int j = 0; j < pointsOnPlane.Count && !added; j++ )
-						{
-							if( i != j )
-							{
-								var i1 = pointsOnPlane[j];
-								var v1 = _points[i1];
-
-								var v1v0 = v0 - v1;
-								v1v0.Normalize();
-
-								var innerNormal = v1v0.Cross( plane.Normal );
-								innerNormal.Normalize();
-
-								var distanceAlongNormal = v0.Dot( innerNormal );
-
-								var allBehind = true;
-								for( int k = 0; k < pointsOnPlane.Count && allBehind; k++ )
-								{
-									if( i != k && j != k )
-									{
-										var innerPlane = new Plane( innerNormal, distanceAlongNormal );
-
-										var index = pointsOnPlane[k];
-										var point = _points[index];
-										if( innerPlane.InFront( point ) )
-											allBehind = false;
-									}
-								}
-
-								if( allBehind )
-								{
-									if( !innerIndices.Contains( i1 ) )
-									{
-										innerIndices.Add( i1 );
-										added = true;
-									}
-								}
-							}
-						}
-					}
-
-					var vi0 = innerIndices[0];
-					for( int i = 1; i < innerIndices.Count - 1; i++ )
-					{
-						var vi1 = innerIndices[i];
-						var vi2 = innerIndices[i + 1];
-
-						_indices.AddRange( new[] { vi0, vi1, vi2 } );
-					}*/
-
 					var projectedPoints = new List<Point>();
 					for(int i=0; i<pointsOnPlane.Count; i++)
 					{
@@ -272,38 +204,33 @@ namespace Editor
 
 					for( int i = 0; i < projectedPoints.Count-1; i++ )
 					{
-						//if( i != index )
+						var outerPoint = projectedPoints[index];
+
+						var nextIndex = i;
+						var smallestAngle = 9999.0f;
+						for( int j = 0; j < projectedPoints.Count; j++ )
 						{
-							var outerPoint = projectedPoints[index];
-
-							var nextIndex = i;
-							var smallestAngle = 9999.0f;
-							for( int j = 0; j < projectedPoints.Count; j++ )
+							if( j != index )
 							{
-								if( j != index )
+								var innerPoint = projectedPoints[j];
+
+								var angle = (float)Math.Atan2( innerPoint.Y-outerPoint.Y, innerPoint.X- outerPoint.X );
+
+								if( angle < 0 )
+									angle += (float)(Math.PI * 2);
+
+								if( angle < smallestAngle )
 								{
-									var innerPoint = projectedPoints[j];
-
-									//var angle = (float)Math.Atan2( outerPoint.Y, outerPoint.X ) - (float)Math.Atan2( innerPoint.Y, innerPoint.X );
-									var angle = (float)Math.Atan2( innerPoint.Y-outerPoint.Y, innerPoint.X- outerPoint.X );
-
-									if( angle < 0 )
-										angle += (float)(Math.PI * 2);
-
-									if( angle < smallestAngle )
-									{
-										nextIndex = j;
-										smallestAngle = angle;
-									}
+									nextIndex = j;
+									smallestAngle = angle;
 								}
 							}
-
-							//innerIndices.Add( pointsOnPlane[nextIndex] );
-							innerIndices.Add( nextIndex );
-							index = nextIndex;
 						}
+							
+						innerIndices.Add( nextIndex );
+						index = nextIndex;
 					}
-
+					
 					var vi0 = innerIndices[0];
 					for( int i = 1; i < innerIndices.Count - 1; i++ )
 					{
@@ -313,6 +240,25 @@ namespace Editor
 						var ai0 = pointsOnPlane[vi0];
 						var ai1 = pointsOnPlane[vi1];
 						var ai2 = pointsOnPlane[vi2];
+
+						var v0 = _points[ai0];
+						var v1 = _points[ai1];
+						var v2 = _points[ai2];
+
+						var v2v0 = v0 - v2;
+						var v1v0 = v0 - v1;
+
+						var normal = v2v0.Cross( v1v0 );
+						normal.Normalize();
+
+						var flip = ( normal.Dot( plane.Normal ) < 0 );
+
+						if( flip )
+						{
+							var temp = ai2;
+							ai2 = ai1;
+							ai1 = temp;
+						}
 
 						_indices.AddRange( new[] { ai0, ai1, ai2 } );
 					}
