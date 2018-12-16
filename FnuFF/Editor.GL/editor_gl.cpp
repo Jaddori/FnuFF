@@ -103,7 +103,12 @@ EXPORT void swapBuffers( HWND windowHandle )
 	ReleaseDC( windowHandle, deviceHandle );
 }
 
-EXPORT void begin()
+EXPORT void beginLines()
+{
+	glBegin( GL_LINES );
+}
+
+EXPORT void beginTriangles()
 {
 	glBegin( GL_TRIANGLES );
 }
@@ -126,4 +131,12 @@ EXPORT void vertex3f( float x, float y, float z )
 EXPORT void color4f( float r, float g, float b, float a )
 {
 	glColor4f( r, g, b, a );
+}
+
+EXPORT void viewMatrix( float px, float py, float pz, float dx, float dy, float dz )
+{
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
+
+	gluLookAt( px, py, pz, px+dx, py+dy, pz+dz, 0, 1, 0 );
 }

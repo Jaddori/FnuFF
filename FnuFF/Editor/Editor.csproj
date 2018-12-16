@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera2D.cs" />
+    <Compile Include="Camera3D.cs" />
     <Compile Include="EditorColors.cs" />
     <Compile Include="EditorForm.cs">
       <SubType>Form</SubType>

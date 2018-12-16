@@ -9,6 +9,8 @@ namespace Editor
 {
 	public static class Extensions
 	{
+		public const float EPSILON = 0.001f;
+
 		public static Rectangle FromMinMax( Point min, Point max )
 		{
 			var result = new Rectangle();

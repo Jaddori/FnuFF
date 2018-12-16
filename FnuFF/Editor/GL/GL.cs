@@ -27,7 +27,10 @@ namespace Editor
 		private extern static void swapBuffers( IntPtr windowHandle );
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
-		private extern static void begin();
+		private extern static void beginLines();
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void beginTriangles();
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void end();
@@ -40,6 +43,9 @@ namespace Editor
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void color4f( float r, float g, float b, float a );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void viewMatrix( float px, float py, float pz, float dx, float dy, float dz );
 
 		private static IntPtr _context;
 		
@@ -64,9 +70,14 @@ namespace Editor
 			swapBuffers( windowHandle );
 		}
 
-		public static void Begin()
+		public static void BeginLines()
 		{
-			begin();
+			beginLines();
+		}
+
+		public static void BeginTriangles()
+		{
+			beginTriangles();
 		}
 
 		public static void End()
@@ -87,6 +98,11 @@ namespace Editor
 		public static void Color4f( float r, float g, float b, float a )
 		{
 			color4f( r, g, b, a );
+		}
+
+		public static void ViewMatrix( Triple position, Triple direction )
+		{
+			viewMatrix( position.X, position.Y, position.Z, direction.X, direction.Y, direction.Z );
 		}
 	}
 }

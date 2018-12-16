@@ -322,7 +322,7 @@ namespace Editor
 
 		public void Paint3D()
 		{
-			GL.Begin();
+			GL.BeginTriangles();
 
 			float r = _color.R / 255.0f;
 			float g = _color.G / 255.0f;

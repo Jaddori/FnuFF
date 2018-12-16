@@ -145,7 +145,7 @@ void Camera::setDirection( const glm::vec3& d )
 
 	float acva = glm::acos( verticalAngle );
 
-	if( acva < EPSILON || acva > EPSILON )
+	if( acva < -EPSILON || acva > EPSILON )
 		horizontalAngle = glm::acos( d.z / glm::cos( verticalAngle ) );
 	else
 		horizontalAngle = glm::acos( 0.0f );

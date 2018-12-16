@@ -32,6 +32,26 @@ namespace Editor
 			return new Triple( a.X - b.X, a.Y - b.Y, a.Z - b.Z );
 		}
 
+		public static Triple operator *( Triple a, Triple b )
+		{
+			return new Triple( a.X * b.X, a.Y * b.Y, a.Z * b.Z );
+		}
+
+		public static Triple operator *( Triple a, float b )
+		{
+			return new Triple( a.X * b, a.Y * b, a.Z * b );
+		}
+
+		public static Triple operator /( Triple a, Triple b )
+		{
+			return new Triple( a.X / b.X, a.Y / b.Y, a.Z / b.Z );
+		}
+
+		public static Triple operator /( Triple a, float b )
+		{
+			return new Triple( a.X / b, a.Y / b, a.Z / b );
+		}
+
 		public float Dot( Triple t )
 		{
 			return ( X * t.X + Y * t.Y + Z * t.Z );
