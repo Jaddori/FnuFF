@@ -462,37 +462,49 @@ namespace Editor
 
 					var newBounds = bounds;
 
-					if( _handleIndex % 3 == 0 )
+					if( _handleIndex == 4 ) // center move tool
 					{
-						var right = newBounds.Right;
-						if( snapPosition.X < right )
+						var halfWidth = newBounds.Width / 2;
+						var halfHeight = newBounds.Height / 2;
+
+						snapPosition = SnapToGrid( new Point( e.Location.X - halfWidth, e.Location.Y - halfHeight ) );
+						newBounds = new Rectangle( snapPosition.X, snapPosition.Y, newBounds.Width, newBounds.Height );
+					}
+					else
+					{
+						if( _handleIndex % 3 == 0 ) // left column
 						{
-							newBounds.X = snapPosition.X;
-							newBounds.Width = right - newBounds.X;
+							var right = newBounds.Right;
+							if( snapPosition.X < right )
+							{
+								newBounds.X = snapPosition.X;
+								newBounds.Width = right - newBounds.X;
+							}
+						}
+						else if( ( _handleIndex + 1 ) % 3 == 0 ) // right column
+						{
+							if( snapPosition.X > newBounds.X )
+								newBounds.Width = snapPosition.X - newBounds.X;
+						}
+
+						if( _handleIndex / 3 == 0 ) // top row
+						{
+							var bottom = newBounds.Bottom;
+							if( snapPosition.Y < bottom )
+							{
+								newBounds.Y = snapPosition.Y;
+								newBounds.Height = bottom - newBounds.Y;
+							}
+						}
+						else if( _handleIndex / 3 == 2 ) // bottom row
+						{
+							if( snapPosition.Y > newBounds.Y )
+								newBounds.Height = snapPosition.Y - newBounds.Y;
 						}
 					}
-					else if( ( _handleIndex + 1 ) % 3 == 0 )
-					{
-						if( snapPosition.X > newBounds.X )
-							newBounds.Width = snapPosition.X - newBounds.X;
-					}
 
-					if( _handleIndex / 3 == 0 )
-					{
-						var bottom = newBounds.Bottom;
-						if( snapPosition.Y < bottom )
-						{
-							newBounds.Y = snapPosition.Y;
-							newBounds.Height = bottom - newBounds.Y;
-						}
-					}
-					else if( _handleIndex / 3 == 2 )
-					{
-						if(snapPosition.Y > newBounds.Y)
-							newBounds.Height = snapPosition.Y - newBounds.Y;
-					}
-
-					_selectedSolid.Unproject( _camera, newBounds, _gridGap, _gridSize );
+					if(!newBounds.Equals(bounds))
+						_selectedSolid.Unproject( _camera, newBounds, _gridGap, _gridSize );
 
 					Invalidate();
 				}

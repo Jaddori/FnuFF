@@ -343,6 +343,9 @@ namespace Editor
 
 			_min = minTriple;
 			_max = maxTriple;
+
+			_points.Clear();
+			GeneratePoints();
 		}
     }
 }
