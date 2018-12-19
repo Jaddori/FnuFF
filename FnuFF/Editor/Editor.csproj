@@ -85,7 +85,10 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Triple.cs" />
     <Compile Include="UndoRedo\CommandNewLevel.cs" />
+    <Compile Include="UndoRedo\CommandSolidChanged.cs" />
+    <Compile Include="UndoRedo\CommandSolidCreated.cs" />
     <Compile Include="UndoRedo\CommandStack.cs" />
+    <Compile Include="UndoRedo\Delta.cs" />
     <Compile Include="UndoRedo\ICommand.cs" />
     <Compile Include="View3DControl.cs">
       <SubType>Component</SubType>

@@ -91,6 +91,20 @@ namespace Editor
 			return new Point( (int)x, (int)y );
 		}
 
+		public void Inflate( float value )
+		{
+			X *= value;
+			Y *= value;
+			Z *= value;
+		}
+
+		public void Deflate( float value )
+		{
+			X /= value;
+			Y /= value;
+			Z /= value;
+		}
+
         public override bool Equals( object obj )
         {
             var result = false;

@@ -21,8 +21,8 @@ namespace Editor
 		private List<Triple> _points;
 		private List<int> _indices;
 
-        public Triple Min { get { return _min; } set { _min = value; } }
-        public Triple Max { get { return _max; } set { _max = value; } }
+        public Triple Min { get { return _min; } set { _min = value; _points.Clear(); GeneratePoints(); } }
+        public Triple Max { get { return _max; } set { _max = value; _points.Clear(); GeneratePoints(); } }
 
 		[XmlIgnore]
 		public Color Color { get { return _color; } set { _color = value; } }
@@ -275,6 +275,11 @@ namespace Editor
 			float b = _color.B / 255.0f;
 			float a = 1.0f;
 
+			if( _selected )
+			{
+				r = g = b = 1.0f;
+			}
+
 			for( int i = 0; i < _indices.Count; i += 3 )
 			{
 				var i1 = _indices[i];
@@ -296,6 +301,48 @@ namespace Editor
 			}
 
 			GL.End();
+		}
+
+		public Rectangle Project( Camera2D camera, int gridGap, int gridSize )
+		{
+			var gmin = camera.Project( _min );
+			var gmax = camera.Project( _max );
+			
+			gmin = gmin.Inflate( gridGap );
+			gmax = gmax.Inflate( gridGap );
+
+			gmin = gmin.Deflate( gridSize );
+			gmax = gmax.Deflate( gridSize );
+
+			var lmin = camera.ToLocal( gmin );
+			var lmax = camera.ToLocal( gmax );
+
+			var result = Extensions.FromMinMax( lmin, lmax );
+
+			return result;
+		}
+
+		public void Unproject( Camera2D camera, Rectangle bounds, int gridGap, int gridSize )
+		{
+			var lmin = new Point( bounds.Left, bounds.Top );
+			var lmax = new Point( bounds.Right, bounds.Bottom );
+
+			var gmin = camera.ToGlobal( lmin );
+			var gmax = camera.ToGlobal( lmax );
+
+			var minTriple = camera.Unproject( gmin, (int)_min.Dot(camera.Direction)*gridGap );
+			var maxTriple = camera.Unproject( gmax, (int)_max.Dot(camera.Direction)*gridGap );
+
+			Extensions.MinMax( ref minTriple, ref maxTriple );
+
+			minTriple.Deflate( gridGap );
+			maxTriple.Deflate( gridGap );
+
+			minTriple.Inflate( gridSize );
+			maxTriple.Inflate( gridSize );
+
+			_min = minTriple;
+			_max = maxTriple;
 		}
     }
 }

@@ -30,6 +30,13 @@ namespace Editor
             Keys.Alt
         };
 
+		private static Cursor[] HANDLE_CURSORS =
+		{
+			Cursors.SizeNWSE, Cursors.SizeNS, Cursors.SizeNESW,
+			Cursors.SizeWE, Cursors.SizeAll, Cursors.SizeWE,
+			Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE
+		};
+
 		//private static float[] GRID_SIZES = new float[]{ 0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 8.0f, 10.0f, 15.0f, 20.0f };
 		private static int[] GRID_SIZES = new int[] { 1, 2, 3, 4, 5, 10 };
 		private const int GRID_MAX_LINES = 100;
@@ -55,6 +62,10 @@ namespace Editor
 		private Point _hoverPosition;
 
 		private Point _previousMousePosition;
+
+		//private SizeHandle[] _sizeHandles;
+		private int _handleIndex;
+		private GeometrySolid _selectedSolid;
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
@@ -115,6 +126,15 @@ namespace Editor
             _snapToGrid = true;
 
 			_invalidateAction = new Level.ChangeHandler( () => Invalidate() );
+
+			var handleCursors = new[]
+			{
+				Cursors.SizeNWSE, Cursors.SizeNS, Cursors.SizeNESW,
+				Cursors.SizeWE, Cursors.SizeAll, Cursors.SizeWE,
+				Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE
+			};
+
+			_handleIndex = -1;
         }
 
 		private Point SnapToGrid( Point point )
@@ -131,7 +151,9 @@ namespace Editor
 			base.OnCreateControl();
 
 			if(_directionType == 1 )
-				_camera.Position = new Point( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.75f) );
+				_camera.Position = new Point( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.25f) );
+			else
+				_camera.Position = new Point( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
 
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
@@ -205,25 +227,7 @@ namespace Editor
 			// paint solids
 			foreach( var solid in _level.Solids )
 			{
-				var minproj = _camera.Project( solid.Min );
-				var maxproj = _camera.Project( solid.Max );
-
-				minproj.X *= _gridGap;
-				minproj.Y *= _gridGap;
-
-				maxproj.X *= _gridGap;
-				maxproj.Y *= _gridGap;
-
-				minproj.X /= _gridSize;
-				minproj.Y /= _gridSize;
-
-				maxproj.X /= _gridSize;
-				maxproj.Y /= _gridSize;
-
-				var lmin = _camera.ToLocal( minproj );
-				var lmax = _camera.ToLocal( maxproj );
-
-				var srect = Extensions.FromMinMax( lmin, lmax );
+				var bounds = solid.Project( _camera, _gridGap, _gridSize );
 
 				var color = Color.FromArgb( EditorColors.FADE, solid.Color );
 				if( solid.Selected )
@@ -237,50 +241,14 @@ namespace Editor
 					_solidPen.DashStyle = DashStyle.Dash;
 
 				_solidPen.Color = color;
-				g.DrawRectangle( _solidPen, srect );
+				g.DrawRectangle( _solidPen, bounds );
 
 				if( solid.Selected )
 				{
-					var topleft = new Point( srect.Left, srect.Top );
-					var topright = new Point( srect.Right, srect.Top );
-					var bottomleft = new Point( srect.Left, srect.Bottom );
-					var bottomright = new Point( srect.Right, srect.Bottom );
-					var midleft = new Point( srect.Left, srect.Top + srect.Height / 2 );
-					var midright = new Point( srect.Right, srect.Top + srect.Height / 2 );
-					var midtop = new Point( srect.Left + srect.Width / 2, srect.Top );
-					var midbottom = new Point( srect.Left + srect.Width / 2, srect.Bottom );
+					var handles = Extensions.GetHandles( bounds, 8 );
 
-					var r = Extensions.FromPoint( topleft, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
-
-					r = Extensions.FromPoint( topright, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
-
-					r = Extensions.FromPoint( bottomleft, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
-
-					r = Extensions.FromPoint( bottomright, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
-
-					r = Extensions.FromPoint( midleft, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
-
-					r = Extensions.FromPoint( midright, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
-
-					r = Extensions.FromPoint( midtop, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
-
-					r = Extensions.FromPoint( midbottom, 8 );
-					g.FillRectangle( EditorColors.BRUSH_HANDLE, r );
-					//g.DrawRectangle( EditorColors.PEN_HANDLE_OUTLINE, r );
+					foreach( var handle in handles )
+						g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
 				}
 			}
 
@@ -333,6 +301,27 @@ namespace Editor
 					Invalidate();
 
 					OnGlobalInvalidation?.Invoke();
+				}
+			}
+			else if( EditorTool.Current == EditorTools.Select )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					_handleIndex = -1;
+					
+					if( _selectedSolid != null )
+					{
+						var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
+						var handles = Extensions.GetHandles( bounds, 8 );
+						for( int i = 0; i < handles.Length && _handleIndex < 0; i++ )
+						{
+							if( handles[i].Contains( e.Location ) )
+								_handleIndex = i;
+						}
+
+						if( _handleIndex >= 0 )
+							Cursor.Current = HANDLE_CURSORS[_handleIndex];
+					}
 				}
 			}
         }
@@ -388,58 +377,49 @@ namespace Editor
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					var hadSelection = false;
-					var minDepth = 99999;
-					GeometrySolid minSolid = null;
-					foreach( var solid in _level.Solids )
+					if( _handleIndex >= 0 )
 					{
-						if( solid.Selected )
-							hadSelection = true;
-
-						solid.Selected = false;
-
-						var min = _camera.Project( solid.Min );
-						var max = _camera.Project( solid.Max );
-
-						min.X *= _gridGap;
-						min.Y *= _gridGap;
-
-						max.X *= _gridGap;
-						max.Y *= _gridGap;
-
-						min.X /= _gridSize;
-						min.Y /= _gridSize;
-
-						max.X /= _gridSize;
-						max.Y /= _gridSize;
-
-						var lmin = _camera.ToLocal( min );
-						var lmax = _camera.ToLocal( max );
-						
-						var depth = (int)Math.Min(_camera.Direction.Dot( solid.Min ), _camera.Direction.Dot(solid.Max));
-						if( depth < minDepth || minSolid == null )
+						_handleIndex = -1;
+					}
+					else
+					{
+						var hadSelection = false;
+						var minDepth = 99999;
+						_selectedSolid = null;
+						var minBounds = Rectangle.Empty;
+						foreach( var solid in _level.Solids )
 						{
-							var bounds = Extensions.FromMinMax( lmin, lmax );
+							if( solid.Selected )
+								hadSelection = true;
 
-							if( bounds.Contains( e.Location ) )
+							solid.Selected = false;
+
+							var bounds = solid.Project( _camera, _gridGap, _gridSize );
+
+							var depth = (int)Math.Min( _camera.Direction.Dot( solid.Min ), _camera.Direction.Dot( solid.Max ) );
+							if( depth < minDepth || _selectedSolid == null )
 							{
-								minDepth = depth;
-								minSolid = solid;
+								if( bounds.Contains( e.Location ) )
+								{
+									minDepth = depth;
+									_selectedSolid = solid;
+									minBounds = bounds;
+								}
 							}
 						}
-					}
 
-					if( minSolid != null )
-					{
-						minSolid.Selected = true;
+						if( _selectedSolid != null )
+						{
+							_selectedSolid.Selected = true;
 
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
-					}
-					else if( hadSelection )
-					{
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
+						}
+						else if( hadSelection )
+						{
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
+						}
 					}
 				}
 			}
@@ -468,7 +448,58 @@ namespace Editor
 			if( e.Location == _previousMousePosition )
 				return;
 
-			if( _spaceDown || _mmbDown )
+			if( _handleIndex >= 0 )
+			{
+				var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
+				var snapPosition = SnapToGrid( e.Location );
+				
+				_hoverPosition = snapPosition;
+				
+				if( snapPosition.X != bounds.X || snapPosition.Y != bounds.Y )
+				{
+					var min = new Point( bounds.Left, bounds.Top );
+					var max = new Point( bounds.Right, bounds.Bottom );
+
+					var newBounds = bounds;
+
+					if( _handleIndex % 3 == 0 )
+					{
+						var right = newBounds.Right;
+						if( snapPosition.X < right )
+						{
+							newBounds.X = snapPosition.X;
+							newBounds.Width = right - newBounds.X;
+						}
+					}
+					else if( ( _handleIndex + 1 ) % 3 == 0 )
+					{
+						if( snapPosition.X > newBounds.X )
+							newBounds.Width = snapPosition.X - newBounds.X;
+					}
+
+					if( _handleIndex / 3 == 0 )
+					{
+						var bottom = newBounds.Bottom;
+						if( snapPosition.Y < bottom )
+						{
+							newBounds.Y = snapPosition.Y;
+							newBounds.Height = bottom - newBounds.Y;
+						}
+					}
+					else if( _handleIndex / 3 == 2 )
+					{
+						if(snapPosition.Y > newBounds.Y)
+							newBounds.Height = snapPosition.Y - newBounds.Y;
+					}
+
+					_selectedSolid.Unproject( _camera, newBounds, _gridGap, _gridSize );
+
+					Invalidate();
+				}
+
+				Cursor.Current = HANDLE_CURSORS[_handleIndex];
+			}
+			else if( _spaceDown || _mmbDown )
 			{
 				var mouseDelta = new Point( e.X - _previousMousePosition.X, e.Y - _previousMousePosition.Y );
 				_camera.Move( -mouseDelta.X, -mouseDelta.Y );
@@ -518,29 +549,11 @@ namespace Editor
 
 						solid.Hovered = false;
 
-						var min = _camera.Project( solid.Min );
-						var max = _camera.Project( solid.Max );
-
-						min.X *= _gridGap;
-						min.Y *= _gridGap;
-
-						max.X *= _gridGap;
-						max.Y *= _gridGap;
-
-						min.X /= _gridSize;
-						min.Y /= _gridSize;
-
-						max.X /= _gridSize;
-						max.Y /= _gridSize;
-
-						var lmin = _camera.ToLocal( min );
-						var lmax = _camera.ToLocal( max );
+						var bounds = solid.Project( _camera, _gridGap, _gridSize );
 						
 						var depth = (int)Math.Min( _camera.Direction.Dot( solid.Min ), _camera.Direction.Dot( solid.Max ) );
 						if( depth < minDepth || minSolid == null )
 						{
-							var bounds = Extensions.FromMinMax( lmin, lmax );
-
 							if( bounds.Contains( e.Location ) )
 							{
 								minDepth = depth;
@@ -563,6 +576,23 @@ namespace Editor
 					{
 						Invalidate();
 						OnGlobalInvalidation?.Invoke();
+					}
+
+					// check interaction with handles
+					if( _selectedSolid != null )
+					{
+						var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
+						var handles = Extensions.GetHandles( bounds, 8 );
+
+						var cursorChanged = false;
+						for( int i = 0; i < handles.Length && !cursorChanged; i++ )
+						{
+							if( handles[i].Contains( e.Location ) )
+							{
+								Cursor.Current = HANDLE_CURSORS[i];
+								cursorChanged = true;
+							}
+						}
 					}
 				}
 			}

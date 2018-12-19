@@ -45,6 +45,47 @@ namespace Editor
 			return new Rectangle( center.X - size / 2, center.Y - size / 2, size, size );
 		}
 
+		public static Point GetCenter( Rectangle r )
+		{
+			return new Point( r.Left + r.Width / 2, r.Top + r.Height / 2 );
+		}
+
+		public static Point[] GetHandlePoints( Rectangle r )
+		{
+			var center = GetCenter( r );
+
+			var result = new Point[]
+			{
+				new Point(r.Left, r.Top),
+				new Point(center.X, r.Top),
+				new Point(r.Right, r.Top),
+				new Point(r.Left, center.Y),
+				new Point(center.X, center.Y),
+				new Point(r.Right, center.Y),
+				new Point(r.Left, r.Bottom),
+				new Point(center.X, r.Bottom),
+				new Point(r.Right, r.Bottom)
+			};
+
+			return result;
+		}
+
+		public static Rectangle[] GetHandles( Rectangle r, int size )
+		{
+			var points = GetHandlePoints( r );
+
+			var result = new Rectangle[points.Length];
+			for( int i = 0; i < points.Length; i++ )
+				result[i] = FromPoint( points[i], size );
+
+			return result;
+		}
+
+		public static int HandleIndex( int x, int y )
+		{
+			return ( y * 3 + x );
+		}
+
 		public static Point Min( Point a, Point b )
 		{
 			var result = new Point( Math.Min( a.X, b.X ), Math.Min( a.Y, b.Y ) );
@@ -96,6 +137,16 @@ namespace Editor
 				max.Z = min.Z;
 				min.Z = temp;
 			}
+		}
+
+		public static Point Inflate( this Point point, float value )
+		{
+			return new Point((int)( point.X * value ), (int)( point.Y * value ));
+		}
+
+		public static Point Deflate( this Point point, float value )
+		{
+			return new Point((int)( point.X / value ), (int)( point.Y / value ));
 		}
 	}
 }
