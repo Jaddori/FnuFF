@@ -53,6 +53,9 @@ EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
 
 			glEnable( GL_CULL_FACE );
 			glEnable( GL_DEPTH_TEST );
+			glEnable( GL_TEXTURE_2D );
+
+			glewInit();
 		}
 		else
 		{
@@ -118,6 +121,11 @@ EXPORT void end()
 	glEnd();
 }
 
+EXPORT void texCoord2f( float u, float v )
+{
+	glTexCoord2f( u, v );
+}
+
 EXPORT void vertex2f( float u, float v )
 {
 	glVertex2f( u, v );
@@ -139,4 +147,57 @@ EXPORT void viewMatrix( float px, float py, float pz, float dx, float dy, float 
 	glLoadIdentity();
 
 	gluLookAt( px, py, pz, px+dx, py+dy, pz+dz, 0, 1, 0 );
+}
+
+EXPORT uint32_t loadTexture( const char* path )
+{
+	uint32_t result = 0;
+
+	FILE* file = fopen( path, "rb" );
+	if( file )
+	{
+		int32_t magicNumber;
+		fread( &magicNumber, sizeof(magicNumber), 1, file );
+
+		if( magicNumber == DDS_MAGIC_NUMBER )
+		{
+			DDS_HEADER header = {};
+			fread( &header, sizeof(header), 1, file );
+
+			int width = header.width;
+			int height = header.height;
+			int size = header.pitchOrLinearSize;
+
+			int format = -1;
+			switch( header.format.fourCC )
+			{
+				default:
+				case ID_DXT1: format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT; break;
+				case ID_DXT3: format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT; break;
+				case ID_DXT5: format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT; break;
+			}
+
+			GLbyte* pixels = new GLbyte[size];
+			fread( pixels, 1, size, file );
+
+			GLuint id;
+			glGenTextures( 1, &id );
+			glBindTexture( GL_TEXTURE_2D, id );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glCompressedTexImage2D( GL_TEXTURE_2D, 0, format, width, height, 0, size, pixels );
+
+			result = id;
+			delete[] pixels;
+		}
+
+		fclose( file );
+	}
+
+	return result;
+}
+
+EXPORT void setTexture( uint32_t id )
+{
+	glBindTexture( GL_TEXTURE_2D, id );
 }

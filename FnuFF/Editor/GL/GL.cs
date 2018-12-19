@@ -36,6 +36,9 @@ namespace Editor
 		private extern static void end();
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void texCoord2f( float u, float v );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void vertex2f( float u, float v );
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
@@ -46,6 +49,12 @@ namespace Editor
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void viewMatrix( float px, float py, float pz, float dx, float dy, float dz );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static UInt32 loadTexture( string path );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void setTexture( UInt32 texture );
 
 		private static IntPtr _context;
 		
@@ -85,6 +94,11 @@ namespace Editor
 			end();
 		}
 
+		public static void TexCoord2f( float u, float v )
+		{
+			texCoord2f( u, v );
+		}
+
 		public static void Vertex2f( float u, float v )
 		{
 			vertex2f( u, v );
@@ -103,6 +117,16 @@ namespace Editor
 		public static void ViewMatrix( Triple position, Triple direction )
 		{
 			viewMatrix( position.X, position.Y, position.Z, direction.X, direction.Y, direction.Z );
+		}
+
+		public static UInt32 LoadTexture( string path )
+		{
+			return loadTexture( path );
+		}
+
+		public static void SetTexture( UInt32 texture )
+		{
+			setTexture( texture );
 		}
 	}
 }

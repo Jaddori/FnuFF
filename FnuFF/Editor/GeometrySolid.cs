@@ -19,6 +19,7 @@ namespace Editor
 		private bool _hovered;
 		private bool _selected;
 		private List<Triple> _points;
+		private List<Triple> _coords;
 		private List<int> _indices;
 
         public Triple Min { get { return _min; } set { _min = value; _points.Clear(); GeneratePoints(); } }
@@ -47,6 +48,7 @@ namespace Editor
 			_hovered = _selected = false;
 
 			_points = new List<Triple>();
+			_coords = new List<Triple>();
 			_indices = new List<int>();
 
 			GenerateColor();
@@ -61,6 +63,7 @@ namespace Editor
 			_hovered = _selected = false;
 
 			_points = new List<Triple>();
+			_coords = new List<Triple>();
 			_indices = new List<int>();
 
 			GenerateColor();
@@ -232,6 +235,7 @@ namespace Editor
 					}
 					
 					var vi0 = innerIndices[0];
+
 					for( int i = 1; i < innerIndices.Count - 1; i++ )
 					{
 						var vi1 = innerIndices[i];
@@ -261,6 +265,17 @@ namespace Editor
 						}
 
 						_indices.AddRange( new[] { ai0, ai1, ai2 } );
+						_coords.Add( new Triple( 0, 0, 0 ) );
+						if( i == 1 )
+						{
+							_coords.Add( new Triple( 0, 1, 0 ) );
+							_coords.Add( new Triple( 1, 1, 0 ) );
+						}
+						else
+						{
+							_coords.Add( new Triple( 1, 1, 0 ) );
+							_coords.Add( new Triple( 1, 0, 0 ) );
+						}
 					}
 				}
 			}
@@ -280,6 +295,7 @@ namespace Editor
 				r = g = b = 1.0f;
 			}
 
+			GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 			for( int i = 0; i < _indices.Count; i += 3 )
 			{
 				var i1 = _indices[i];
@@ -290,13 +306,20 @@ namespace Editor
 				var v2 = _points[i2];
 				var v3 = _points[i3];
 
-				GL.Color4f( r, g, b, a );
+				var c1 = _coords[i];
+				var c2 = _coords[i + 1];
+				var c3 = _coords[i + 2];
+
+				//GL.Color4f( r, g, b, a );
+				GL.TexCoord2f( c1.X, c1.Y );
 				GL.Vertex3f( v1.X, v1.Y, v1.Z );
 
-				GL.Color4f( r, g, b, a );
+				//GL.Color4f( r, g, b, a );
+				GL.TexCoord2f( c2.X, c2.Y );
 				GL.Vertex3f( v2.X, v2.Y, v2.Z );
 
-				GL.Color4f( r, g, b, a );
+				//GL.Color4f( r, g, b, a );
+				GL.TexCoord2f( c3.X, c3.Y );
 				GL.Vertex3f( v3.X, v3.Y, v3.Z );
 			}
 
