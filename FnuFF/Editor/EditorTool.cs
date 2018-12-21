@@ -15,6 +15,7 @@ namespace Editor
     {
         None,
         Select,
-        Solid
+        Solid,
+		Vertex
     }
 }

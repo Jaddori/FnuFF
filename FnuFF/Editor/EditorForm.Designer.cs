@@ -40,16 +40,17 @@
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnl_left = new System.Windows.Forms.Panel();
+			this.btn_vertex = new Editor.FlatButtonControl();
 			this.btn_solid = new Editor.FlatButtonControl();
 			this.btn_select = new Editor.FlatButtonControl();
 			this.pnl_right = new System.Windows.Forms.Panel();
+			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.ws_viewports = new Editor.WorkspaceControl();
 			this.view_bottomLeft = new Editor.View2DControl();
 			this.view_bottomRight = new Editor.View2DControl();
 			this.view_3d = new Editor.View3DControl();
 			this.view_topRight = new Editor.View2DControl();
-			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.status_editor.SuspendLayout();
 			this.menu_editor.SuspendLayout();
 			this.pnl_left.SuspendLayout();
@@ -152,6 +153,7 @@
 			// pnl_left
 			// 
 			this.pnl_left.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_left.Controls.Add(this.btn_vertex);
 			this.pnl_left.Controls.Add(this.btn_solid);
 			this.pnl_left.Controls.Add(this.btn_select);
 			this.pnl_left.Dock = System.Windows.Forms.DockStyle.Left;
@@ -159,6 +161,20 @@
 			this.pnl_left.Name = "pnl_left";
 			this.pnl_left.Size = new System.Drawing.Size(58, 702);
 			this.pnl_left.TabIndex = 3;
+			// 
+			// btn_vertex
+			// 
+			this.btn_vertex.Hovered = false;
+			this.btn_vertex.Image = global::Editor.Properties.Resources.icon_vertex;
+			this.btn_vertex.Location = new System.Drawing.Point(0, 76);
+			this.btn_vertex.Name = "btn_vertex";
+			this.btn_vertex.Pressed = false;
+			this.btn_vertex.Selected = false;
+			this.btn_vertex.Size = new System.Drawing.Size(58, 32);
+			this.btn_vertex.TabIndex = 3;
+			this.btn_vertex.Tag = "";
+			this.btn_vertex.UseVisualStyleBackColor = true;
+			this.btn_vertex.Click += new System.EventHandler(this.toolbarButton_Click);
 			// 
 			// btn_solid
 			// 
@@ -196,6 +212,10 @@
 			this.pnl_right.Name = "pnl_right";
 			this.pnl_right.Size = new System.Drawing.Size(200, 702);
 			this.pnl_right.TabIndex = 4;
+			// 
+			// openFileDialog
+			// 
+			this.openFileDialog.FileName = "openFileDialog";
 			// 
 			// ws_viewports
 			// 
@@ -279,10 +299,6 @@
 			this.view_topRight.Size = new System.Drawing.Size(488, 349);
 			this.view_topRight.TabIndex = 0;
 			// 
-			// openFileDialog
-			// 
-			this.openFileDialog.FileName = "openFileDialog";
-			// 
 			// EditorForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -338,6 +354,7 @@
 		private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 		private System.Windows.Forms.OpenFileDialog openFileDialog;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
+		private FlatButtonControl btn_vertex;
 	}
 }
 

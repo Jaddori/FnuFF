@@ -21,6 +21,7 @@ namespace Editor
 		private List<Triple> _points;
 		private List<Triple> _coords;
 		private List<int> _indices;
+		private List<Face> _faces;
 
         public Triple Min { get { return _min; } set { _min = value; _points.Clear(); GeneratePoints(); } }
         public Triple Max { get { return _max; } set { _max = value; _points.Clear(); GeneratePoints(); } }
@@ -40,6 +41,9 @@ namespace Editor
 		[XmlIgnore]
 		public List<int> Indices => _indices;
 
+		[XmlIgnore]
+		public List<Face> Faces => _faces;
+
 		public GeometrySolid()
 		{
 			_min = new Triple();
@@ -50,9 +54,10 @@ namespace Editor
 			_points = new List<Triple>();
 			_coords = new List<Triple>();
 			_indices = new List<int>();
+			_faces = new List<Face>();
 
 			GenerateColor();
-			GeneratePoints();
+			//GeneratePoints();
 		}
 
         public GeometrySolid(Triple min, Triple max)
@@ -65,10 +70,12 @@ namespace Editor
 			_points = new List<Triple>();
 			_coords = new List<Triple>();
 			_indices = new List<int>();
+			_faces = new List<Face>();
 
 			GenerateColor();
 			GeneratePoints();
-			GenerateIndices();
+			//GenerateIndices();
+			GenerateFaces();
         }
 
 		private void GenerateColor()
@@ -101,6 +108,53 @@ namespace Editor
 			var v8 = new Triple( _max.X, _max.Y, _min.Z );
 
 			_points.AddRange( new[]{ v1, v2, v3, v4, v5, v6, v7, v8} );
+		}
+
+		public void GenerateFaces()
+		{
+			// left
+			var left = new Face();
+			left.Points.AddRange( new[] { _points[7], _points[1], _points[0], _points[6] } );
+			left.Indices.AddRange( new[] { 0, 1, 2, 0, 2, 3 } );
+			left.Normal = new Triple( 0, 0, -1 );
+			left.D = _points[7].Dot( left.Normal );
+
+			// right
+			var right = new Face();
+			right.Points.AddRange( new[] { _points[5], _points[3], _points[2], _points[4] } );
+			right.Indices.AddRange( new[] { 0, 1, 2, 0, 2, 3 } );
+			right.Normal = new Triple( 0, 0, 1 );
+			right.D = _points[5].Dot( right.Normal );
+
+			// top
+			var top = new Face();
+			top.Points.AddRange( new[] { _points[7], _points[6], _points[5], _points[4] } );
+			top.Indices.AddRange( new[] { 0, 1, 2, 0, 2, 3 } );
+			top.Normal = new Triple( 0, 1, 0 );
+			top.D = _points[7].Dot( top.Normal );
+
+			// bottom
+			var bottom = new Face();
+			bottom.Points.AddRange( new[] { _points[0], _points[1], _points[2], _points[3] } );
+			bottom.Indices.AddRange( new[] { 0, 1, 2, 0, 2, 3 } );
+			bottom.Normal = new Triple( 0, -1, 0 );
+			bottom.D = _points[0].Dot( bottom.Normal );
+
+			// front
+			var front = new Face();
+			front.Points.AddRange( new[] { _points[6], _points[0], _points[3], _points[5] } );
+			front.Indices.AddRange( new[] { 0, 1, 2, 0, 2, 3 } );
+			front.Normal = new Triple( -1, 0, 0 );
+			front.D = _points[6].Dot( front.Normal );
+
+			// back
+			var back = new Face();
+			back.Points.AddRange( new[] { _points[4], _points[2], _points[1], _points[7] } );
+			back.Indices.AddRange( new[] { 0, 1, 2, 0, 2, 3 } );
+			back.Normal = new Triple( 1, 0, 0 );
+			back.D = _points[4].Dot( back.Normal );
+
+			_faces.AddRange( new[] { left, right, top, bottom, front, back } );
 		}
 
 		public void GenerateIndices()
@@ -140,7 +194,7 @@ namespace Editor
 									if( i != a && j != a && k != a )
 									{
 										var point = _points[a];
-										if( !plane.InFront( point ) )
+										if( plane.InFront( point ) )
 											allBehind = false;
 									}
 								}
@@ -236,6 +290,13 @@ namespace Editor
 					
 					var vi0 = innerIndices[0];
 
+					var face = new Face();
+					face.Normal = plane.Normal;
+					face.D = plane.D;
+
+					for( int i = 0; i < innerIndices.Count; i++ )
+						face.Points.Add( _points[pointsOnPlane[innerIndices[i]]] );
+
 					for( int i = 1; i < innerIndices.Count - 1; i++ )
 					{
 						var vi1 = innerIndices[i];
@@ -255,7 +316,7 @@ namespace Editor
 						var normal = v2v0.Cross( v1v0 );
 						normal.Normalize();
 
-						var flip = ( normal.Dot( plane.Normal ) < 0 );
+						var flip = ( normal.Dot( plane.Normal ) > 0 );
 
 						if( flip )
 						{
@@ -264,19 +325,35 @@ namespace Editor
 							ai1 = temp;
 						}
 
+						//var face = new Face();
+						//face.Points.AddRange( new[] { v0, v1, v2 } );
+						//face.Normal = plane.Normal;
+						//face.D = plane.D;
+
 						_indices.AddRange( new[] { ai0, ai1, ai2 } );
+						face.Indices.AddRange( new[] { ai0, ai1, ai2 } );
+
 						_coords.Add( new Triple( 0, 0, 0 ) );
-						if( i == 1 )
+						face.Coords.Add( new Triple( 0, 0, 0 ) );
+						if( (i == 1 && !flip) || ( i > 1 && flip) )
 						{
 							_coords.Add( new Triple( 0, 1, 0 ) );
 							_coords.Add( new Triple( 1, 1, 0 ) );
+							face.Coords.Add( new Triple( 0, 1, 0 ) );
+							face.Coords.Add( new Triple( 1, 1, 0 ) );
 						}
 						else
 						{
 							_coords.Add( new Triple( 1, 1, 0 ) );
 							_coords.Add( new Triple( 1, 0, 0 ) );
+							face.Coords.Add( new Triple( 1, 1, 0 ) );
+							face.Coords.Add( new Triple( 1, 0, 0 ) );
 						}
+
+						//_faces.Add( face );
 					}
+
+					_faces.Add( face );
 				}
 			}
 		}
@@ -296,7 +373,7 @@ namespace Editor
 			}
 
 			GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-			for( int i = 0; i < _indices.Count; i += 3 )
+			/*for( int i = 0; i < _indices.Count; i += 3 )
 			{
 				var i1 = _indices[i];
 				var i2 = _indices[i + 1];
@@ -321,6 +398,29 @@ namespace Editor
 				//GL.Color4f( r, g, b, a );
 				GL.TexCoord2f( c3.X, c3.Y );
 				GL.Vertex3f( v3.X, v3.Y, v3.Z );
+			}*/
+
+			foreach( var face in _faces )
+			{
+				for( int i = 0; i < face.Indices.Count; i += 3 )
+				{
+					var i0 = face.Indices[i];
+					var i1 = face.Indices[i+1];
+					var i2 = face.Indices[i+2];
+
+					var v0 = face.Points[i0];
+					var v1 = face.Points[i1];
+					var v2 = face.Points[i2];
+
+					GL.Color4f( r, g, b, a );
+					GL.Vertex3f( v0.X, v0.Y, v0.Z );
+
+					GL.Color4f( r, g, b, a );
+					GL.Vertex3f( v1.X, v1.Y, v1.Z );
+
+					GL.Color4f( r, g, b, a );
+					GL.Vertex3f( v2.X, v2.Y, v2.Z );
+				}
 			}
 
 			GL.End();

@@ -57,7 +57,8 @@ namespace Editor
 			//var dif = Math.Abs( distanceAlongNormal - _d );
 			//return ( dif > -EPSILON );
 
-			var greater = (distanceAlongNormal + EPSILON > _d);
+			//var greater = (distanceAlongNormal + EPSILON > _d);
+			var greater = ( distanceAlongNormal > _d );
 			return greater;
 		}
 

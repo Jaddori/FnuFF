@@ -103,6 +103,25 @@ namespace Editor
 				_level = value;
 				_level.OnSolidChange += _invalidateAction;
 
+				var solid = new GeometrySolid();
+				solid.Points.AddRange
+				(
+					new[]
+					{
+					new Triple(0,0,0),
+					new Triple(2,0,1),
+					new Triple(2,0,3),
+					new Triple(0,0,2),
+
+					new Triple(2,2,3),
+					new Triple(0,2,2),
+					new Triple(0,2,0),
+					new Triple(2,2,1),
+					}
+				);
+				solid.GenerateFaces();
+				//_level.AddSolid( solid );
+
 				Invalidate();
 			}
 		}
@@ -227,7 +246,7 @@ namespace Editor
 			// paint solids
 			foreach( var solid in _level.Solids )
 			{
-				var bounds = solid.Project( _camera, _gridGap, _gridSize );
+				/*var bounds = solid.Project( _camera, _gridGap, _gridSize );
 
 				var color = Color.FromArgb( EditorColors.FADE, solid.Color );
 				if( solid.Selected )
@@ -249,6 +268,41 @@ namespace Editor
 
 					foreach( var handle in handles )
 						g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
+				}*/
+
+				var color = Color.FromArgb( EditorColors.FADE, solid.Color );
+				if( solid.Selected )
+					color = Color.White;
+				else if( solid.Hovered )
+					color = solid.Color;
+
+				if( solid.Selected || solid.Hovered )
+					_solidPen.DashStyle = DashStyle.Solid;
+				else
+					_solidPen.DashStyle = DashStyle.Dash;
+
+				_solidPen.Color = color;
+
+				var faces = solid.Faces.Where( x => x.Normal.Dot( _camera.Direction ) < 0 ).ToList();
+				foreach( var face in faces )
+				{
+					var vertices = face.Points;
+
+					var points = new List<Point>();
+					foreach(var vertex in vertices)
+					{
+						var point = vertex.Project( _camera.Direction );
+						point = point.Inflate( _gridGap );
+						point = point.Deflate( _gridSize );
+						point = _camera.ToLocal( point );
+						points.Add( point );
+					}
+
+					for( int i = 0; i < points.Count - 1; i++ )
+					{
+						g.DrawLine( _solidPen, points[i], points[i + 1] );
+					}
+					g.DrawLine( _solidPen, points[points.Count - 1], points[0] );
 				}
 			}
 
@@ -308,7 +362,7 @@ namespace Editor
 				if( e.Button == MouseButtons.Left )
 				{
 					_handleIndex = -1;
-					
+
 					if( _selectedSolid != null )
 					{
 						var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
@@ -322,6 +376,13 @@ namespace Editor
 						if( _handleIndex >= 0 )
 							Cursor.Current = HANDLE_CURSORS[_handleIndex];
 					}
+				}
+			}
+			else if( EditorTool.Current == EditorTools.Vertex )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					
 				}
 			}
         }
