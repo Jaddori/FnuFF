@@ -27,6 +27,11 @@ namespace Editor
 			return new Triple( a.X + b.X, a.Y + b.Y, a.Z + b.Z );
 		}
 
+		public static Triple operator -( Triple t )
+		{
+			return new Triple( -t.X, -t.Y, -t.Z );
+		}
+
 		public static Triple operator -( Triple a, Triple b )
 		{
 			return new Triple( a.X - b.X, a.Y - b.Y, a.Z - b.Z );

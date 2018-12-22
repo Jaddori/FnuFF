@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Editor
 {
-	[DebuggerDisplay( "{Normal.X}, {Normal.Y}, {Normal.Z}, {D}" )]
+	[DebuggerDisplay( "{Plane.Normal.X}, {Plane.Normal.Y}, {Plane.Normal.Z}, {Plane.D}" )]
 	public class Face
 	{
 		private Plane _plane;

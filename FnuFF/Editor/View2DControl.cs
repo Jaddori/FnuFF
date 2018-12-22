@@ -246,30 +246,6 @@ namespace Editor
 			// paint solids
 			foreach( var solid in _level.Solids )
 			{
-				/*var bounds = solid.Project( _camera, _gridGap, _gridSize );
-
-				var color = Color.FromArgb( EditorColors.FADE, solid.Color );
-				if( solid.Selected )
-					color = Color.White;
-				else if(solid.Hovered)
-					color = solid.Color;
-
-				if( solid.Selected || solid.Hovered )
-					_solidPen.DashStyle = DashStyle.Solid;
-				else
-					_solidPen.DashStyle = DashStyle.Dash;
-
-				_solidPen.Color = color;
-				g.DrawRectangle( _solidPen, bounds );
-
-				if( solid.Selected )
-				{
-					var handles = Extensions.GetHandles( bounds, 8 );
-
-					foreach( var handle in handles )
-						g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
-				}*/
-
 				var color = Color.FromArgb( EditorColors.FADE, solid.Color );
 				if( solid.Selected )
 					color = Color.White;
@@ -283,27 +259,21 @@ namespace Editor
 
 				_solidPen.Color = color;
 
-				/*var faces = solid.Faces.Where( x => x.Normal.Dot( _camera.Direction ) < 0 ).ToList();
+				var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) < 0 ).ToArray();
 				foreach( var face in faces )
 				{
-					var vertices = face.Points;
+					var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+					var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+					var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
 
-					var points = new List<Point>();
-					foreach(var vertex in vertices)
-					{
-						var point = vertex.Project( _camera.Direction );
-						point = point.Inflate( _gridGap );
-						point = point.Deflate( _gridSize );
-						point = _camera.ToLocal( point );
-						points.Add( point );
-					}
+					var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
-					for( int i = 0; i < points.Count - 1; i++ )
+					for( int i = 0; i < windingPoints.Length - 1; i++ )
 					{
-						g.DrawLine( _solidPen, points[i], points[i + 1] );
+						g.DrawLine( _solidPen, windingPoints[i], windingPoints[i + 1] );
 					}
-					g.DrawLine( _solidPen, points[points.Count - 1], points[0] );
-				}*/
+					g.DrawLine( _solidPen, windingPoints[windingPoints.Length - 1], windingPoints[0] );
+				}
 			}
 
 			if( !DesignMode )
