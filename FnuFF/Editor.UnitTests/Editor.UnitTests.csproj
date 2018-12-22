@@ -56,6 +56,7 @@
     <Compile Include="Camera2DTests.cs" />
     <Compile Include="CommandStackTestCommand.cs" />
     <Compile Include="CommandStackTests.cs" />
+    <Compile Include="ExtensionsTests.cs" />
     <Compile Include="GeometrySolidTests.cs" />
     <Compile Include="PlaneTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

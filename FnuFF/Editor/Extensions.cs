@@ -148,5 +148,121 @@ namespace Editor
 		{
 			return new Point((int)( point.X / value ), (int)( point.Y / value ));
 		}
+
+		public static Point[] WindingSort2D( Point[] points )
+		{
+			var cx = 0.0f;
+			var cy = 0.0f;
+			foreach( var p in points )
+			{
+				cx += p.X;
+				cy += p.Y;
+			}
+
+			cx /= points.Length;
+			cy /= points.Length;
+
+			var sorted = points.OrderBy( x => Math.Atan2( x.Y - cy, x.X - cx ) ).ToArray();
+			return sorted;
+		}
+
+		public static Point[] WindingSort3D( Triple[] points, Triple normal )
+		{
+			normal.Normalize();
+			var projectedPoints = points.Select( x => x.Project( normal ) ).ToArray();
+
+			return WindingSort2D( projectedPoints );
+		}
+
+		public static int[] WindingIndex2D( Point[] points )
+		{
+			var cx = 0.0f;
+			var cy = 0.0f;
+			foreach( var p in points )
+			{
+				cx += p.X;
+				cy += p.Y;
+			}
+
+			cx /= points.Length;
+			cy /= points.Length;
+
+			var sorted = points.Select((x,i) => new { point = x, index = i }).OrderBy( x => Math.Atan2( x.point.Y - cy, x.point.X - cx ) ).Select( x => x.index ).ToArray();
+			return sorted;
+		}
+
+		public static int[] WindingIndex3D( Triple[] points, Triple normal )
+		{
+			normal.Normalize();
+			var projectedPoints = points.Select( x => x.Project( normal ) ).ToArray();
+
+			return WindingIndex2D( projectedPoints );
+		}
+
+		public static Triple[] IntersectPlanes( Plane p0, Plane[] ps )
+		{
+			var points = new List<Triple>();
+
+			if( ps.Length > 1 )
+			{
+				// get planes that are not parallell and not coinciding
+				var validPlanes = new List<Plane>();
+				foreach( var p in ps )
+				{
+					if( p0.Normal.Dot( p.Normal ) > -1 + EPSILON )
+						validPlanes.Add( p );
+				}
+
+				// get intersection points between planes
+				var potentialPoints = new List<Triple>();
+				for( int i = 0; i < validPlanes.Count; i++ )
+				{
+					var p1 = validPlanes[i];
+
+					for( int j = 0; j < validPlanes.Count; j++ )
+					{
+						if( i != j )
+						{
+							var p2 = validPlanes[j];
+
+							var div = p1.Normal.Cross( p2.Normal ).Dot( p0.Normal );
+							if( Math.Abs( div ) > EPSILON )
+							{
+								var a = p1.Normal.Cross( p2.Normal ) * p0.D;
+								var b = p2.Normal.Cross( p0.Normal ) * p1.D;
+								var c = p0.Normal.Cross( p1.Normal ) * p2.D;
+
+								var sum = a + b + c;
+								var result = sum / div;
+
+								if( !potentialPoints.Contains( result ) )
+									potentialPoints.Add( result );
+							}
+						}
+					}
+				}
+
+				// make sure all points are behind all planes
+				foreach( var point in potentialPoints )
+				{
+					var isBehind = true;
+					foreach( var plane in validPlanes )
+					{
+						if( plane.InFront( point ) )
+						{
+							isBehind = false;
+							break;
+						}
+					}
+
+					if( isBehind )
+					{
+						points.Add( point );
+					}
+				}
+			}
+
+			return points.ToArray();
+		}
 	}
 }

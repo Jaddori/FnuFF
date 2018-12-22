@@ -27,6 +27,7 @@ namespace Editor
 		public Plane(Triple normal, float d)
 		{
 			_normal = normal;
+			_normal.Normalize();
 			_d = d;
 		}
 

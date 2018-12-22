@@ -21,8 +21,8 @@ namespace Editor.UndoRedo
 			var result = new CommandSolidChanged
 			{
 				_solid = solid,
-				_min = new Delta<Triple>( oldMin, solid.Min ),
-				_max = new Delta<Triple>( solid.Max, solid.Max )
+				//_min = new Delta<Triple>( oldMin, solid.Min ),
+				//_max = new Delta<Triple>( solid.Max, solid.Max )
 			};
 
 			return result;
@@ -33,8 +33,8 @@ namespace Editor.UndoRedo
 			var result = new CommandSolidChanged
 			{
 				_solid = solid,
-				_min = new Delta<Triple>( solid.Min, solid.Min ),
-				_max = new Delta<Triple>( oldMax, solid.Max )
+				//_min = new Delta<Triple>( solid.Min, solid.Min ),
+				//_max = new Delta<Triple>( oldMax, solid.Max )
 			};
 
 			return result;
@@ -42,14 +42,14 @@ namespace Editor.UndoRedo
 
 		public void Undo()
 		{
-			_solid.Min = _min.Old;
-			_solid.Max = _max.Old;
+			/*_solid.Min = _min.Old;
+			_solid.Max = _max.Old;*/
 		}
 
 		public void Redo()
 		{
-			_solid.Min = _min.New;
-			_solid.Max = _max.New;
+			/*_solid.Min = _min.New;
+			_solid.Max = _max.New;*/
 		}
 
 		public string GetDescription()

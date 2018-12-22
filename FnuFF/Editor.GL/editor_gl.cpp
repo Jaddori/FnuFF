@@ -55,6 +55,8 @@ EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
 			glEnable( GL_DEPTH_TEST );
 			glEnable( GL_TEXTURE_2D );
 
+			glPointSize(8.0f);
+
 			glewInit();
 		}
 		else
@@ -104,6 +106,11 @@ EXPORT void swapBuffers( HWND windowHandle )
 	}
 
 	ReleaseDC( windowHandle, deviceHandle );
+}
+
+EXPORT void beginPoints()
+{
+	glBegin( GL_POINTS );
 }
 
 EXPORT void beginLines()

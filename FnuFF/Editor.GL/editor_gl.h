@@ -51,6 +51,7 @@ EXPORT void destroyContext( HGLRC context );
 EXPORT void clearColor( float r, float g, float b, float a );
 EXPORT void swapBuffers( HWND windowHandle );
 
+EXPORT void beginPoints();
 EXPORT void beginLines();
 EXPORT void beginTriangles();
 EXPORT void end();

@@ -103,7 +103,7 @@ namespace Editor
 				_level = value;
 				_level.OnSolidChange += _invalidateAction;
 
-				var solid = new GeometrySolid();
+				/*var solid = new GeometrySolid();
 				solid.Points.AddRange
 				(
 					new[]
@@ -120,7 +120,7 @@ namespace Editor
 					}
 				);
 				solid.GenerateFaces();
-				//_level.AddSolid( solid );
+				//_level.AddSolid( solid );*/
 
 				Invalidate();
 			}
@@ -283,7 +283,7 @@ namespace Editor
 
 				_solidPen.Color = color;
 
-				var faces = solid.Faces.Where( x => x.Normal.Dot( _camera.Direction ) < 0 ).ToList();
+				/*var faces = solid.Faces.Where( x => x.Normal.Dot( _camera.Direction ) < 0 ).ToList();
 				foreach( var face in faces )
 				{
 					var vertices = face.Points;
@@ -303,7 +303,7 @@ namespace Editor
 						g.DrawLine( _solidPen, points[i], points[i + 1] );
 					}
 					g.DrawLine( _solidPen, points[points.Count - 1], points[0] );
-				}
+				}*/
 			}
 
 			if( !DesignMode )
@@ -365,7 +365,7 @@ namespace Editor
 
 					if( _selectedSolid != null )
 					{
-						var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
+						/*var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
 						var handles = Extensions.GetHandles( bounds, 8 );
 						for( int i = 0; i < handles.Length && _handleIndex < 0; i++ )
 						{
@@ -374,7 +374,7 @@ namespace Editor
 						}
 
 						if( _handleIndex >= 0 )
-							Cursor.Current = HANDLE_CURSORS[_handleIndex];
+							Cursor.Current = HANDLE_CURSORS[_handleIndex];*/
 					}
 				}
 			}
@@ -455,7 +455,7 @@ namespace Editor
 
 							solid.Selected = false;
 
-							var bounds = solid.Project( _camera, _gridGap, _gridSize );
+							/*var bounds = solid.Project( _camera, _gridGap, _gridSize );
 
 							var depth = (int)Math.Min( _camera.Direction.Dot( solid.Min ), _camera.Direction.Dot( solid.Max ) );
 							if( depth < minDepth || _selectedSolid == null )
@@ -466,7 +466,7 @@ namespace Editor
 									_selectedSolid = solid;
 									minBounds = bounds;
 								}
-							}
+							}*/
 						}
 
 						if( _selectedSolid != null )
@@ -511,7 +511,7 @@ namespace Editor
 
 			if( _handleIndex >= 0 )
 			{
-				var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
+				/*var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
 				var snapPosition = SnapToGrid( e.Location );
 				
 				_hoverPosition = snapPosition;
@@ -570,7 +570,7 @@ namespace Editor
 					Invalidate();
 				}
 
-				Cursor.Current = HANDLE_CURSORS[_handleIndex];
+				Cursor.Current = HANDLE_CURSORS[_handleIndex];*/
 			}
 			else if( _spaceDown || _mmbDown )
 			{
@@ -622,7 +622,7 @@ namespace Editor
 
 						solid.Hovered = false;
 
-						var bounds = solid.Project( _camera, _gridGap, _gridSize );
+						/*var bounds = solid.Project( _camera, _gridGap, _gridSize );
 						
 						var depth = (int)Math.Min( _camera.Direction.Dot( solid.Min ), _camera.Direction.Dot( solid.Max ) );
 						if( depth < minDepth || minSolid == null )
@@ -632,7 +632,7 @@ namespace Editor
 								minDepth = depth;
 								minSolid = solid;
 							}
-						}
+						}*/
 					}
 
 					if( minSolid != null )
@@ -654,7 +654,7 @@ namespace Editor
 					// check interaction with handles
 					if( _selectedSolid != null )
 					{
-						var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
+						/*var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
 						var handles = Extensions.GetHandles( bounds, 8 );
 
 						var cursorChanged = false;
@@ -665,7 +665,7 @@ namespace Editor
 								Cursor.Current = HANDLE_CURSORS[i];
 								cursorChanged = true;
 							}
-						}
+						}*/
 					}
 				}
 			}

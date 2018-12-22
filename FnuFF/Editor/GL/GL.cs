@@ -27,6 +27,9 @@ namespace Editor
 		private extern static void swapBuffers( IntPtr windowHandle );
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void beginPoints();
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void beginLines();
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
@@ -77,6 +80,11 @@ namespace Editor
 		public static void SwapBuffers( IntPtr windowHandle )
 		{
 			swapBuffers( windowHandle );
+		}
+
+		public static void BeginPoints()
+		{
+			beginPoints();
 		}
 
 		public static void BeginLines()
