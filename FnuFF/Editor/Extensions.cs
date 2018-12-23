@@ -98,6 +98,11 @@ namespace Editor
 			return result;
 		}
 
+		public static Triple ToTriple( this PointF point )
+		{
+			return new Triple( point.X, point.Y, 0 );
+		}
+
 		public static void MinMax( ref PointF min, ref PointF max )
 		{
 			if( min.X > max.X )

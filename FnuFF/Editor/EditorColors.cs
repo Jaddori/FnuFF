@@ -50,6 +50,6 @@ namespace Editor
 
 		// values
 		public static int FADE = 64;
-		public static float[] DASH_PATTERN = { 2.0f, 2.0f };
+		public static float[] DASH_PATTERN = { 4.0f, 4.0f };
 	}
 }

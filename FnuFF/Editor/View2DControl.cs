@@ -103,44 +103,27 @@ namespace Editor
 				_level = value;
 				_level.OnSolidChange += _invalidateAction;
 
-				/*var solid = new GeometrySolid();
-				solid.Points.AddRange
-				(
-					new[]
-					{
-					new Triple(0,0,0),
-					new Triple(2,0,1),
-					new Triple(2,0,3),
-					new Triple(0,0,2),
+				if( _directionType == 0 )
+				{
+					var solid = new GeometrySolid();
+					// TRIANGLE
+					/*solid.Faces.AddRange
+					(
+						new[]
+						{
+							new Face(new Triple(-1, 1, 0), 1),
+							new Face(new Triple(1,1,0), 1),
+							new Face(new Triple(0,0,1), 1),
+							new Face(new Triple(0,0,-1), 1),
+							new Face(new Triple(0,-1,0), 1)
+						}
+					);*/
 
-					new Triple(2,2,3),
-					new Triple(0,2,2),
-					new Triple(0,2,0),
-					new Triple(2,2,1),
-					}
-				);
-				solid.GenerateFaces();
-				//_level.AddSolid( solid );*/
-
-				var solid = new GeometrySolid();
-				// TRIANGLE
-				/*solid.Faces.AddRange
-				(
-					new[]
-					{
-						new Face(new Triple(-1, 1, 0), 1),
-						new Face(new Triple(1,1,0), 1),
-						new Face(new Triple(0,0,1), 1),
-						new Face(new Triple(0,0,-1), 1),
-						new Face(new Triple(0,-1,0), 1)
-					}
-				);*/
-
-				// PENTAGON
-				solid.Faces.AddRange
-				(
-					new[]
-					{
+					// PENTAGON
+					solid.Faces.AddRange
+					(
+						new[]
+						{
 						new Face(new Triple(0,0,1), 1),
 						new Face(new Triple(0,0,-1), 1),
 
@@ -149,25 +132,26 @@ namespace Editor
 						new Face(new Triple(1,1,0), 1),
 						new Face(new Triple(2,-1,0), 1),
 						new Face(new Triple(0,-1,0), 1)
-					}
-				);
+						}
+					);
 
-				// ROTATED CUBE
-				/*solid.Faces.AddRange
-				(
-					new[]
-					{
-						new Face(new Triple(0,0,1),1),
-						new Face(new Triple(0,0,-1),1),
+					// ROTATED CUBE
+					/*solid.Faces.AddRange
+					(
+						new[]
+						{
+							new Face(new Triple(0,0,1),1),
+							new Face(new Triple(0,0,-1),1),
 
-						new Face(new Triple(-1,-1,0), 1),
-						new Face(new Triple(-1,1,0), 1),
-						new Face(new Triple(1,1,0), 1 ),
-						new Face(new Triple(1,-1,0), 1 )
-					}
-				);*/
+							new Face(new Triple(-1,-1,0), 1),
+							new Face(new Triple(-1,1,0), 1),
+							new Face(new Triple(1,1,0), 1 ),
+							new Face(new Triple(1,-1,0), 1 )
+						}
+					);*/
 
-				_level.AddSolid( solid );
+					_level.AddSolid( solid );
+				}
 
 				Invalidate();
 			}
@@ -187,7 +171,7 @@ namespace Editor
             _gridGap = 64;
 			
             _solidPen = new Pen( Color.White );
-			_solidPen.DashPattern = new[] { 2.0f, 2.0f };
+			_solidPen.DashPattern = EditorColors.DASH_PATTERN;
 
             _snapToGrid = true;
 
@@ -302,11 +286,15 @@ namespace Editor
 				if( solid.Selected || solid.Hovered )
 					_solidPen.DashStyle = DashStyle.Solid;
 				else
+				{
 					_solidPen.DashStyle = DashStyle.Dash;
+					_solidPen.DashPattern = EditorColors.DASH_PATTERN;
+				}
 
 				_solidPen.Color = color;
 
-				var faces = solid.Faces.Where( x => Math.Abs(x.Plane.Normal.Dot( _camera.Direction )) > Extensions.EPSILON ).ToArray();
+				//var faces = solid.Faces.Where( x => Math.Abs(x.Plane.Normal.Dot( _camera.Direction )) > Extensions.EPSILON ).ToArray();
+				var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 				foreach( var face in faces )
 				{
 					var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
@@ -355,6 +343,9 @@ namespace Editor
 
 			if( e.Button == MouseButtons.Middle )
 				_mmbDown = true;
+
+			if( e.Button == MouseButtons.Left )
+				_lmbDown = true;
 
 			if( EditorTool.Current == EditorTools.Solid )
 			{
@@ -484,6 +475,9 @@ namespace Editor
 									minBounds = bounds;
 								}
 							}*/
+
+							if( solid.Hovered )
+								_selectedSolid = solid;
 						}
 
 						if( _selectedSolid != null )
@@ -626,7 +620,7 @@ namespace Editor
 				else if( EditorTool.Current == EditorTools.Select )
 				{
 					var hadHover = false;
-					var minDepth = 99999;
+					var minDepth = 99999.0f;
 					GeometrySolid minSolid = null;
 					GeometrySolid prevHover = null;
 					foreach( var solid in _level.Solids )
@@ -650,6 +644,69 @@ namespace Editor
 								minSolid = solid;
 							}
 						}*/
+
+						var mpos = new Triple( e.X, e.Y, 0 );
+
+						//var faces = solid.Faces.Where( x => Math.Abs( x.Plane.Normal.Dot( _camera.Direction ) ) > Extensions.EPSILON ).ToArray();
+						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
+						
+						for( int i=0; i<faces.Length; i++ )
+						{
+							var face = faces[i];
+							var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
+
+							var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
+
+							var lineIndices = new Point[windingPoints.Length];
+							for( int j = 0; j < windingPoints.Length - 1; j++ )
+								lineIndices[j] = new Point( j, j + 1 );
+							lineIndices[lineIndices.Length - 1] = new Point( lineIndices.Length - 1, 0 );
+
+							var hovered = false;
+							for( int j = 0; j < lineIndices.Length && !hovered; j++ )
+							{
+								var i0 = lineIndices[j].X;
+								var i1 = lineIndices[j].Y;
+
+								var p0 = windingPoints[i0].ToTriple();
+								var p1 = windingPoints[i1].ToTriple();
+								var dir = p1 - p0;
+								dir.Normalize();
+								
+								var dif = mpos - p0;
+								var proj = dir * dif.Dot( dir );
+
+								var u = dif - proj;
+								var distance = u.Length();
+
+								if( distance < 8.0f )
+								{
+									// check if point is within segment
+									var d0 = (mpos-p0).Dot( dir );
+									var d1 = (mpos-p1).Dot( dir );
+									if( (d0 < 0 && d1 > 0) || (d0 > 0 && d1 < 0))
+									{
+										hovered = true;
+
+										var localMinDepth = 9999.0f;
+										foreach( var p in points )
+										{
+											var depth = p.Dot( _camera.Direction );
+											if( depth < localMinDepth )
+												localMinDepth = depth;
+										}
+
+										if( localMinDepth < minDepth )
+										{
+											minDepth = localMinDepth;
+											minSolid = solid;
+										}
+									}
+								}
+							}
+						}
 					}
 
 					if( minSolid != null )

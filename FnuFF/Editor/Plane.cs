@@ -68,5 +68,11 @@ namespace Editor
 			var distanceAlongNormal = point.Dot( _normal );
 			return ( Math.Abs( distanceAlongNormal - _d ) < EPSILON );
 		}
+
+		public float Distance( Triple point )
+		{
+			var distanceAlongNormal = point.Dot( _normal );
+			return ( _d - distanceAlongNormal );
+		}
 	}
 }
