@@ -116,7 +116,7 @@ namespace Editor
 			//if( value < 0 )
 				//value -= gapSize; // TODO: Change to gap
 
-			return (int)( value / gap ) * gap;
+			return (int)( Math.Round( value / gap ) * gap);
 		}
 
 		public PointF Snap( int gapSize, PointF value )
