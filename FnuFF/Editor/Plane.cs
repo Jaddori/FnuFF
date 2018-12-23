@@ -11,6 +11,7 @@ namespace Editor
 	public class Plane
 	{
 		private const float EPSILON = 0.001f;
+		private const float EPSILON_MINOR = 0.00001f;
 
 		private Triple _normal;
 		private float _d;
@@ -58,8 +59,8 @@ namespace Editor
 			//var dif = Math.Abs( distanceAlongNormal - _d );
 			//return ( dif > -EPSILON );
 
-			//var greater = (distanceAlongNormal + EPSILON > _d);
-			var greater = ( distanceAlongNormal > _d );
+			var greater = (distanceAlongNormal - EPSILON_MINOR > _d);
+			//var greater = ( distanceAlongNormal > _d );
 			return greater;
 		}
 

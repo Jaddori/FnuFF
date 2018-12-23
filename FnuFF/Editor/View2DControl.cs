@@ -150,7 +150,7 @@ namespace Editor
 						}
 					);*/
 
-					_level.AddSolid( solid );
+					//_level.AddSolid( solid );
 				}
 
 				Invalidate();
@@ -200,10 +200,10 @@ namespace Editor
 		{
 			base.OnCreateControl();
 
-			/*if(_directionType == 1 )
+			if(_directionType == 1 )
 				_camera.Position = new PointF( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.25f) );
 			else
-				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );*/
+				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
 
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
@@ -304,11 +304,14 @@ namespace Editor
 
 					var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
-					for( int i = 0; i < windingPoints.Length - 1; i++ )
+					if( windingPoints.Length > 0 )
 					{
-						g.DrawLine( _solidPen, windingPoints[i], windingPoints[i + 1] );
+						for( int i = 0; i < windingPoints.Length - 1; i++ )
+						{
+							g.DrawLine( _solidPen, windingPoints[i], windingPoints[i + 1] );
+						}
+						g.DrawLine( _solidPen, windingPoints[windingPoints.Length - 1], windingPoints[0] );
 					}
-					g.DrawLine( _solidPen, windingPoints[windingPoints.Length - 1], windingPoints[0] );
 
 					facePoints.AddRange( projectedPoints );
 				}
@@ -364,9 +367,6 @@ namespace Editor
 			if( e.Button == MouseButtons.Middle )
 				_mmbDown = true;
 
-			if( e.Button == MouseButtons.Left )
-				_lmbDown = true;
-
 			if( EditorTool.Current == EditorTools.Solid )
 			{
 				if( e.Button == MouseButtons.Left )
@@ -403,6 +403,33 @@ namespace Editor
 
 						if( _handleIndex >= 0 )
 							Cursor.Current = HANDLE_CURSORS[_handleIndex];*/
+
+						var facePoints = new List<PointF>();
+						var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
+						foreach( var face in faces )
+						{
+							var otherPlanes = _selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
+
+							facePoints.AddRange( projectedPoints );
+						}
+
+						var bounds = Extensions.FromPoints( facePoints.ToArray() );
+						var handles = Extensions.GetHandles( bounds, 8 );
+						
+						for( int i = 0; i < handles.Length && _handleIndex < 0; i++ )
+						{
+							if( handles[i].Contains( e.Location ) )
+							{
+								_handleIndex = i;
+							}
+						}
+
+						if( _handleIndex >= 0 )
+						{
+							Cursor.Current = HANDLE_CURSORS[_handleIndex];
+						}
 					}
 				}
 			}
@@ -421,6 +448,22 @@ namespace Editor
 
 			if( e.Button == MouseButtons.Middle )
 				_mmbDown = false;
+
+			if( e.Button == MouseButtons.Right )
+			{
+				if( _selectedSolid != null )
+				{
+					var dir = new Triple( -1, 0, 0 );
+					var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( dir ) > 0 ).ToArray();
+					for( int i = 0; i < faces.Length; i++ )
+					{
+						faces[i].Plane.D += 1.0f;
+					}
+
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
+			}
 
 			if( EditorTool.Current == EditorTools.Solid )
 			{
@@ -602,6 +645,33 @@ namespace Editor
 				}
 
 				Cursor.Current = HANDLE_CURSORS[_handleIndex];*/
+
+				var localSnap = SnapToGrid( e.Location );
+				_hoverPosition = localSnap;
+
+				var globalSnap = _camera.Unproject( _camera.ToGlobal(localSnap).Deflate( _gridGap ).Inflate( _gridSize ) );
+
+				var localDirection = new PointF( 0, 0 );
+
+				if( _handleIndex % 3 == 0 )
+					localDirection.X = -1.0f;
+				else if( ( _handleIndex + 1 ) % 3 == 0 )
+					localDirection.X = 1.0f;
+
+				if( _handleIndex / 3 == 0 )
+					localDirection.Y = -1.0f;
+				else if( _handleIndex / 3 == 2 )
+					localDirection.Y = 1.0f;
+
+				var globalDirection = _camera.Unproject( localDirection );
+
+				var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
+				for( int i = 0; i < faces.Length; i++ )
+				{
+					faces[i].Plane.D = globalSnap.Dot( faces[i].Plane.Normal );
+				}
+
+				Invalidate();
 			}
 			else if( _spaceDown || _mmbDown )
 			{
@@ -678,11 +748,14 @@ namespace Editor
 							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
 
 							var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
-
+							
 							var lineIndices = new Point[windingPoints.Length];
-							for( int j = 0; j < windingPoints.Length - 1; j++ )
-								lineIndices[j] = new Point( j, j + 1 );
-							lineIndices[lineIndices.Length - 1] = new Point( lineIndices.Length - 1, 0 );
+							if( lineIndices.Length > 0 )
+							{
+								for( int j = 0; j < windingPoints.Length - 1; j++ )
+									lineIndices[j] = new Point( j, j + 1 );
+								lineIndices[lineIndices.Length - 1] = new Point( lineIndices.Length - 1, 0 );
+							}
 
 							var hovered = false;
 							for( int j = 0; j < lineIndices.Length && !hovered; j++ )
@@ -748,18 +821,33 @@ namespace Editor
 					// check interaction with handles
 					if( _selectedSolid != null )
 					{
-						/*var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
+						var facePoints = new List<PointF>();
+						var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
+						foreach( var face in faces )
+						{
+							var otherPlanes = _selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
+
+							facePoints.AddRange( projectedPoints );
+						}
+
+						var bounds = Extensions.FromPoints( facePoints.ToArray() );
 						var handles = Extensions.GetHandles( bounds, 8 );
 
-						var cursorChanged = false;
-						for( int i = 0; i < handles.Length && !cursorChanged; i++ )
+						var hoverHandleIndex = -1;
+						for( int i=0; i<handles.Length && hoverHandleIndex < 0; i++ )
 						{
 							if( handles[i].Contains( e.Location ) )
 							{
-								Cursor.Current = HANDLE_CURSORS[i];
-								cursorChanged = true;
+								hoverHandleIndex = i;
 							}
-						}*/
+						}
+
+						if( hoverHandleIndex >= 0 )
+						{
+							Cursor.Current = HANDLE_CURSORS[hoverHandleIndex];
+						}
 					}
 				}
 			}

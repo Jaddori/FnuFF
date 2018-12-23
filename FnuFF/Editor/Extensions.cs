@@ -45,6 +45,21 @@ namespace Editor
 			return new RectangleF( center.X - size / 2, center.Y - size / 2, size, size );
 		}
 
+		public static RectangleF FromPoints( PointF[] points )
+		{
+			var result = new RectangleF();
+
+			if( points.Length > 1 )
+			{
+				var topLeft = new PointF( points.Min( x => x.X ), points.Min( x => x.Y ) );
+				var bottomRight = new PointF( points.Max( x => x.X ), points.Max( x => x.Y ) );
+
+				result = new RectangleF( topLeft.X, topLeft.Y, bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y );
+			}
+
+			return result;
+		}
+
 		public static Rectangle Downcast( this RectangleF r )
 		{
 			return new Rectangle( (int)r.X, (int)r.Y, (int)r.Width, (int)r.Height );
