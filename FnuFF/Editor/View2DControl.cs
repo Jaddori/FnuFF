@@ -294,6 +294,7 @@ namespace Editor
 				_solidPen.Color = color;
 
 				//var faces = solid.Faces.Where( x => Math.Abs(x.Plane.Normal.Dot( _camera.Direction )) > Extensions.EPSILON ).ToArray();
+				var facePoints = new List<PointF>();
 				var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 				foreach( var face in faces )
 				{
@@ -308,6 +309,25 @@ namespace Editor
 						g.DrawLine( _solidPen, windingPoints[i], windingPoints[i + 1] );
 					}
 					g.DrawLine( _solidPen, windingPoints[windingPoints.Length - 1], windingPoints[0] );
+
+					facePoints.AddRange( projectedPoints );
+				}
+
+				if( solid.Selected )
+				{
+					var topleft = new PointF( facePoints.Min( x => x.X ), facePoints.Min( x => x.Y ) );
+					var bottomright = new PointF( facePoints.Max( x => x.X ), facePoints.Max( x => x.Y ) );
+					var bounds = new RectangleF( topleft.X, topleft.Y, bottomright.X - topleft.X, bottomright.Y - topleft.Y );
+
+					var handles = Extensions.GetHandles( bounds, 8 );
+					var drawBounds = bounds.Downcast();
+
+					// draw handle outline
+					g.DrawRectangle( EditorColors.PEN_DASH_FADED_HANDLE_OUTLINE, drawBounds );
+
+					// draw handles
+					foreach( var handle in handles )
+						g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
 				}
 			}
 

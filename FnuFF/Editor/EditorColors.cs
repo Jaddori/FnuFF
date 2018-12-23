@@ -47,6 +47,7 @@ namespace Editor
 		public static Pen PEN_DASH_FADED_BLUE = new Pen( Color.FromArgb( 128, Color.Blue ) ) { DashPattern = new[] { 2.0f, 2.0f } };
 
 		public static Pen PEN_HANDLE_OUTLINE = Pens.Black;
+		public static Pen PEN_DASH_FADED_HANDLE_OUTLINE = new Pen( Color.FromArgb( 128, Color.DarkGray ) ) { DashPattern = new[] { 2.0f, 2.0f } };
 
 		// values
 		public static int FADE = 64;

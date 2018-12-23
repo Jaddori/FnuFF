@@ -45,6 +45,11 @@ namespace Editor
 			return new RectangleF( center.X - size / 2, center.Y - size / 2, size, size );
 		}
 
+		public static Rectangle Downcast( this RectangleF r )
+		{
+			return new Rectangle( (int)r.X, (int)r.Y, (int)r.Width, (int)r.Height );
+		}
+
 		public static PointF GetCenter( RectangleF r )
 		{
 			return new PointF( r.Left + r.Width / 2, r.Top + r.Height / 2 );
