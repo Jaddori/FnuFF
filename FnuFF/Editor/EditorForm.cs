@@ -97,6 +97,7 @@ namespace Editor
 
 				if( success )
 				{
+					view_3d.Level = _level;
 					view_topRight.Level = _level;
 					view_bottomLeft.Level = _level;
 					view_bottomRight.Level = _level;

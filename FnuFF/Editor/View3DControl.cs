@@ -48,6 +48,8 @@ namespace Editor
 			{
 				_level = value;
 				_level.OnSolidChange += () => Invalidate();
+
+				Invalidate();
 			}
 		}
 

@@ -13,19 +13,13 @@ namespace Editor
 		private Plane _plane;
 		private Triple _u;
 		private Triple _v;
-		//private Triple[] _vertices;
-		
-		//public Triple Normal { get { return _normal; } set { _normal = value; } }
-		//public float D { get { return _d; } set { _d = value; } }
+
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public Triple U { get { return _u; } set { _u = value; } }
 		public Triple V { get { return _v; } set { _v = value; } }
-		//public Triple[] Vertices { get { return _vertices; } set { _vertices = value; } }
-		public Triple[] Vertices;
 
 		public Face()
 		{
-			Vertices = new Triple[3];
 			_plane = new Plane();
 			_u = new Triple();
 			_v = new Triple();
@@ -41,8 +35,6 @@ namespace Editor
 			_plane = new Plane( normal, d );
 			_u = u;
 			_v = v;
-
-			Vertices = new Triple[3];
 		}
 	}
 }
