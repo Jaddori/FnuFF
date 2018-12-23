@@ -13,12 +13,12 @@ namespace Editor
 		public const float MIN_ZOOM = 1.0f;
 		public const float MAX_ZOOM = 10.0f;
 
-		private Point _position;
+		private PointF _position;
 		private float _zoom;
 		private int _speed;
 		private Triple _direction;
 
-		public Point Position { get { return _position; } set { _position = value; } }
+		public PointF Position { get { return _position; } set { _position = value; } }
 		public float Zoom
 		{
 			get { return _zoom; }
@@ -41,27 +41,27 @@ namespace Editor
 			_speed = 4;
 		}
 
-		public void Move( int deltaX, int deltaY )
+		public void Move( float deltaX, float deltaY )
 		{
 			_position.X += deltaX * _speed;
 			_position.Y += deltaY * _speed;
 		}
 
-		public Point ToLocal( Point point )
+		public PointF ToLocal( PointF point )
 		{
-			return new Point
+			return new PointF
 			(
-				(int)( point.X / _zoom ) - _position.X,
-				(int)( point.Y / _zoom ) - _position.Y
+				point.X / _zoom - _position.X,
+				point.Y / _zoom - _position.Y
 			);
 		}
 
-		public Point ToGlobal( Point point )
+		public PointF ToGlobal( PointF point )
 		{
-			return new Point( (int)( ( point.X + _position.X ) * _zoom ), (int)( ( point.Y + _position.Y ) * _zoom ) );
+			return new PointF( ( point.X + _position.X ) * _zoom, ( point.Y + _position.Y ) * _zoom );
 		}
 
-		public Point Project( Triple point )
+		public PointF Project( Triple point )
 		{
 			var bx = _direction.Y * point.X;
 			var az = _direction.X * point.Z;
@@ -74,10 +74,10 @@ namespace Editor
 			var x = az + bx + cx;
 			var y = bz - ay - cy;
 
-			return new Point( (int)x, (int)y );
+			return new PointF( (int)x, (int)y );
 		}
 
-		public Triple Unproject( Point point, int depth = 0 )
+		public Triple Unproject( PointF point, int depth = 0 )
 		{
 			var bx = _direction.Y * point.X;
 			var cx = _direction.Z * point.X;
@@ -119,9 +119,9 @@ namespace Editor
 			return (int)( value / gap ) * gap;
 		}
 
-		public Point Snap( int gapSize, Point value )
+		public PointF Snap( int gapSize, PointF value )
 		{
-			return new Point( Snap( gapSize, value.X ), Snap( gapSize, value.Y ) );
+			return new PointF( Snap( gapSize, value.X ), Snap( gapSize, value.Y ) );
 		}
     }
 }

@@ -16,10 +16,10 @@ namespace Editor.UnitTests
 		{
 			var points = new[]
 			{
-				new Point(0,-1),
-				new Point(-1,-1),
-				new Point(0,0),
-				new Point(-1,0)
+				new PointF(0,-1),
+				new PointF(-1,-1),
+				new PointF(0,0),
+				new PointF(-1,0)
 			};
 
 			var sorted = Extensions.WindingSort2D( points );
@@ -35,10 +35,10 @@ namespace Editor.UnitTests
 		{
 			var points = new[]
 			{
-				new Point(0,1),
-				new Point(1,1),
-				new Point(0,0),
-				new Point(1,0)
+				new PointF(0,1),
+				new PointF(1,1),
+				new PointF(0,0),
+				new PointF(1,0)
 			};
 
 			var sorted = Extensions.WindingSort2D( points );
@@ -54,10 +54,10 @@ namespace Editor.UnitTests
 		{
 			var points = new[]
 			{
-				new Point(0,0),
-				new Point(1,0),
-				new Point(0,1),
-				new Point(1,1)
+				new PointF(0,0),
+				new PointF(1,0),
+				new PointF(0,1),
+				new PointF(1,1)
 			};
 
 			var sorted = Extensions.WindingSort2D( points );
@@ -73,10 +73,10 @@ namespace Editor.UnitTests
 		{
 			var points = new[]
 			{
-				new Point(0,0),
-				new Point(-1,0),
-				new Point(0,-1),
-				new Point(-1,-1)
+				new PointF(0,0),
+				new PointF(-1,0),
+				new PointF(0,-1),
+				new PointF(-1,-1)
 			};
 
 			var sorted = Extensions.WindingSort2D( points );
@@ -92,10 +92,10 @@ namespace Editor.UnitTests
 		{
 			var points = new[]
 			{
-				new Point(0,-1),
-				new Point(0,0),
-				new Point(-1,-1),
-				new Point(-1,0)
+				new PointF(0,-1),
+				new PointF(0,0),
+				new PointF(-1,-1),
+				new PointF(-1,0)
 			};
 
 			var sorted = Extensions.WindingSort2D( points );
@@ -111,10 +111,10 @@ namespace Editor.UnitTests
 		{
 			var points = new[]
 			{
-				new Point(0,1),
-				new Point(0,0),
-				new Point(1,1),
-				new Point(1,0)
+				new PointF(0,1),
+				new PointF(0,0),
+				new PointF(1,1),
+				new PointF(1,0)
 			};
 
 			var sorted = Extensions.WindingSort2D( points );
@@ -130,10 +130,10 @@ namespace Editor.UnitTests
 		{
 			var points = new[]
 			{
-				new Point(0,-1),
-				new Point(-1,-1),
-				new Point(0,0),
-				new Point(-1,0)
+				new PointF(0,-1),
+				new PointF(-1,-1),
+				new PointF(0,0),
+				new PointF(-1,0)
 			};
 
 			var sorted = Extensions.WindingIndex2D( points );

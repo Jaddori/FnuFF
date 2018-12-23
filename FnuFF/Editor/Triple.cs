@@ -85,7 +85,7 @@ namespace Editor
 			Z /= magnitude;
 		}
 
-		public Point Project( Triple t )
+		public PointF Project( Triple t )
 		{
 			var bx = t.Y * X;
 			var az = t.X * Z;
@@ -98,7 +98,7 @@ namespace Editor
 			var x = bx + az + cx;
 			var y = ay + bz + cy;
 
-			return new Point( (int)x, (int)y );
+			return new PointF( x, y );
 		}
 
 		public PointF ProjectF( Triple t )

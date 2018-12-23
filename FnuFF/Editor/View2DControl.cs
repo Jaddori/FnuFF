@@ -52,16 +52,16 @@ namespace Editor
         private int _gridSizeIndex;
 
         private Pen _solidPen;
-        private Point _startPosition;
-        private Point _endPosition;
+        private PointF _startPosition;
+        private PointF _endPosition;
         private bool _snapToGrid;
         private bool _lmbDown;
 		private bool _mmbDown;
 		private bool _spaceDown;
         private int _directionType;
-		private Point _hoverPosition;
+		private PointF _hoverPosition;
 
-		private Point _previousMousePosition;
+		private PointF _previousMousePosition;
 
 		//private SizeHandle[] _sizeHandles;
 		private int _handleIndex;
@@ -167,7 +167,7 @@ namespace Editor
 					}
 				);*/
 
-				//_level.AddSolid( solid );
+				_level.AddSolid( solid );
 
 				Invalidate();
 			}
@@ -203,7 +203,7 @@ namespace Editor
 			_handleIndex = -1;
         }
 
-		private Point SnapToGrid( Point point )
+		private PointF SnapToGrid( PointF point )
 		{
 			var result = _camera.ToGlobal( point );
 			result = _camera.Snap( _gridGap, result );
@@ -217,9 +217,9 @@ namespace Editor
 			base.OnCreateControl();
 
 			if(_directionType == 1 )
-				_camera.Position = new Point( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.25f) );
+				_camera.Position = new PointF( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.25f) );
 			else
-				_camera.Position = new Point( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
+				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
 
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
@@ -230,7 +230,7 @@ namespace Editor
 		protected override void OnPaint( PaintEventArgs e )
         {
             var g = e.Graphics;
-            var rect = new Rectangle( 0, 0, Size.Width, Size.Height );
+            var rect = new RectangleF( 0, 0, Size.Width, Size.Height );
 
             // paint background
             g.FillRectangle( _backgroundBrush, rect );
@@ -241,8 +241,8 @@ namespace Editor
 			// paint grid
 			for( int x = -GRID_MAX_LINES; x <= GRID_MAX_LINES; x++ )
 			{
-				var p1 = new Point( x * _gridGap, -GRID_MAX_LINES*_gridGap );
-				var p2 = new Point( p1.X, GRID_MAX_LINES * _gridGap );
+				var p1 = new PointF( x * _gridGap, -GRID_MAX_LINES*_gridGap );
+				var p2 = new PointF( p1.X, GRID_MAX_LINES * _gridGap );
 
 				var g1 = _camera.ToLocal( p1 );
 				var g2 = _camera.ToLocal( p2 );
@@ -253,8 +253,8 @@ namespace Editor
 			
 			for( int y = -GRID_MAX_LINES; y <= GRID_MAX_LINES; y++ )
 			{
-				var p1 = new Point( -GRID_MAX_LINES * _gridGap, y*_gridGap );
-				var p2 = new Point( GRID_MAX_LINES * _gridGap, p1.Y );
+				var p1 = new PointF( -GRID_MAX_LINES * _gridGap, y*_gridGap );
+				var p2 = new PointF( GRID_MAX_LINES * _gridGap, p1.Y );
 
 				var g1 = _camera.ToLocal( p1 );
 				var g2 = _camera.ToLocal( p2 );
@@ -284,10 +284,10 @@ namespace Editor
             // paint outline of new solid
             if( _lmbDown )
             {
-                var minPoint = new Point( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
-                var maxPoint = new Point( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
-                var solidRect = new Rectangle( minPoint, new Size( maxPoint.X - minPoint.X, maxPoint.Y - minPoint.Y ) );
-                g.DrawRectangle( EditorColors.PEN_WHITE, solidRect );
+                var minPoint = new PointF( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
+                var maxPoint = new PointF( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
+                var solidRect = new RectangleF( minPoint, new SizeF( maxPoint.X - minPoint.X, maxPoint.Y - minPoint.Y ) );
+				g.DrawRectangle( EditorColors.PEN_WHITE, solidRect.X, solidRect.Y, solidRect.Width, solidRect.Height );
             }
 
 			// paint solids
@@ -328,8 +328,8 @@ namespace Editor
 				// (DEBUG) paint hover position
 				using( var pen = new Pen( Color.Blue ) )
 				{
-					g.DrawLine( pen, new Point( _hoverPosition.X - 4, _hoverPosition.Y ), new Point( _hoverPosition.X + 4, _hoverPosition.Y ) );
-					g.DrawLine( pen, new Point( _hoverPosition.X, _hoverPosition.Y - 4 ), new Point( _hoverPosition.X, _hoverPosition.Y + 4 ) );
+					g.DrawLine( pen, new PointF( _hoverPosition.X - 4, _hoverPosition.Y ), new PointF( _hoverPosition.X + 4, _hoverPosition.Y ) );
+					g.DrawLine( pen, new PointF( _hoverPosition.X, _hoverPosition.Y - 4 ), new PointF( _hoverPosition.X, _hoverPosition.Y + 4 ) );
 				}
 
 				// (DEBUG) paint log
@@ -425,8 +425,8 @@ namespace Editor
 					_lmbDown = false;
 					Invalidate();
 
-					var min = new Point( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
-					var max = new Point( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
+					var min = new PointF( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
+					var max = new PointF( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
 
 					if( max.X - min.X > Extensions.EPSILON && max.Y - min.Y > Extensions.EPSILON )
 					{
@@ -464,7 +464,7 @@ namespace Editor
 						var hadSelection = false;
 						var minDepth = 99999;
 						_selectedSolid = null;
-						var minBounds = Rectangle.Empty;
+						var minBounds = RectangleF.Empty;
 						foreach( var solid in _level.Solids )
 						{
 							if( solid.Selected )
@@ -535,8 +535,8 @@ namespace Editor
 				
 				if( snapPosition.X != bounds.X || snapPosition.Y != bounds.Y )
 				{
-					var min = new Point( bounds.Left, bounds.Top );
-					var max = new Point( bounds.Right, bounds.Bottom );
+					var min = new PointF( bounds.Left, bounds.Top );
+					var max = new PointF( bounds.Right, bounds.Bottom );
 
 					var newBounds = bounds;
 
@@ -545,8 +545,8 @@ namespace Editor
 						var halfWidth = newBounds.Width / 2;
 						var halfHeight = newBounds.Height / 2;
 
-						snapPosition = SnapToGrid( new Point( e.Location.X - halfWidth, e.Location.Y - halfHeight ) );
-						newBounds = new Rectangle( snapPosition.X, snapPosition.Y, newBounds.Width, newBounds.Height );
+						snapPosition = SnapToGrid( new PointF( e.Location.X - halfWidth, e.Location.Y - halfHeight ) );
+						newBounds = new RectangleF( snapPosition.X, snapPosition.Y, newBounds.Width, newBounds.Height );
 					}
 					else
 					{
@@ -591,7 +591,7 @@ namespace Editor
 			}
 			else if( _spaceDown || _mmbDown )
 			{
-				var mouseDelta = new Point( e.X - _previousMousePosition.X, e.Y - _previousMousePosition.Y );
+				var mouseDelta = new PointF( e.X - _previousMousePosition.X, e.Y - _previousMousePosition.Y );
 				_camera.Move( -mouseDelta.X, -mouseDelta.Y );
 
 				Invalidate();
@@ -702,7 +702,7 @@ namespace Editor
             base.OnKeyDown( e );
 
             // camera input
-            var movement = new Point();
+            var movement = new PointF();
             if( e.KeyCode == Keys.Left || e.KeyCode == Keys.A )
                 movement.X = -1;
             else if( e.KeyCode == Keys.Right || e.KeyCode == Keys.D )
