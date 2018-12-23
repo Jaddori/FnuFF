@@ -204,11 +204,28 @@ namespace Editor
 				}
 			}*/
 
+			var cur = -1;
 			foreach( var face in _faces )
 			{
+				cur++;
+				//if( cur != 3 )
+				//	continue;
+
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-				var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
+				var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
+
+				var rr = face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) );
+				var gg = face.Plane.Normal.Dot( new Triple( 0, 1, 0 ) );
+				var bb = face.Plane.Normal.Dot( new Triple( 0, 0, 1 ) );
+				var aa = 1.0f;
+
+				if( rr < Extensions.EPSILON )
+					rr += 1.0f;
+				if( gg < Extensions.EPSILON )
+					gg += 1.0f;
+				if( bb < Extensions.EPSILON )
+					bb += 1.0f;
 
 				var v0 = points[indices[0]];
 				for( int j = 1; j < indices.Length - 1; j++ )
@@ -233,6 +250,7 @@ namespace Editor
 						v1 = temp;
 					}
 
+					GL.Color4f( rr, gg, bb, aa );
 					GL.Vertex3f( v0.X, v0.Y, v0.Z );
 					GL.Vertex3f( v1.X, v1.Y, v1.Z );
 					GL.Vertex3f( v2.X, v2.Y, v2.Z );

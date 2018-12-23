@@ -199,6 +199,31 @@ namespace Editor
 			return WindingIndex2D( projectedPoints );
 		}
 
+		public static int[] WindingIndex2DF( PointF[] points )
+		{
+			var cx = 0.0f;
+			var cy = 0.0f;
+			foreach( var p in points )
+			{
+				cx += p.X;
+				cy += p.Y;
+			}
+
+			cx /= points.Length;
+			cy /= points.Length;
+
+			var sorted = points.Select( ( x, i ) => new { point = x, index = i } ).OrderBy( x => Math.Atan2( x.point.Y - cy, x.point.X - cx ) ).Select( x => x.index ).ToArray();
+			return sorted;
+		}
+
+		public static int[] WindingIndex3DF( Triple[] points, Triple normal )
+		{
+			normal.Normalize();
+			var projectedPoints = points.Select( x => x.ProjectF( normal ) ).ToArray();
+
+			return WindingIndex2DF( projectedPoints );
+		}
+
 		public static Triple[] IntersectPlanes( Plane p0, Plane[] ps )
 		{
 			var points = new List<Triple>();

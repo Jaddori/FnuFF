@@ -57,6 +57,11 @@ namespace Editor
 			return new Triple( a.X / b, a.Y / b, a.Z / b );
 		}
 
+		public float Length()
+		{
+			return (float)Math.Sqrt( X * X + Y * Y + Z * Z );
+		}
+
 		public float Dot( Triple t )
 		{
 			return ( X * t.X + Y * t.Y + Z * t.Z );
@@ -94,6 +99,44 @@ namespace Editor
 			var y = ay + bz + cy;
 
 			return new Point( (int)x, (int)y );
+		}
+
+		public PointF ProjectF( Triple t )
+		{
+			var mx = X;
+			var my = Y;
+			var mz = Z;
+
+			if( t.X < 0 )
+			{
+				t.X *= -1.0f;
+				mx *= -1.0f;
+			}
+
+			if( t.Y < 0 )
+			{
+				t.Y *= -1.0f;
+				my *= -1.0f;
+			}
+
+			if( t.Z < 0 )
+			{
+				t.Z *= -1.0f;
+				mz *= -1.0f;
+			}
+
+			var bx = t.Y * mx;
+			var az = t.X * mz;
+			var cx = t.Z * mx;
+
+			var ay = t.X * my;
+			var bz = t.Y * mz;
+			var cy = t.Z * my;
+
+			var x = bx + az + cx;
+			var y = ay + bz + cy;
+
+			return new PointF( x,y );
 		}
 
 		public void Inflate( float value )

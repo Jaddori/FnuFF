@@ -122,6 +122,53 @@ namespace Editor
 				solid.GenerateFaces();
 				//_level.AddSolid( solid );*/
 
+				var solid = new GeometrySolid();
+				// TRIANGLE
+				/*solid.Faces.AddRange
+				(
+					new[]
+					{
+						new Face(new Triple(-1, 1, 0), 1),
+						new Face(new Triple(1,1,0), 1),
+						new Face(new Triple(0,0,1), 1),
+						new Face(new Triple(0,0,-1), 1),
+						new Face(new Triple(0,-1,0), 1)
+					}
+				);*/
+
+				// PENTAGON
+				solid.Faces.AddRange
+				(
+					new[]
+					{
+						new Face(new Triple(0,0,1), 1),
+						new Face(new Triple(0,0,-1), 1),
+
+						new Face(new Triple(-2,-1,0),1),
+						new Face(new Triple(-1,1,0), 1),
+						new Face(new Triple(1,1,0), 1),
+						new Face(new Triple(2,-1,0), 1),
+						new Face(new Triple(0,-1,0), 1)
+					}
+				);
+
+				// ROTATED CUBE
+				/*solid.Faces.AddRange
+				(
+					new[]
+					{
+						new Face(new Triple(0,0,1),1),
+						new Face(new Triple(0,0,-1),1),
+
+						new Face(new Triple(-1,-1,0), 1),
+						new Face(new Triple(-1,1,0), 1),
+						new Face(new Triple(1,1,0), 1 ),
+						new Face(new Triple(1,-1,0), 1 )
+					}
+				);*/
+
+				//_level.AddSolid( solid );
+
 				Invalidate();
 			}
 		}
