@@ -216,10 +216,10 @@ namespace Editor
 		{
 			base.OnCreateControl();
 
-			if(_directionType == 1 )
+			/*if(_directionType == 1 )
 				_camera.Position = new PointF( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.25f) );
 			else
-				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
+				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );*/
 
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
@@ -306,7 +306,7 @@ namespace Editor
 
 				_solidPen.Color = color;
 
-				var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) < 0 ).ToArray();
+				var faces = solid.Faces.Where( x => Math.Abs(x.Plane.Normal.Dot( _camera.Direction )) > Extensions.EPSILON ).ToArray();
 				foreach( var face in faces )
 				{
 					var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();

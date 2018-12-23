@@ -74,7 +74,7 @@ namespace Editor
 			var x = az + bx + cx;
 			var y = bz - ay - cy;
 
-			return new PointF( (int)x, (int)y );
+			return new PointF( x, y );
 		}
 
 		public Triple Unproject( PointF point, int depth = 0 )

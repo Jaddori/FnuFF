@@ -141,12 +141,12 @@ namespace Editor
 
 		public static PointF Inflate( this PointF point, float value )
 		{
-			return new PointF((int)( point.X * value ), (int)( point.Y * value ));
+			return new PointF(point.X * value, point.Y * value);
 		}
 
 		public static PointF Deflate( this PointF point, float value )
 		{
-			return new PointF((int)( point.X / value ), (int)( point.Y / value ));
+			return new PointF(point.X / value, point.Y / value);
 		}
 
 		public static PointF[] WindingSort2D( PointF[] points )
