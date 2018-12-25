@@ -271,6 +271,7 @@
 			this.btn_face.Name = "btn_face";
 			this.btn_face.Pressed = false;
 			this.btn_face.Selected = false;
+			this.btn_face.SelectedImage = global::Editor.Properties.Resources.icon_face_selected;
 			this.btn_face.Size = new System.Drawing.Size(58, 32);
 			this.btn_face.TabIndex = 6;
 			this.btn_face.Tag = "";
@@ -285,6 +286,7 @@
 			this.btn_texture.Name = "btn_texture";
 			this.btn_texture.Pressed = false;
 			this.btn_texture.Selected = false;
+			this.btn_texture.SelectedImage = global::Editor.Properties.Resources.icon_texture_selected;
 			this.btn_texture.Size = new System.Drawing.Size(58, 32);
 			this.btn_texture.TabIndex = 5;
 			this.btn_texture.Tag = "";
@@ -299,6 +301,7 @@
 			this.btn_clip.Name = "btn_clip";
 			this.btn_clip.Pressed = false;
 			this.btn_clip.Selected = false;
+			this.btn_clip.SelectedImage = global::Editor.Properties.Resources.icon_clip_selected;
 			this.btn_clip.Size = new System.Drawing.Size(58, 32);
 			this.btn_clip.TabIndex = 4;
 			this.btn_clip.Tag = "";
@@ -313,6 +316,7 @@
 			this.btn_vertex.Name = "btn_vertex";
 			this.btn_vertex.Pressed = false;
 			this.btn_vertex.Selected = false;
+			this.btn_vertex.SelectedImage = global::Editor.Properties.Resources.icon_vertex_selected;
 			this.btn_vertex.Size = new System.Drawing.Size(58, 32);
 			this.btn_vertex.TabIndex = 3;
 			this.btn_vertex.Tag = "";
@@ -327,6 +331,7 @@
 			this.btn_solid.Name = "btn_solid";
 			this.btn_solid.Pressed = false;
 			this.btn_solid.Selected = false;
+			this.btn_solid.SelectedImage = global::Editor.Properties.Resources.icon_solid_selected;
 			this.btn_solid.Size = new System.Drawing.Size(58, 32);
 			this.btn_solid.TabIndex = 2;
 			this.btn_solid.Tag = "";
@@ -341,6 +346,7 @@
 			this.btn_select.Name = "btn_select";
 			this.btn_select.Pressed = false;
 			this.btn_select.Selected = true;
+			this.btn_select.SelectedImage = global::Editor.Properties.Resources.icon_select_selected;
 			this.btn_select.Size = new System.Drawing.Size(58, 32);
 			this.btn_select.TabIndex = 1;
 			this.btn_select.Tag = "";

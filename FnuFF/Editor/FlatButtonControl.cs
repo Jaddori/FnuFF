@@ -23,6 +23,8 @@ namespace Editor
         private Brush _selectedPressedBrush;
         private Brush _selectedHoveredBrush;
 
+		private Image _selectedImage;
+
         public bool Pressed { get { return _pressed; } set { _pressed = value; } }
         public bool Hovered { get { return _hovered; } set { _hovered = value; } }
         public bool Selected
@@ -34,6 +36,8 @@ namespace Editor
                 Invalidate();
             }
         }
+
+		public Image SelectedImage { get { return _selectedImage; } set { _selectedImage = value; } }
 
         public FlatButtonControl()
         {
@@ -55,16 +59,31 @@ namespace Editor
             if( BackgroundImage != null )
                 e.Graphics.DrawImage( BackgroundImage, rect );
 
-            // draw image
-            if( Image != null )
-            {
-                var offset = new Size( ( Size.Width - Image.Width ) / 2, ( Size.Height - Image.Height ) / 2 );
-                var imageRect = new Rectangle( rect.X + offset.Width, rect.Y + offset.Height, Image.Width, Image.Height );
+			// draw image
+			if( _selected )
+			{
+				if( _selectedImage != null )
+				{
+					var offset = new Size( ( Size.Width - _selectedImage.Width ) / 2, ( Size.Height - _selectedImage.Height ) / 2 );
+					var imageRect = new Rectangle( rect.X + offset.Width, rect.Y + offset.Height, _selectedImage.Width, _selectedImage.Height );
 
-                e.Graphics.DrawImage( Image, imageRect );
-            }
-            else
-                e.Graphics.FillRectangle( Brushes.White, rect );
+					e.Graphics.DrawImage( _selectedImage, imageRect );
+				}
+				else
+					e.Graphics.FillRectangle( Brushes.White, rect );
+			}
+			else
+			{
+				if( Image != null )
+				{
+					var offset = new Size( ( Size.Width - Image.Width ) / 2, ( Size.Height - Image.Height ) / 2 );
+					var imageRect = new Rectangle( rect.X + offset.Width, rect.Y + offset.Height, Image.Width, Image.Height );
+
+					e.Graphics.DrawImage( Image, imageRect );
+				}
+				else
+					e.Graphics.FillRectangle( Brushes.White, rect );
+			}
 
             // draw selection/hover indicator
             if( _pressed || _hovered || _selected )
