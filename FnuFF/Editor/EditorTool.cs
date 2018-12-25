@@ -17,6 +17,8 @@ namespace Editor
         Select,
         Solid,
 		Clip,
-		Vertex
+		Vertex,
+		Texture,
+		Face
     }
 }

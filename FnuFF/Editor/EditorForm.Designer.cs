@@ -40,10 +40,6 @@
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnl_left = new System.Windows.Forms.Panel();
-			this.btn_clip = new Editor.FlatButtonControl();
-			this.btn_vertex = new Editor.FlatButtonControl();
-			this.btn_solid = new Editor.FlatButtonControl();
-			this.btn_select = new Editor.FlatButtonControl();
 			this.pnl_right = new System.Windows.Forms.Panel();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
@@ -52,6 +48,12 @@
 			this.view_bottomRight = new Editor.View2DControl();
 			this.view_3d = new Editor.View3DControl();
 			this.view_topRight = new Editor.View2DControl();
+			this.btn_face = new Editor.FlatButtonControl();
+			this.btn_texture = new Editor.FlatButtonControl();
+			this.btn_clip = new Editor.FlatButtonControl();
+			this.btn_vertex = new Editor.FlatButtonControl();
+			this.btn_solid = new Editor.FlatButtonControl();
+			this.btn_select = new Editor.FlatButtonControl();
 			this.status_editor.SuspendLayout();
 			this.menu_editor.SuspendLayout();
 			this.pnl_left.SuspendLayout();
@@ -154,6 +156,8 @@
 			// pnl_left
 			// 
 			this.pnl_left.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_left.Controls.Add(this.btn_face);
+			this.pnl_left.Controls.Add(this.btn_texture);
 			this.pnl_left.Controls.Add(this.btn_clip);
 			this.pnl_left.Controls.Add(this.btn_vertex);
 			this.pnl_left.Controls.Add(this.btn_solid);
@@ -163,62 +167,6 @@
 			this.pnl_left.Name = "pnl_left";
 			this.pnl_left.Size = new System.Drawing.Size(58, 702);
 			this.pnl_left.TabIndex = 3;
-			// 
-			// btn_clip
-			// 
-			this.btn_clip.Hovered = false;
-			this.btn_clip.Image = global::Editor.Properties.Resources.icon_clip;
-			this.btn_clip.Location = new System.Drawing.Point(0, 76);
-			this.btn_clip.Name = "btn_clip";
-			this.btn_clip.Pressed = false;
-			this.btn_clip.Selected = false;
-			this.btn_clip.Size = new System.Drawing.Size(58, 32);
-			this.btn_clip.TabIndex = 4;
-			this.btn_clip.Tag = "";
-			this.btn_clip.UseVisualStyleBackColor = true;
-			this.btn_clip.Click += new System.EventHandler(this.toolbarButton_Click);
-			// 
-			// btn_vertex
-			// 
-			this.btn_vertex.Hovered = false;
-			this.btn_vertex.Image = global::Editor.Properties.Resources.icon_vertex;
-			this.btn_vertex.Location = new System.Drawing.Point(0, 108);
-			this.btn_vertex.Name = "btn_vertex";
-			this.btn_vertex.Pressed = false;
-			this.btn_vertex.Selected = false;
-			this.btn_vertex.Size = new System.Drawing.Size(58, 32);
-			this.btn_vertex.TabIndex = 3;
-			this.btn_vertex.Tag = "";
-			this.btn_vertex.UseVisualStyleBackColor = true;
-			this.btn_vertex.Click += new System.EventHandler(this.toolbarButton_Click);
-			// 
-			// btn_solid
-			// 
-			this.btn_solid.Hovered = false;
-			this.btn_solid.Image = global::Editor.Properties.Resources.icon_solid;
-			this.btn_solid.Location = new System.Drawing.Point(0, 44);
-			this.btn_solid.Name = "btn_solid";
-			this.btn_solid.Pressed = false;
-			this.btn_solid.Selected = false;
-			this.btn_solid.Size = new System.Drawing.Size(58, 32);
-			this.btn_solid.TabIndex = 2;
-			this.btn_solid.Tag = "";
-			this.btn_solid.UseVisualStyleBackColor = true;
-			this.btn_solid.Click += new System.EventHandler(this.toolbarButton_Click);
-			// 
-			// btn_select
-			// 
-			this.btn_select.Hovered = false;
-			this.btn_select.Image = global::Editor.Properties.Resources.icon_select;
-			this.btn_select.Location = new System.Drawing.Point(0, 12);
-			this.btn_select.Name = "btn_select";
-			this.btn_select.Pressed = false;
-			this.btn_select.Selected = true;
-			this.btn_select.Size = new System.Drawing.Size(58, 32);
-			this.btn_select.TabIndex = 1;
-			this.btn_select.Tag = "";
-			this.btn_select.UseVisualStyleBackColor = true;
-			this.btn_select.Click += new System.EventHandler(this.toolbarButton_Click);
 			// 
 			// pnl_right
 			// 
@@ -315,6 +263,90 @@
 			this.view_topRight.Size = new System.Drawing.Size(488, 349);
 			this.view_topRight.TabIndex = 0;
 			// 
+			// btn_face
+			// 
+			this.btn_face.Hovered = false;
+			this.btn_face.Image = global::Editor.Properties.Resources.icon_face;
+			this.btn_face.Location = new System.Drawing.Point(0, 172);
+			this.btn_face.Name = "btn_face";
+			this.btn_face.Pressed = false;
+			this.btn_face.Selected = false;
+			this.btn_face.Size = new System.Drawing.Size(58, 32);
+			this.btn_face.TabIndex = 6;
+			this.btn_face.Tag = "";
+			this.btn_face.UseVisualStyleBackColor = true;
+			this.btn_face.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
+			// btn_texture
+			// 
+			this.btn_texture.Hovered = false;
+			this.btn_texture.Image = global::Editor.Properties.Resources.icon_texture;
+			this.btn_texture.Location = new System.Drawing.Point(0, 140);
+			this.btn_texture.Name = "btn_texture";
+			this.btn_texture.Pressed = false;
+			this.btn_texture.Selected = false;
+			this.btn_texture.Size = new System.Drawing.Size(58, 32);
+			this.btn_texture.TabIndex = 5;
+			this.btn_texture.Tag = "";
+			this.btn_texture.UseVisualStyleBackColor = true;
+			this.btn_texture.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
+			// btn_clip
+			// 
+			this.btn_clip.Hovered = false;
+			this.btn_clip.Image = global::Editor.Properties.Resources.icon_clip;
+			this.btn_clip.Location = new System.Drawing.Point(0, 76);
+			this.btn_clip.Name = "btn_clip";
+			this.btn_clip.Pressed = false;
+			this.btn_clip.Selected = false;
+			this.btn_clip.Size = new System.Drawing.Size(58, 32);
+			this.btn_clip.TabIndex = 4;
+			this.btn_clip.Tag = "";
+			this.btn_clip.UseVisualStyleBackColor = true;
+			this.btn_clip.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
+			// btn_vertex
+			// 
+			this.btn_vertex.Hovered = false;
+			this.btn_vertex.Image = global::Editor.Properties.Resources.icon_vertex;
+			this.btn_vertex.Location = new System.Drawing.Point(0, 108);
+			this.btn_vertex.Name = "btn_vertex";
+			this.btn_vertex.Pressed = false;
+			this.btn_vertex.Selected = false;
+			this.btn_vertex.Size = new System.Drawing.Size(58, 32);
+			this.btn_vertex.TabIndex = 3;
+			this.btn_vertex.Tag = "";
+			this.btn_vertex.UseVisualStyleBackColor = true;
+			this.btn_vertex.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
+			// btn_solid
+			// 
+			this.btn_solid.Hovered = false;
+			this.btn_solid.Image = global::Editor.Properties.Resources.icon_solid;
+			this.btn_solid.Location = new System.Drawing.Point(0, 44);
+			this.btn_solid.Name = "btn_solid";
+			this.btn_solid.Pressed = false;
+			this.btn_solid.Selected = false;
+			this.btn_solid.Size = new System.Drawing.Size(58, 32);
+			this.btn_solid.TabIndex = 2;
+			this.btn_solid.Tag = "";
+			this.btn_solid.UseVisualStyleBackColor = true;
+			this.btn_solid.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
+			// btn_select
+			// 
+			this.btn_select.Hovered = false;
+			this.btn_select.Image = global::Editor.Properties.Resources.icon_select;
+			this.btn_select.Location = new System.Drawing.Point(0, 12);
+			this.btn_select.Name = "btn_select";
+			this.btn_select.Pressed = false;
+			this.btn_select.Selected = true;
+			this.btn_select.Size = new System.Drawing.Size(58, 32);
+			this.btn_select.TabIndex = 1;
+			this.btn_select.Tag = "";
+			this.btn_select.UseVisualStyleBackColor = true;
+			this.btn_select.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
 			// EditorForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -372,6 +404,8 @@
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 		private FlatButtonControl btn_vertex;
 		private FlatButtonControl btn_clip;
+		private FlatButtonControl btn_face;
+		private FlatButtonControl btn_texture;
 	}
 }
 
