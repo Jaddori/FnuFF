@@ -65,7 +65,7 @@ namespace Editor
 			return new Rectangle( (int)r.X, (int)r.Y, (int)r.Width, (int)r.Height );
 		}
 
-		public static PointF GetCenter( RectangleF r )
+		public static PointF GetCenter( this RectangleF r )
 		{
 			return new PointF( r.Left + r.Width / 2, r.Top + r.Height / 2 );
 		}

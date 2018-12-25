@@ -86,7 +86,6 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Triple.cs" />
     <Compile Include="UndoRedo\CommandNewLevel.cs" />
-    <Compile Include="UndoRedo\CommandPlaneChanged.cs" />
     <Compile Include="UndoRedo\CommandSolidChanged.cs" />
     <Compile Include="UndoRedo\CommandSolidCreated.cs" />
     <Compile Include="UndoRedo\CommandStack.cs" />
@@ -153,6 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_vertex.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_clip.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

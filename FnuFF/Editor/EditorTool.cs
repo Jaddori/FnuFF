@@ -16,6 +16,7 @@ namespace Editor
         None,
         Select,
         Solid,
+		Clip,
 		Vertex
     }
 }

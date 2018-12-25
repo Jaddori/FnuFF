@@ -40,6 +40,7 @@
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnl_left = new System.Windows.Forms.Panel();
+			this.btn_clip = new Editor.FlatButtonControl();
 			this.btn_vertex = new Editor.FlatButtonControl();
 			this.btn_solid = new Editor.FlatButtonControl();
 			this.btn_select = new Editor.FlatButtonControl();
@@ -153,6 +154,7 @@
 			// pnl_left
 			// 
 			this.pnl_left.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_left.Controls.Add(this.btn_clip);
 			this.pnl_left.Controls.Add(this.btn_vertex);
 			this.pnl_left.Controls.Add(this.btn_solid);
 			this.pnl_left.Controls.Add(this.btn_select);
@@ -162,11 +164,25 @@
 			this.pnl_left.Size = new System.Drawing.Size(58, 702);
 			this.pnl_left.TabIndex = 3;
 			// 
+			// btn_clip
+			// 
+			this.btn_clip.Hovered = false;
+			this.btn_clip.Image = global::Editor.Properties.Resources.icon_clip;
+			this.btn_clip.Location = new System.Drawing.Point(0, 76);
+			this.btn_clip.Name = "btn_clip";
+			this.btn_clip.Pressed = false;
+			this.btn_clip.Selected = false;
+			this.btn_clip.Size = new System.Drawing.Size(58, 32);
+			this.btn_clip.TabIndex = 4;
+			this.btn_clip.Tag = "";
+			this.btn_clip.UseVisualStyleBackColor = true;
+			this.btn_clip.Click += new System.EventHandler(this.toolbarButton_Click);
+			// 
 			// btn_vertex
 			// 
 			this.btn_vertex.Hovered = false;
 			this.btn_vertex.Image = global::Editor.Properties.Resources.icon_vertex;
-			this.btn_vertex.Location = new System.Drawing.Point(0, 76);
+			this.btn_vertex.Location = new System.Drawing.Point(0, 108);
 			this.btn_vertex.Name = "btn_vertex";
 			this.btn_vertex.Pressed = false;
 			this.btn_vertex.Selected = false;
@@ -355,6 +371,7 @@
 		private System.Windows.Forms.OpenFileDialog openFileDialog;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 		private FlatButtonControl btn_vertex;
+		private FlatButtonControl btn_clip;
 	}
 }
 

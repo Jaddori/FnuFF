@@ -34,11 +34,13 @@ namespace Editor
 
             btn_select.Tag = EditorTools.Select;
             btn_solid.Tag = EditorTools.Solid;
+			btn_clip.Tag = EditorTools.Clip;
 			btn_vertex.Tag = EditorTools.Vertex;
 
             _toolbarButtons = new List<FlatButtonControl>();
             _toolbarButtons.Add( btn_select );
             _toolbarButtons.Add( btn_solid );
+			_toolbarButtons.Add( btn_clip );
 			_toolbarButtons.Add( btn_vertex );
 
 			view_3d.Level = _level;

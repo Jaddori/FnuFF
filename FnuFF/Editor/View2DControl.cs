@@ -28,7 +28,8 @@ namespace Editor
             Keys.Delete,
             Keys.Space,
             Keys.Escape,
-            Keys.Alt
+            Keys.Alt,
+			Keys.Enter
         };
 
 		private static Cursor[] HANDLE_CURSORS =
@@ -61,6 +62,10 @@ namespace Editor
 		private bool _spaceDown;
         private int _directionType;
 		private PointF _hoverPosition;
+		private PointF _clipStart;
+		private PointF _clipEnd;
+		private bool _hasClipStart;
+		private bool _clipping;
 
 		private PointF _previousMousePosition;
 
@@ -197,6 +202,8 @@ namespace Editor
 			};
 
 			_handleIndex = -1;
+			_clipping = false;
+			_hasClipStart = false;
         }
 
 		private PointF SnapToGrid( PointF point )
@@ -276,13 +283,6 @@ namespace Editor
 			var xproj = _camera.ToLocal( _camera.Project( new Triple( gizmoExtent, 0, 0 ) ) );
 			var yproj = _camera.ToLocal( _camera.Project( new Triple( 0, gizmoExtent, 0 ) ) );
 			var zproj = _camera.ToLocal( _camera.Project( new Triple( 0, 0, gizmoExtent ) ) );
-
-			if( Direction == 1 )
-			{
-				var p1 = _camera.Project( new Triple( gizmoExtent, 0, 0 ) );
-				var p2 = _camera.Project( new Triple( 0, gizmoExtent, 0 ) );
-				var p3 = _camera.Project( new Triple( 0, 0, gizmoExtent ) );
-			}
 
 			g.DrawLine( EditorColors.PEN_FADED_RED, origo, xproj );
 			g.DrawLine( EditorColors.PEN_FADED_GREEN, origo, yproj );
@@ -366,6 +366,22 @@ namespace Editor
 					g.DrawLine( pen, new PointF( _hoverPosition.X, _hoverPosition.Y - 4 ), new PointF( _hoverPosition.X, _hoverPosition.Y + 4 ) );
 				}
 
+				// (DEBUG) paint clip start and end
+				if( _clipping )
+				{
+					using( var brush = new SolidBrush( Color.Blue ) )
+					{
+						var start = Extensions.FromPoint( _clipStart, 8 );
+						g.FillRectangle( brush, start );
+
+						var end = Extensions.FromPoint( _clipEnd, 8 );
+						g.FillRectangle( brush, end );
+
+						if( _hasClipStart )
+							g.DrawLine( EditorColors.PEN_FADED_BLUE, start.GetCenter(), end.GetCenter() );
+					}
+				}
+
 				// (DEBUG) paint log
 				Log.Paint( Name, g );
 			}
@@ -429,7 +445,7 @@ namespace Editor
 
 						var bounds = Extensions.FromPoints( facePoints.ToArray() );
 						var handles = Extensions.GetHandles( bounds, 8 );
-						
+
 						for( int i = 0; i < handles.Length && _handleIndex < 0; i++ )
 						{
 							if( handles[i].Contains( e.Location ) )
@@ -448,11 +464,38 @@ namespace Editor
 					}
 				}
 			}
+			else if( EditorTool.Current == EditorTools.Clip )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					if( !_hasClipStart )
+					{
+						_clipStart = e.Location;
+
+						if( _snapToGrid )
+						{
+							_clipStart = SnapToGrid( _clipStart );
+						}
+
+						_clipEnd = _clipStart;
+
+						_clipping = true;
+					}
+					else
+					{
+						_clipEnd = e.Location;
+
+						if( _snapToGrid )
+						{
+							_clipStart = SnapToGrid( _clipStart );
+						}
+					}
+				}
+			}
 			else if( EditorTool.Current == EditorTools.Vertex )
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					
 				}
 			}
         }
@@ -561,6 +604,21 @@ namespace Editor
 							Invalidate();
 							OnGlobalInvalidation?.Invoke();
 						}
+					}
+				}
+			}
+			else if( EditorTool.Current == EditorTools.Clip )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					if( !_hasClipStart )
+					{
+						_hasClipStart = true;
+					}
+					else
+					{
+						_hasClipStart = false;
+						_clipping = false;
 					}
 				}
 			}
@@ -694,8 +752,8 @@ namespace Editor
 
 						//var faces = solid.Faces.Where( x => Math.Abs( x.Plane.Normal.Dot( _camera.Direction ) ) > Extensions.EPSILON ).ToArray();
 						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
-						
-						for( int i=0; i<faces.Length; i++ )
+
+						for( int i = 0; i < faces.Length; i++ )
 						{
 							var face = faces[i];
 							var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
@@ -703,7 +761,7 @@ namespace Editor
 							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
 
 							var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
-							
+
 							var lineIndices = new Point[windingPoints.Length];
 							if( lineIndices.Length > 0 )
 							{
@@ -722,7 +780,7 @@ namespace Editor
 								var p1 = windingPoints[i1].ToTriple();
 								var dir = p1 - p0;
 								dir.Normalize();
-								
+
 								var dif = mpos - p0;
 								var proj = dir * dif.Dot( dir );
 
@@ -732,9 +790,9 @@ namespace Editor
 								if( distance < 8.0f )
 								{
 									// check if point is within segment
-									var d0 = (mpos-p0).Dot( dir );
-									var d1 = (mpos-p1).Dot( dir );
-									if( (d0 < 0 && d1 > 0) || (d0 > 0 && d1 < 0))
+									var d0 = ( mpos - p0 ).Dot( dir );
+									var d1 = ( mpos - p1 ).Dot( dir );
+									if( ( d0 < 0 && d1 > 0 ) || ( d0 > 0 && d1 < 0 ) )
 									{
 										hovered = true;
 
@@ -791,7 +849,7 @@ namespace Editor
 						var handles = Extensions.GetHandles( bounds, 8 );
 
 						var hoverHandleIndex = -1;
-						for( int i=0; i<handles.Length && hoverHandleIndex < 0; i++ )
+						for( int i = 0; i < handles.Length && hoverHandleIndex < 0; i++ )
 						{
 							if( handles[i].Contains( e.Location ) )
 							{
@@ -803,6 +861,34 @@ namespace Editor
 						{
 							Cursor.Current = HANDLE_CURSORS[hoverHandleIndex];
 						}
+					}
+				}
+				else if( EditorTool.Current == EditorTools.Clip )
+				{
+					if( _clipping )
+					{
+						if( !_hasClipStart )
+						{
+							_clipStart = e.Location;
+
+							if( _snapToGrid )
+							{
+								_clipStart = SnapToGrid( _clipStart );
+							}
+
+							_clipEnd = _clipStart;
+						}
+						else
+						{
+							_clipEnd = e.Location;
+
+							if( _snapToGrid )
+							{
+								_clipEnd = SnapToGrid( _clipEnd );
+							}
+						}
+
+						Invalidate();
 					}
 				}
 			}
@@ -876,6 +962,17 @@ namespace Editor
 					_commandStack.Redo();
 					Invalidate();
 					OnGlobalInvalidation?.Invoke();
+				}
+			}
+
+			if( e.KeyCode == Keys.Enter )
+			{
+				if( EditorTool.Current == EditorTools.Clip )
+				{
+					_clipping = false;
+					_hasClipStart = false;
+
+					Invalidate();
 				}
 			}
 		}

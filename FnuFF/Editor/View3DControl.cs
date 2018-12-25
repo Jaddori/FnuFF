@@ -83,7 +83,8 @@ namespace Editor
 
 		protected override void OnPaintBackground( PaintEventArgs pevent )
 		{
-			//base.OnPaintBackground( pevent );
+			if(DesignMode)
+				base.OnPaintBackground( pevent );
 		}
 
 		protected override void OnPaint( PaintEventArgs e )
