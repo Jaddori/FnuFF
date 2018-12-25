@@ -29,7 +29,6 @@ namespace Editor
             Keys.Space,
             Keys.Escape,
             Keys.Alt,
-			Keys.Enter
         };
 
 		private static Cursor[] HANDLE_CURSORS =
@@ -228,6 +227,7 @@ namespace Editor
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
 			Log.AddFunctor( Name, () => "Grid size: " + _gridSize.ToString() );
 			Log.AddFunctor( Name, () => "Grid gap: " + _gridGap.ToString() );
+			Log.AddFunctor( Name, () => "Clip end: " + _clipEnd.ToString() );
 			Log.AddFunctor( Name, () =>
 				{
 					var sb = new StringBuilder();
@@ -239,6 +239,17 @@ namespace Editor
 				}
 			);
 			Log.AddFunctor( Name, () => "Command index: " + _commandStack.Index.ToString() );
+			Log.AddFunctor( Name, () =>
+				{
+					var result = "No solid selected.";
+					if( _selectedSolid != null )
+					{
+						result = "Selected solid faces: " + _selectedSolid.Faces.Count.ToString();
+					}
+
+					return result;
+				}
+			);
 		}
 
 		protected override void OnPaint( PaintEventArgs e )
@@ -289,7 +300,7 @@ namespace Editor
 			g.DrawLine( EditorColors.PEN_FADED_BLUE, origo, zproj );
 
             // paint outline of new solid
-            if( _lmbDown )
+            if( EditorTool.Current == EditorTools.Solid && _lmbDown )
             {
                 var minPoint = new PointF( Math.Min( _startPosition.X, _endPosition.X ), Math.Min( _startPosition.Y, _endPosition.Y ) );
                 var maxPoint = new PointF( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
@@ -348,13 +359,32 @@ namespace Editor
 					var handles = Extensions.GetHandles( bounds, 8 );
 					var drawBounds = bounds.Downcast();
 
-					// draw handle outline
-					g.DrawRectangle( EditorColors.PEN_DASH_FADED_HANDLE_OUTLINE, drawBounds );
+					if( EditorTool.Current == EditorTools.Select )
+					{
+						// draw handle outline
+						g.DrawRectangle( EditorColors.PEN_DASH_FADED_HANDLE_OUTLINE, drawBounds );
 
-					// draw handles
-					foreach( var handle in handles )
-						g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
+						// draw handles
+						foreach( var handle in handles )
+							g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
+					}
 				}
+			}
+
+			if( _clipping )
+			{
+				var start = Extensions.FromPoint( _clipStart, 8 );
+				var end = Extensions.FromPoint( _clipEnd, 8 );
+
+				var center = Extensions.PointLerp( _clipStart, _clipEnd, 0.5f );
+				var dir = Extensions.Normalize( new PointF( _clipEnd.X - _clipStart.X, _clipEnd.Y - _clipStart.Y ) );
+				var complimentDir = Extensions.Normalize( new PointF( dir.Y, -dir.X ) );
+				var compliment = new PointF( center.X - complimentDir.X * 32, center.Y - complimentDir.Y * 32 );
+
+				g.FillRectangle( EditorColors.BRUSH_HANDLE, start );
+				g.FillRectangle( EditorColors.BRUSH_HANDLE, end );
+				g.DrawLine( EditorColors.PEN_DASH_FADED_CLIP_LINE, _clipStart, _clipEnd );
+				g.DrawLine( EditorColors.PEN_DASH_FADED_CLIP_LINE, center, compliment );
 			}
 
 			if( !DesignMode )
@@ -364,22 +394,6 @@ namespace Editor
 				{
 					g.DrawLine( pen, new PointF( _hoverPosition.X - 4, _hoverPosition.Y ), new PointF( _hoverPosition.X + 4, _hoverPosition.Y ) );
 					g.DrawLine( pen, new PointF( _hoverPosition.X, _hoverPosition.Y - 4 ), new PointF( _hoverPosition.X, _hoverPosition.Y + 4 ) );
-				}
-
-				// (DEBUG) paint clip start and end
-				if( _clipping )
-				{
-					using( var brush = new SolidBrush( Color.Blue ) )
-					{
-						var start = Extensions.FromPoint( _clipStart, 8 );
-						g.FillRectangle( brush, start );
-
-						var end = Extensions.FromPoint( _clipEnd, 8 );
-						g.FillRectangle( brush, end );
-
-						if( _hasClipStart )
-							g.DrawLine( EditorColors.PEN_FADED_BLUE, start.GetCenter(), end.GetCenter() );
-					}
 				}
 
 				// (DEBUG) paint log
@@ -468,7 +482,7 @@ namespace Editor
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					if( !_hasClipStart )
+					/*if( !_hasClipStart )
 					{
 						_clipStart = e.Location;
 
@@ -487,9 +501,15 @@ namespace Editor
 
 						if( _snapToGrid )
 						{
-							_clipStart = SnapToGrid( _clipStart );
+							_clipEnd = SnapToGrid( _clipEnd );
 						}
-					}
+					}*/
+
+					_clipStart = e.Location;
+					if( _snapToGrid )
+						_clipStart = SnapToGrid( _clipStart );
+
+					_clipping = true;
 				}
 			}
 			else if( EditorTool.Current == EditorTools.Vertex )
@@ -575,19 +595,6 @@ namespace Editor
 
 							solid.Selected = false;
 
-							/*var bounds = solid.Project( _camera, _gridGap, _gridSize );
-
-							var depth = (int)Math.Min( _camera.Direction.Dot( solid.Min ), _camera.Direction.Dot( solid.Max ) );
-							if( depth < minDepth || _selectedSolid == null )
-							{
-								if( bounds.Contains( e.Location ) )
-								{
-									minDepth = depth;
-									_selectedSolid = solid;
-									minBounds = bounds;
-								}
-							}*/
-
 							if( solid.Hovered )
 								_selectedSolid = solid;
 						}
@@ -611,7 +618,7 @@ namespace Editor
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					if( !_hasClipStart )
+					/*if( !_hasClipStart )
 					{
 						_hasClipStart = true;
 					}
@@ -619,7 +626,9 @@ namespace Editor
 					{
 						_hasClipStart = false;
 						_clipping = false;
-					}
+					}*/
+
+					_clipping = false;
 				}
 			}
         }
@@ -735,18 +744,6 @@ namespace Editor
 						}
 
 						solid.Hovered = false;
-
-						/*var bounds = solid.Project( _camera, _gridGap, _gridSize );
-						
-						var depth = (int)Math.Min( _camera.Direction.Dot( solid.Min ), _camera.Direction.Dot( solid.Max ) );
-						if( depth < minDepth || minSolid == null )
-						{
-							if( bounds.Contains( e.Location ) )
-							{
-								minDepth = depth;
-								minSolid = solid;
-							}
-						}*/
 
 						var mpos = new Triple( e.X, e.Y, 0 );
 
@@ -867,7 +864,7 @@ namespace Editor
 				{
 					if( _clipping )
 					{
-						if( !_hasClipStart )
+						/*if( !_hasClipStart )
 						{
 							_clipStart = e.Location;
 
@@ -886,7 +883,11 @@ namespace Editor
 							{
 								_clipEnd = SnapToGrid( _clipEnd );
 							}
-						}
+						}*/
+
+						_clipEnd = e.Location;
+						if( _snapToGrid )
+							_clipEnd = SnapToGrid( _clipEnd );
 
 						Invalidate();
 					}
@@ -971,6 +972,24 @@ namespace Editor
 				{
 					_clipping = false;
 					_hasClipStart = false;
+
+					if( _selectedSolid != null )
+					{
+						var globalStart = _camera.Unproject( _camera.ToGlobal( _clipStart ).Deflate( _gridGap ).Inflate( _gridSize ) );
+						var globalEnd = _camera.Unproject( _camera.ToGlobal( _clipEnd ).Deflate( _gridGap ).Inflate( _gridSize ) );
+
+						var compliment = globalEnd - _camera.Direction;
+
+						var v1v0 = compliment - globalStart;
+						var v2v0 = compliment - globalEnd;
+
+						var normal = v2v0.Cross( v1v0 );
+						var clipPlane = new Plane( normal, globalStart );
+
+						_selectedSolid.Clip( clipPlane );
+
+						OnGlobalInvalidation?.Invoke();
+					}
 
 					Invalidate();
 				}

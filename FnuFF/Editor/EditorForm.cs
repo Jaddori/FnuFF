@@ -72,6 +72,8 @@ namespace Editor
             EditorTool.Current = (EditorTools)button.Tag;
 
             Text = "FnuFF Editor - " + EditorTool.Current.ToString();
+
+			ViewGlobalInvalidation();
         }
 
 		private void newToolStripMenuItem_Click( object sender, EventArgs e )

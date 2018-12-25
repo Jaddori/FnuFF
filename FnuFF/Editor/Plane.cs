@@ -32,6 +32,14 @@ namespace Editor
 			_d = d;
 		}
 
+		public Plane( Triple normal, Triple pointOnPlane )
+		{
+			_normal = normal;
+			_normal.Normalize();
+
+			_d = pointOnPlane.Dot( _normal );
+		}
+
 		public override bool Equals( object obj )
 		{
 			var result = false;

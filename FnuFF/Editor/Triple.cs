@@ -134,19 +134,19 @@ namespace Editor
 			if( t.X < 0 )
 			{
 				t.X *= -1.0f;
-				mx *= -1.0f;
+				mx *= -0.5f;
 			}
 
 			if( t.Y < 0 )
 			{
 				t.Y *= -1.0f;
-				my *= -1.0f;
+				my *= -0.5f;
 			}
 
 			if( t.Z < 0 )
 			{
 				t.Z *= -1.0f;
-				mz *= -1.0f;
+				mz *= -0.5f;
 			}
 
 			var bx = t.Y * mx;

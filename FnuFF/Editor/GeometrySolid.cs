@@ -10,13 +10,13 @@ using Editor.UndoRedo;
 
 namespace Editor
 {
-    public class GeometrySolid
-    {
+	public class GeometrySolid
+	{
 		private static Random random = new Random();
 
 		[XmlIgnore]
 		public static CommandStack CommandStack;
-		
+
 		private Color _color;
 		private bool _hovered;
 		private bool _selected;
@@ -27,10 +27,10 @@ namespace Editor
 
 		[XmlIgnore]
 		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
-		
+
 		[XmlIgnore]
 		public bool Selected { get { return _selected; } set { _selected = value; } }
-		
+
 		public List<Face> Faces => _faces;
 
 		public GeometrySolid()
@@ -41,14 +41,14 @@ namespace Editor
 			GenerateColor();
 		}
 
-        public GeometrySolid(Triple min, Triple max)
-        {
+		public GeometrySolid( Triple min, Triple max )
+		{
 			_hovered = _selected = false;
 			_faces = new List<Face>();
 
 			GenerateColor();
-			GenerateFaces(min, max);
-        }
+			GenerateFaces( min, max );
+		}
 
 		private void GenerateColor()
 		{
@@ -65,7 +65,7 @@ namespace Editor
 			_color = Color.FromArgb( (int)( r * 255 ), (int)( g * 255 ), (int)( b * 255 ) );
 		}
 
-		public void GenerateFaces(Triple min, Triple max)
+		public void GenerateFaces( Triple min, Triple max )
 		{
 			// left
 			var left = new Face();
@@ -100,6 +100,36 @@ namespace Editor
 			_faces.AddRange( new[] { left, right, top, bottom, front, back } );
 		}
 
+		public void Clip( Plane plane )
+		{
+			// remove faces that are behind the plane
+			var facesToRemove = new List<Face>();
+			foreach( var face in _faces )
+			{
+				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+
+				var allInFront = true;
+				for( int i = 0; i < points.Length && allInFront; i++ )
+				{
+					if( !plane.InFront( points[i] ) )
+						allInFront = false;
+				}
+
+				if( allInFront )
+				{
+					facesToRemove.Add( face );
+				}
+			}
+
+			for( int i = 0; i < facesToRemove.Count; i++ )
+				_faces.Remove( facesToRemove[i] );
+
+			// add new face
+			var newFace = new Face( plane.Normal, plane.D );
+			_faces.Add( newFace );
+		}
+
 		public void Paint3D()
 		{
 			GL.BeginTriangles();
@@ -116,11 +146,16 @@ namespace Editor
 			}
 
 			GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-			
+
+			var cur = 0;
 			foreach( var face in _faces )
 			{
+				//cur++;
+				//if( cur < 7 )
+				//	continue;
+
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes.ToArray() );
 				var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
 				
 				var rr = red;

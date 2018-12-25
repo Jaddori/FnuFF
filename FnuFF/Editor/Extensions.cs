@@ -123,6 +123,11 @@ namespace Editor
 			return new Triple( point.X, point.Y, 0 );
 		}
 
+		public static Triple TripleLerp( Triple a, Triple b, float t )
+		{
+			return a + ( b - a ) * t;
+		}
+
 		public static void MinMax( ref PointF min, ref PointF max )
 		{
 			if( min.X > max.X )
@@ -172,6 +177,17 @@ namespace Editor
 		public static PointF Deflate( this PointF point, float value )
 		{
 			return new PointF(point.X / value, point.Y / value);
+		}
+
+		public static PointF PointLerp( PointF a, PointF b, float t )
+		{
+			return new PointF( a.X + ( b.X - a.X ) * t, a.Y + ( b.Y - a.Y ) * t );
+		}
+
+		public static PointF Normalize( PointF point )
+		{
+			var len = (float)Math.Sqrt( point.X * point.X + point.Y * point.Y );
+			return new PointF( point.X / len, point.Y / len );
 		}
 
 		public static PointF[] WindingSort2D( PointF[] points )
