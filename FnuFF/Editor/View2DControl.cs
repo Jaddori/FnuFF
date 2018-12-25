@@ -986,7 +986,13 @@ namespace Editor
 						var normal = v2v0.Cross( v1v0 );
 						var clipPlane = new Plane( normal, globalStart );
 
+						var command = new CommandSolidChanged( _selectedSolid );
+						command.Begin();
+
 						_selectedSolid.Clip( clipPlane );
+
+						command.End();
+						_commandStack.Do( command );
 
 						OnGlobalInvalidation?.Invoke();
 					}
