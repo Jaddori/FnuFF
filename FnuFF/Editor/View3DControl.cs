@@ -81,6 +81,11 @@ namespace Editor
 			Log.AddFunctor( Name, () => "Frame: " + _frame.ToString() );
 		}
 
+		protected override void OnPaintBackground( PaintEventArgs pevent )
+		{
+			//base.OnPaintBackground( pevent );
+		}
+
 		protected override void OnPaint( PaintEventArgs e )
 		{
 			//base.OnPaint( e );

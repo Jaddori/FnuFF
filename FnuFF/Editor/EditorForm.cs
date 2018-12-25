@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using Editor.UndoRedo;
 
 namespace Editor
 {
@@ -17,6 +18,7 @@ namespace Editor
     {
         private List<FlatButtonControl> _toolbarButtons;
 		private Level _level;
+		private CommandStack _commandStack;
 
         public EditorForm()
         {
@@ -25,6 +27,8 @@ namespace Editor
 
         private void Form1_Load( object sender, EventArgs e )
         {
+			GeometrySolid.CommandStack = _commandStack;
+
 			_level = new Level();
 
             btn_select.Tag = EditorTools.Select;
@@ -40,6 +44,10 @@ namespace Editor
 			view_topRight.Level = _level;
 			view_bottomLeft.Level = _level;
 			view_bottomRight.Level = _level;
+
+			view_topRight.CommandStack = _commandStack;
+			view_bottomLeft.CommandStack = _commandStack;
+			view_bottomRight.CommandStack = _commandStack;
 
 			view_topRight.OnGlobalInvalidation += ViewGlobalInvalidation;
 			view_bottomLeft.OnGlobalInvalidation += ViewGlobalInvalidation;

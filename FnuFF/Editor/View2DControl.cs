@@ -9,6 +9,7 @@ using System.Windows.Forms.ComponentModel;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Drawing2D;
+using Editor.UndoRedo;
 
 namespace Editor
 {
@@ -69,6 +70,7 @@ namespace Editor
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
+		private CommandStack _commandStack;
 
         public int Direction
         {
@@ -157,7 +159,15 @@ namespace Editor
 			}
 		}
 
-        public View2DControl()
+		[Browsable( false )]
+		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+		public CommandStack CommandStack
+		{
+			get { return _commandStack; }
+			set { _commandStack = value; }
+		}
+
+		public View2DControl()
         {
             DoubleBuffered = true;
 
@@ -664,14 +674,24 @@ namespace Editor
 					localDirection.Y = 1.0f;
 
 				var globalDirection = _camera.Unproject( localDirection );
-
+				
+				var faceChanged = false;
 				var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
 				for( int i = 0; i < faces.Length; i++ )
 				{
-					faces[i].Plane.D = globalSnap.Dot( faces[i].Plane.Normal );
+					var d = globalSnap.Dot( faces[i].Plane.Normal );
+					if( faces[i].Plane.D != d )
+					{
+						faces[i].Plane.D = globalSnap.Dot( faces[i].Plane.Normal );
+						faceChanged = true;
+					}
 				}
 
-				Invalidate();
+				if( faceChanged )
+				{
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
 			}
 			else if( _spaceDown || _mmbDown )
 			{

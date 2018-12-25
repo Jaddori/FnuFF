@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Xml;
 using System.Xml.Serialization;
+using Editor.UndoRedo;
 
 namespace Editor
 {
     public class GeometrySolid
     {
 		private static Random random = new Random();
+
+		[XmlIgnore]
+		public static CommandStack CommandStack;
 		
 		private Color _color;
 		private bool _hovered;
