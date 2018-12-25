@@ -29,6 +29,12 @@ namespace Editor
 			OnSolidChange?.Invoke();
 		}
 
+		public void RemoveSolid( GeometrySolid solid )
+		{
+			_solids.Remove( solid );
+			OnSolidChange?.Invoke();
+		}
+
 		public void Reset()
 		{
 			_solids.Clear();

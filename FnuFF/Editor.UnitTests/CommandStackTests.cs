@@ -46,6 +46,30 @@ namespace Editor.UnitTests
 		}
 
 		[TestMethod]
+		public void Do_AfterUndo_RemovesUndoCommands()
+		{
+			var command = new CommandStackTestCommand();
+
+			for( int i = 0; i < 3; i++ )
+				_sut.Do( command );
+
+			Assert.AreEqual( 3, _sut.Index );
+			Assert.AreEqual( 4, _sut.Commands.Count );
+
+			_sut.Undo();
+			_sut.Undo();
+
+			Assert.AreEqual( 1, _sut.Index );
+			Assert.AreEqual( 4, _sut.Commands.Count );
+
+			var newCommand = new CommandStackTestCommand();
+			_sut.Do( newCommand );
+
+			Assert.AreEqual( 2, _sut.Index );
+			Assert.AreEqual( 3, _sut.Commands.Count );
+		}
+
+		[TestMethod]
 		public void Undo_Empty_DoesNothing()
 		{
 			Assert.AreEqual( 0, _sut.Index );

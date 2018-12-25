@@ -27,6 +27,7 @@ namespace Editor
 
         private void Form1_Load( object sender, EventArgs e )
         {
+			_commandStack = new CommandStack();
 			GeometrySolid.CommandStack = _commandStack;
 
 			_level = new Level();

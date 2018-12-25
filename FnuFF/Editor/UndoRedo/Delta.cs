@@ -20,5 +20,10 @@ namespace Editor.UndoRedo
 			Old = old;
 			New = @new;
 		}
+
+		public bool Same()
+		{
+			return Old.Equals( New );
+		}
 	}
 }

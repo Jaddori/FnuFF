@@ -11,6 +11,15 @@ namespace Editor
 	[DebuggerDisplay( "X = {X}, Y = {Y}, Z = {Z}" )]
 	public struct Triple
 	{
+		private const float EPSILON = 0.0001f;
+
+		public static Triple PosX = new Triple( 1, 0, 0 );
+		public static Triple PosY = new Triple( 0, 1, 0 );
+		public static Triple PosZ = new Triple( 0, 0, 1 );
+		public static Triple NegX = new Triple( -1, 0, 0 );
+		public static Triple NegY = new Triple( 0, -1, 0 );
+		public static Triple NegZ = new Triple( 0, 0, -1 );
+
 		public float X { get; set; }
 		public float Y { get; set; }
 		public float Z { get; set; }
@@ -20,6 +29,21 @@ namespace Editor
 			X = x;
 			Y = y;
 			Z = z;
+		}
+
+		public static bool operator ==( Triple a, Triple b )
+		{
+			return
+			(
+				Math.Abs( a.X - b.X ) < EPSILON &&
+				Math.Abs( a.Y - b.Y ) < EPSILON &&
+				Math.Abs( a.Z - b.Z ) < EPSILON
+			);
+		}
+
+		public static bool operator !=( Triple a, Triple b )
+		{
+			return !( a == b );
 		}
 
 		public static Triple operator +( Triple a, Triple b )

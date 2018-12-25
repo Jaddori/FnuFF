@@ -31,6 +31,12 @@ namespace Editor.UndoRedo
 				_commands.RemoveAt( 0 );
 			}
 
+			var currentCommand = _index + 1;
+			if( currentCommand < _commands.Count )
+			{
+				_commands.RemoveRange( currentCommand, _commands.Count - currentCommand );
+			}
+
 			_commands.Add( command );
 			_index = _commands.Count - 1;
 		}

@@ -86,6 +86,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Triple.cs" />
     <Compile Include="UndoRedo\CommandNewLevel.cs" />
+    <Compile Include="UndoRedo\CommandPlaneChanged.cs" />
     <Compile Include="UndoRedo\CommandSolidChanged.cs" />
     <Compile Include="UndoRedo\CommandSolidCreated.cs" />
     <Compile Include="UndoRedo\CommandStack.cs" />

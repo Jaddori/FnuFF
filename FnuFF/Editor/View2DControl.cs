@@ -70,7 +70,9 @@ namespace Editor
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
+		
 		private CommandStack _commandStack;
+		private CommandSolidChanged _commandSolidChanged;
 
         public int Direction
         {
@@ -219,6 +221,17 @@ namespace Editor
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
 			Log.AddFunctor( Name, () => "Grid size: " + _gridSize.ToString() );
 			Log.AddFunctor( Name, () => "Grid gap: " + _gridGap.ToString() );
+			Log.AddFunctor( Name, () =>
+				{
+					var sb = new StringBuilder();
+					sb.Append( "Command stack:\r\n" );
+					foreach( var command in _commandStack.Commands )
+						sb.Append( "\t" + command.GetDescription() + "\r\n" );
+
+					return sb.ToString();
+				}
+			);
+			Log.AddFunctor( Name, () => "Command index: " + _commandStack.Index.ToString() );
 		}
 
 		protected override void OnPaint( PaintEventArgs e )
@@ -403,17 +416,6 @@ namespace Editor
 
 					if( _selectedSolid != null )
 					{
-						/*var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
-						var handles = Extensions.GetHandles( bounds, 8 );
-						for( int i = 0; i < handles.Length && _handleIndex < 0; i++ )
-						{
-							if( handles[i].Contains( e.Location ) )
-								_handleIndex = i;
-						}
-
-						if( _handleIndex >= 0 )
-							Cursor.Current = HANDLE_CURSORS[_handleIndex];*/
-
 						var facePoints = new List<PointF>();
 						var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 						foreach( var face in faces )
@@ -439,6 +441,9 @@ namespace Editor
 						if( _handleIndex >= 0 )
 						{
 							Cursor.Current = HANDLE_CURSORS[_handleIndex];
+
+							_commandSolidChanged = new CommandSolidChanged( _selectedSolid );
+							_commandSolidChanged.Begin();
 						}
 					}
 				}
@@ -458,22 +463,6 @@ namespace Editor
 
 			if( e.Button == MouseButtons.Middle )
 				_mmbDown = false;
-
-			if( e.Button == MouseButtons.Right )
-			{
-				if( _selectedSolid != null )
-				{
-					var dir = new Triple( -1, 0, 0 );
-					var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( dir ) > 0 ).ToArray();
-					for( int i = 0; i < faces.Length; i++ )
-					{
-						faces[i].Plane.D += 1.0f;
-					}
-
-					Invalidate();
-					OnGlobalInvalidation?.Invoke();
-				}
-			}
 
 			if( EditorTool.Current == EditorTools.Solid )
 			{
@@ -511,6 +500,10 @@ namespace Editor
 						var solid = new GeometrySolid( minTriple, maxTriple );
 						_level.AddSolid( solid );
 
+						// add command to stack
+						var newSolidCommand = new CommandSolidCreated( _level.Solids, solid );
+						_commandStack.Do( newSolidCommand );
+
 						OnGlobalInvalidation?.Invoke();
 					}
 				}
@@ -522,6 +515,9 @@ namespace Editor
 					if( _handleIndex >= 0 )
 					{
 						_handleIndex = -1;
+
+						_commandSolidChanged.End();
+						_commandStack.Do( _commandSolidChanged );
 					}
 					else
 					{
@@ -595,67 +591,6 @@ namespace Editor
 
 			if( _handleIndex >= 0 )
 			{
-				/*var bounds = _selectedSolid.Project( _camera, _gridGap, _gridSize );
-				var snapPosition = SnapToGrid( e.Location );
-				
-				_hoverPosition = snapPosition;
-				
-				if( snapPosition.X != bounds.X || snapPosition.Y != bounds.Y )
-				{
-					var min = new PointF( bounds.Left, bounds.Top );
-					var max = new PointF( bounds.Right, bounds.Bottom );
-
-					var newBounds = bounds;
-
-					if( _handleIndex == 4 ) // center move tool
-					{
-						var halfWidth = newBounds.Width / 2;
-						var halfHeight = newBounds.Height / 2;
-
-						snapPosition = SnapToGrid( new PointF( e.Location.X - halfWidth, e.Location.Y - halfHeight ) );
-						newBounds = new RectangleF( snapPosition.X, snapPosition.Y, newBounds.Width, newBounds.Height );
-					}
-					else
-					{
-						if( _handleIndex % 3 == 0 ) // left column
-						{
-							var right = newBounds.Right;
-							if( snapPosition.X < right )
-							{
-								newBounds.X = snapPosition.X;
-								newBounds.Width = right - newBounds.X;
-							}
-						}
-						else if( ( _handleIndex + 1 ) % 3 == 0 ) // right column
-						{
-							if( snapPosition.X > newBounds.X )
-								newBounds.Width = snapPosition.X - newBounds.X;
-						}
-
-						if( _handleIndex / 3 == 0 ) // top row
-						{
-							var bottom = newBounds.Bottom;
-							if( snapPosition.Y < bottom )
-							{
-								newBounds.Y = snapPosition.Y;
-								newBounds.Height = bottom - newBounds.Y;
-							}
-						}
-						else if( _handleIndex / 3 == 2 ) // bottom row
-						{
-							if( snapPosition.Y > newBounds.Y )
-								newBounds.Height = snapPosition.Y - newBounds.Y;
-						}
-					}
-
-					if(!newBounds.Equals(bounds))
-						_selectedSolid.Unproject( _camera, newBounds, _gridGap, _gridSize );
-
-					Invalidate();
-				}
-
-				Cursor.Current = HANDLE_CURSORS[_handleIndex];*/
-
 				var localSnap = SnapToGrid( e.Location );
 				_hoverPosition = localSnap;
 
@@ -886,8 +821,11 @@ namespace Editor
         {
             base.OnKeyDown( e );
 
-            // camera input
-            var movement = new PointF();
+			if( e.KeyCode == Keys.Space )
+				_spaceDown = true;
+
+			// camera input
+			var movement = new PointF();
             if( e.KeyCode == Keys.Left || e.KeyCode == Keys.A )
                 movement.X = -1;
             else if( e.KeyCode == Keys.Right || e.KeyCode == Keys.D )
@@ -902,9 +840,6 @@ namespace Editor
                 _camera.Move( movement.X, movement.Y );
                 Invalidate();
             }
-
-			if( e.KeyCode == Keys.Space )
-				_spaceDown = true;
 
             // grid manipulation
             if( e.Alt )
@@ -926,14 +861,43 @@ namespace Editor
 
 				OnGlobalInvalidation?.Invoke();
 			}
-        }
 
-        protected override void OnKeyUp( KeyEventArgs e )
-        {
-            base.OnKeyUp( e );
+			// command stack manipulation
+			if( e.Control )
+			{
+				if( e.KeyCode == Keys.Z )
+				{
+					_commandStack.Undo();
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
+				else if( e.KeyCode == Keys.Y )
+				{
+					_commandStack.Redo();
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
+			}
+		}
+
+		protected override void OnKeyUp( KeyEventArgs e )
+		{
+			base.OnKeyUp( e );
 
 			if( e.KeyCode == Keys.Space )
 				_spaceDown = false;
+
+			// solid manipulation
+			if( e.KeyCode == Keys.Delete )
+			{
+				if( _selectedSolid != null )
+				{
+					_level.RemoveSolid( _selectedSolid );
+
+					var deleteCommand = new CommandSolidCreated( _level.Solids, _selectedSolid, true );
+					_commandStack.Do( deleteCommand );
+				}
+			}
         }
     }
 }

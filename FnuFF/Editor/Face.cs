@@ -36,5 +36,10 @@ namespace Editor
 			_u = u;
 			_v = v;
 		}
+
+		public Face Copy()
+		{
+			return new Face( _plane.Normal, _plane.D, _u, _v );
+		}
 	}
 }

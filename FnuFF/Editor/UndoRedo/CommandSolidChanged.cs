@@ -9,47 +9,48 @@ namespace Editor.UndoRedo
 	public class CommandSolidChanged : ICommand
 	{
 		private GeometrySolid _solid;
-		private Delta<Triple> _min;
-		private Delta<Triple> _max;
+		private List<Face> _oldFaces;
+		private List<Face> _newFaces;
 
 		public CommandSolidChanged()
 		{
 		}
 
-		public static CommandSolidChanged NewMin( GeometrySolid solid, Triple oldMin )
+		public CommandSolidChanged(GeometrySolid solid)
 		{
-			var result = new CommandSolidChanged
-			{
-				_solid = solid,
-				//_min = new Delta<Triple>( oldMin, solid.Min ),
-				//_max = new Delta<Triple>( solid.Max, solid.Max )
-			};
-
-			return result;
+			_solid = solid;
+			_oldFaces = new List<Face>();
+			_newFaces = new List<Face>();
 		}
 
-		public static CommandSolidChanged NewMax( GeometrySolid solid, Triple oldMax )
+		public void Begin()
 		{
-			var result = new CommandSolidChanged
-			{
-				_solid = solid,
-				//_min = new Delta<Triple>( solid.Min, solid.Min ),
-				//_max = new Delta<Triple>( oldMax, solid.Max )
-			};
+			_oldFaces.Clear();
 
-			return result;
+			foreach( var face in _solid.Faces )
+				_oldFaces.Add( face.Copy() );
+		}
+
+		public void End()
+		{
+			_newFaces.Clear();
+
+			foreach( var face in _solid.Faces )
+				_newFaces.Add( face.Copy() );
 		}
 
 		public void Undo()
 		{
-			/*_solid.Min = _min.Old;
-			_solid.Max = _max.Old;*/
+			_solid.Faces.Clear();
+			foreach( var face in _oldFaces )
+				_solid.Faces.Add( face.Copy() );
 		}
 
 		public void Redo()
 		{
-			/*_solid.Min = _min.New;
-			_solid.Max = _max.New;*/
+			_solid.Faces.Clear();
+			foreach( var face in _newFaces )
+				_solid.Faces.Add( face.Copy() );
 		}
 
 		public string GetDescription()
