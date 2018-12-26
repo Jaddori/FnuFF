@@ -263,7 +263,6 @@ namespace Editor
 				return null;
 
 			normal.Normalize();
-			//var projectedPoints = points.Select( x => x.ProjectF( normal ) ).ToArray();
 
 			var v1v0 = points[1] - points[0];
 			v1v0.Normalize();

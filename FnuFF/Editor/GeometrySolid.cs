@@ -100,9 +100,12 @@ namespace Editor
 			_faces.AddRange( new[] { left, right, top, bottom, front, back } );
 		}
 
-		public void Clip( Plane plane )
+		public bool Clip( Plane plane )
 		{
-			// remove faces that are behind the plane
+			var didClip = false;
+
+			// check if any faces need to removed
+			var allVerticesBehind = true;
 			var facesToRemove = new List<Face>();
 			foreach( var face in _faces )
 			{
@@ -114,6 +117,8 @@ namespace Editor
 				{
 					if( !plane.InFront( points[i] ) )
 						allInFront = false;
+					else
+						allVerticesBehind = false;
 				}
 
 				if( allInFront )
@@ -122,12 +127,21 @@ namespace Editor
 				}
 			}
 
-			for( int i = 0; i < facesToRemove.Count; i++ )
-				_faces.Remove( facesToRemove[i] );
+			// make sure at least one vertex is in front and one behind the clipping plane
+			if( !allVerticesBehind && facesToRemove.Count < _faces.Count )
+			{
+				// remove faces that are behind the plane
+				for( int i = 0; i < facesToRemove.Count; i++ )
+					_faces.Remove( facesToRemove[i] );
 
-			// add new face
-			var newFace = new Face( plane.Normal, plane.D );
-			_faces.Add( newFace );
+				// add new face
+				var newFace = new Face( plane.Normal, plane.D );
+				_faces.Add( newFace );
+
+				didClip = true;
+			}
+
+			return didClip;
 		}
 
 		public void Paint3D()

@@ -989,10 +989,11 @@ namespace Editor
 						var command = new CommandSolidChanged( _selectedSolid );
 						command.Begin();
 
-						_selectedSolid.Clip( clipPlane );
-
-						command.End();
-						_commandStack.Do( command );
+						if( _selectedSolid.Clip( clipPlane ) )
+						{
+							command.End();
+							_commandStack.Do( command );
+						}
 
 						OnGlobalInvalidation?.Invoke();
 					}
