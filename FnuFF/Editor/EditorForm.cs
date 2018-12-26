@@ -38,6 +38,7 @@ namespace Editor
 			btn_vertex.Tag = EditorTools.Vertex;
 			btn_texture.Tag = EditorTools.Texture;
 			btn_face.Tag = EditorTools.Face;
+			btn_entity.Tag = EditorTools.Entity;
 
             _toolbarButtons = new List<FlatButtonControl>();
             _toolbarButtons.Add( btn_select );
@@ -46,6 +47,7 @@ namespace Editor
 			_toolbarButtons.Add( btn_vertex );
 			_toolbarButtons.Add( btn_texture );
 			_toolbarButtons.Add( btn_face );
+			_toolbarButtons.Add( btn_entity );
 
 			view_3d.Level = _level;
 			view_topRight.Level = _level;

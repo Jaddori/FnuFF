@@ -73,6 +73,9 @@
       <DependentUpon>EditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="EditorTool.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityData.cs" />
+    <Compile Include="Entities\PlayerSpawn.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Face.cs" />
     <Compile Include="FlatButtonControl.cs">
@@ -179,6 +182,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_vertex_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_entity.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_entity_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_entity_player_spawn.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

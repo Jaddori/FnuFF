@@ -19,6 +19,7 @@ namespace Editor
 		Clip,
 		Vertex,
 		Texture,
-		Face
+		Face,
+		Entity
     }
 }

@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Drawing2D;
 using Editor.UndoRedo;
+using Editor.Entities;
 
 namespace Editor
 {
@@ -65,6 +66,8 @@ namespace Editor
 		private PointF _clipEnd;
 		private bool _hasClipStart;
 		private bool _clipping;
+
+		private PointF _entityPosition;
 
 		private PointF _previousMousePosition;
 
@@ -387,6 +390,12 @@ namespace Editor
 				g.DrawLine( EditorColors.PEN_DASH_FADED_CLIP_LINE, center, compliment );
 			}
 
+			// draw entities
+			foreach( var entity in _level.Entities )
+			{
+				entity.Paint2D( g, _camera, _gridSize, _gridGap );
+			}
+
 			if( !DesignMode )
 			{
 				// (DEBUG) paint hover position
@@ -518,6 +527,15 @@ namespace Editor
 				{
 				}
 			}
+			else if( EditorTool.Current == EditorTools.Entity )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					_entityPosition = e.Location;
+					if( _snapToGrid )
+						_entityPosition = SnapToGrid( _entityPosition );
+				}
+			}
         }
 
         protected override void OnMouseUp( MouseEventArgs e )
@@ -618,17 +636,24 @@ namespace Editor
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					/*if( !_hasClipStart )
-					{
-						_hasClipStart = true;
-					}
-					else
-					{
-						_hasClipStart = false;
-						_clipping = false;
-					}*/
-
 					_clipping = false;
+				}
+			}
+			else if( EditorTool.Current == EditorTools.Entity )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					_entityPosition = e.Location;
+					if( _snapToGrid )
+						_entityPosition = SnapToGrid( _entityPosition );
+
+					var position = _camera.Unproject( _camera.ToGlobal( _entityPosition ).Deflate( _gridGap ).Inflate( _gridSize ) );
+					var entity = new Entity( position );
+					entity.Data = new PlayerSpawn();
+					_level.AddEntity( entity );
+
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
 				}
 			}
         }
@@ -891,6 +916,21 @@ namespace Editor
 
 						Invalidate();
 					}
+				}
+				else if( EditorTool.Current == EditorTools.Entity )
+				{
+					_hoverPosition = e.Location;
+					if( _snapToGrid )
+						_hoverPosition = SnapToGrid( _hoverPosition );
+
+					if( _lmbDown )
+					{
+						_entityPosition = e.Location;
+						if( _snapToGrid )
+							_entityPosition = SnapToGrid( _entityPosition );
+					}
+
+					Invalidate();
 				}
 			}
 
