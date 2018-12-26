@@ -259,8 +259,26 @@ namespace Editor
 
 		public static int[] WindingIndex3DF( Triple[] points, Triple normal )
 		{
+			if( points.Length < 2 )
+				return null;
+
 			normal.Normalize();
-			var projectedPoints = points.Select( x => x.ProjectF( normal ) ).ToArray();
+			//var projectedPoints = points.Select( x => x.ProjectF( normal ) ).ToArray();
+
+			var v1v0 = points[1] - points[0];
+			v1v0.Normalize();
+
+			var compliment = v1v0.Cross( normal );
+			compliment.Normalize();
+			
+			var projectedPoints = new PointF[points.Length];
+			for( int i = 0; i < points.Length; i++ )
+			{
+				var x = points[i].Dot( v1v0 );
+				var y = points[i].Dot( compliment );
+
+				projectedPoints[i] = new PointF( x, y );
+			}
 
 			return WindingIndex2DF( projectedPoints );
 		}
