@@ -13,6 +13,7 @@
 
 #define CORE_DATA_TRANSIENT_MEMORY_SIZE 1024*1024*10 // 10Mb
 
+class Level;
 struct CoreData
 {
 	System::Input* input;
@@ -25,5 +26,6 @@ struct CoreData
 	Physics::CollisionSolver* collisionSolver;
 	Network::Client* client;
 	Network::Server* server;
+	Level* level;
 	uint64_t* updateAccumulator;
 };

@@ -3,6 +3,8 @@
 #include "entity.h"
 #include "prop.h"
 #include "collision_solver.h"
+#include "solid.h"
+#include "spawn_point.h"
 
 class Level : public Entity
 {
@@ -12,16 +14,23 @@ public:
 
 	bool load( const char* filepath );
 	void unload();
+	void upload();
 
 	void render();
-	int raytrace( const Physics::Ray& ray, glm::vec3& hitPoint );
 
-	const Physics::Triangle* getTriangle( int index ) const;
-	int getTriangleCount() const;
+	const SpawnPoint& getRandomSpawnPoint() const;
 
 private:
-	Transform transform;
-	int meshIndex;
-	Physics::Triangle* triangles;
-	int triangleCount;
+	//Transform transform;
+	//int meshIndex;
+	//Physics::Triangle* triangles;
+	//int triangleCount;
+
+	bool uploaded;
+
+	Solid* solids;
+	int solidCount;
+
+	SpawnPoint* spawnPoints;
+	int spawnPointCount;
 };

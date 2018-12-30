@@ -192,6 +192,8 @@ namespace Editor
 						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes.ToArray() );
 						var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
 
+						writer.Write( (indices.Length-2 ) * 3 );
+
 						var v0 = points[indices[0]];
 						for( int i = 1; i < indices.Length-1; i++ )
 						{

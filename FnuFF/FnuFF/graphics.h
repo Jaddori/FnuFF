@@ -62,6 +62,7 @@ namespace Rendering
 		void finalize();
 		void render( float deltaTime );
 
+		void queueVao( GLuint vao, int vertexCount );
 		void queueMesh( int meshIndex, Transform* transform );
 		void queueQuad( int textureIndex, const glm::vec3& position, const glm::vec2& size, const glm::vec2& uvStart, const glm::vec2& uvEnd, const glm::vec4& color );
 		void queueText( int fontIndex, const char* text, const glm::vec3& position, const glm::vec4& color );
@@ -95,6 +96,12 @@ namespace Rendering
 		GLuint viewLocation;
 
 		Assets assets;
+
+		Shader basicShader;
+		GLuint basicShaderProjectionLocation;
+		GLuint basicShaderViewLocation;
+		SwapArray<GLuint> vaoQueue;
+		SwapArray<int> vaoCountQueue;
 
 		Array<int> meshQueue;
 		Array<Array<Transform*>> transformQueue;

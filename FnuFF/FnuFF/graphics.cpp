@@ -13,6 +13,10 @@ Graphics::~Graphics()
 
 void Graphics::load()
 {
+	basicShader.load( "./assets/shaders/super_basic.vs", NULL, "./assets/shaders/super_basic.fs" );
+	basicShaderProjectionLocation = basicShader.getLocation( "projectionMatrix" );
+	basicShaderViewLocation = basicShader.getLocation( "viewMatrix" );
+
 	if( !gbuffer.load( &assets, WINDOW_WIDTH, WINDOW_HEIGHT ) )
 	{
 		LOG( VERBOSITY_ERROR, "Failed to load gbuffer." );
@@ -191,13 +195,20 @@ void Graphics::finalize()
 
 		transforms.clear();
 	}
+
+	// finalize vaos
+	vaoQueue.swap();
+	vaoQueue.getWrite().clear();
+
+	vaoCountQueue.swap();
+	vaoCountQueue.getWrite().clear();
 }
 
 void Graphics::render( float deltaTime )
 {
 	elapsedTime += deltaTime;
 
-	if( lightingEnabled )
+	/*if( lightingEnabled )
 	{
 		renderDeferred( deltaTime );
 		renderForward();
@@ -205,6 +216,17 @@ void Graphics::render( float deltaTime )
 	else
 	{
 		renderBasic();
+	}*/
+
+	basicShader.bind();
+	basicShader.setMat4( basicShaderProjectionLocation, perspectiveCamera.getProjectionMatrix() );
+	basicShader.setMat4( basicShaderViewLocation, perspectiveCamera.getViewMatrix() );
+
+	const int VAO_COUNT = vaoQueue.getRead().getSize();
+	for( int curVao = 0; curVao < VAO_COUNT; curVao++ )
+	{
+		glBindVertexArray( vaoQueue.getRead()[curVao] );
+		glDrawArrays( GL_TRIANGLES, 0, vaoCountQueue.getRead()[curVao] );
 	}
 }
 
@@ -583,6 +605,12 @@ void Graphics::renderBasic()
 	glBindVertexArray( 0 );
 
 	glDisable( GL_BLEND );
+}
+
+void Graphics::queueVao( GLuint vao, int vertexCount )
+{
+	vaoQueue.getWrite().add( vao );
+	vaoCountQueue.getWrite().add( vertexCount );
 }
 
 void Graphics::queueMesh( int meshIndex, Transform* transform )

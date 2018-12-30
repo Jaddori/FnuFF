@@ -170,6 +170,8 @@
     <ClCompile Include="server.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shapes.cpp" />
+    <ClCompile Include="solid.cpp" />
+    <ClCompile Include="spawn_point.cpp" />
     <ClCompile Include="system_info.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="thread_pool.cpp" />
@@ -207,6 +209,8 @@
     <ClInclude Include="server.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shapes.h" />
+    <ClInclude Include="solid.h" />
+    <ClInclude Include="spawn_point.h" />
     <ClInclude Include="swap.h" />
     <ClInclude Include="swap_array.h" />
     <ClInclude Include="system_info.h" />

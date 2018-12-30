@@ -83,58 +83,8 @@ void Player::update()
 	glm::vec3 end = position + globalMovement;
 	glm::vec3 finalPosition = end;
 
-	Sphere sphere = { end, PLAYER_SIZE };
-	const int TRIANGLE_COUNT = level->getTriangleCount();
-
-	for( int i=0; i<TRIANGLE_COUNT; i++ )
-	{
-		const Triangle* triangle = level->getTriangle( i );
-		Hit hit;
-
-		if( solver.sphere( sphere, *triangle, &hit ) )
-		{
-			finalPosition = start;
-		}
-	}
-
 	position = finalPosition;
 	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
-
-	// check collision
-	/*CollisionSolver& solver = *coreData->collisionSolver;
-
-	glm::vec3 start = position;
-	glm::vec3 end = position + velocity;
-	Ray ray = rayFromPoints( start, end );
-	if( ray.length > EPSILON )
-	{
-		const int TRIANGLE_COUNT = level->getTriangleCount();
-
-		float shortest = ray.length + 1.0f;
-		glm::vec3 finalPosition = position + velocity;
-
-		for( int i=0; i<TRIANGLE_COUNT; i++ )
-		{
-			const Triangle* triangle = level->getTriangle( i );
-			Hit hit;
-
-			if( solver.ray( ray, *triangle, &hit ) )
-			{
-				if( hit.length < shortest )
-				{
-					shortest = hit.length;
-					velocity = glm::vec3( 0.0f );
-					finalPosition = hit.position;
-					platform = triangle;
-				}
-			}
-		}
-
-		position = finalPosition;
-	}
-
-	position += velocity;
-	camera->setPosition( position + glm::vec3( 0.0f, 1.0f, 0.0f ) );*/
 }
 
 void Player::setLevel( Level* lvl )

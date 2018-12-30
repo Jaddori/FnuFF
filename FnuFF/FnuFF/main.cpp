@@ -90,15 +90,19 @@ int update( void* args )
 	camera->setPosition( glm::vec3( 0, 5, -10 ) );
 	camera->setDirection( glm::vec3( 0.0f, 0.0f, 1.0f ) );
 
-	Level level;
-	level.load( "./assets/levels/level01.txt" );
+	//Level level;
+	//level.load( "./assets/levels/level01.txt" );
+	//level.load( "./assets/levels/arena.lvl" );
+	Level& level = *data->coreData->level;
+	level.load( "./assets/levels/arena.lvl" );
 
 	Ray ray;
 	Triangle triangle;
 	glm::vec3 hitPoint;
 
 	Player player;
-	player.setLevel( &level );
+	//player.setLevel( &level );
+	player.setPosition( level.getRandomSpawnPoint().getPosition() );
 
 	while( *data->coreData->running )
 	{
@@ -331,6 +335,8 @@ int main( int argc, char* argv[] )
 			Client client;
 			Server server;
 
+			Level level;
+
 			uint64_t updateAccumulator = 0;
 
 			CoreData coreData = {};
@@ -345,6 +351,7 @@ int main( int argc, char* argv[] )
 			coreData.collisionSolver = &collisionSolver;
 			coreData.client = &client;
 			coreData.server = &server;
+			coreData.level = &level;
 			coreData.updateAccumulator = &updateAccumulator;
 
 			LOG_INFO( "Initializing Entity." );
@@ -411,6 +418,7 @@ int main( int argc, char* argv[] )
 #if _DEBUG
 					graphics.getAssets()->hotload();
 #endif
+					level.upload();
 					graphics.getAssets()->upload();
 					graphics.finalize();
 					debugShapes.finalize();
