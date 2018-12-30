@@ -103,6 +103,16 @@ namespace Editor.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icon_entity_player_spawn_selected {
+            get {
+                object obj = ResourceManager.GetObject("icon_entity_player_spawn_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icon_entity_selected {
             get {
                 object obj = ResourceManager.GetObject("icon_entity_selected", resourceCulture);

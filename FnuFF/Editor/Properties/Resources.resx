@@ -121,14 +121,14 @@
   <data name="icon_face_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_face_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="icon_entity_player_spawn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_entity_player_spawn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="icon_solid_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_solid_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icon_face" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_face.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="icon32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icon_select" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_select.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -145,6 +145,9 @@
   <data name="icon_entity_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_entity_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="icon_select_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_select_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="icon_entity" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_entity.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -160,10 +163,10 @@
   <data name="icon_vertex_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_vertex_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="icon_select_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_select_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="icon32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="icon_entity_player_spawn" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_entity_player_spawn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="icon_entity_player_spawn_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_entity_player_spawn_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

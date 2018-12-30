@@ -10,6 +10,7 @@ namespace Editor.Entities
 	public class PlayerSpawn : EntityData
 	{
 		private static Image _icon = Properties.Resources.icon_entity_player_spawn;
+		private static Image _selectedIcon = Properties.Resources.icon_entity_player_spawn_selected;
 
 		private float _angle;
 
@@ -19,8 +20,10 @@ namespace Editor.Entities
 		{
 		}
 
-		public override Image GetIcon()
+		public override Image GetIcon(bool hovered, bool selected)
 		{
+			if( hovered || selected )
+				return _selectedIcon;
 			return _icon;
 		}
 	}

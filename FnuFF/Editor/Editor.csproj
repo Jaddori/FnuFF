@@ -88,6 +88,8 @@
     <Compile Include="Plane.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Triple.cs" />
+    <Compile Include="UndoRedo\CommandEntityChanged.cs" />
+    <Compile Include="UndoRedo\CommandEntityCreated.cs" />
     <Compile Include="UndoRedo\CommandNewLevel.cs" />
     <Compile Include="UndoRedo\CommandSolidChanged.cs" />
     <Compile Include="UndoRedo\CommandSolidCreated.cs" />
@@ -191,6 +193,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_entity_player_spawn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_entity_player_spawn_selected.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

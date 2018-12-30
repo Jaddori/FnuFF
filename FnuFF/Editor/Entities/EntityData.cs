@@ -10,6 +10,7 @@ namespace Editor.Entities
 	public class EntityData
 	{
 		private static Image _icon = Properties.Resources.icon_entity;
+		private static Image _selectedIcon = Properties.Resources.icon_entity_selected;
 
 		private string _name;
 
@@ -19,8 +20,10 @@ namespace Editor.Entities
 		{
 		}
 
-		public virtual Image GetIcon()
+		public virtual Image GetIcon(bool hovered, bool selected)
 		{
+			if( hovered || selected )
+				return _selectedIcon;
 			return _icon;
 		}
 	}

@@ -38,8 +38,7 @@ namespace Editor
 			Cursors.SizeWE, Cursors.SizeAll, Cursors.SizeWE,
 			Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE
 		};
-
-		//private static float[] GRID_SIZES = new float[]{ 0.1f, 0.5f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 8.0f, 10.0f, 15.0f, 20.0f };
+		
 		private static int[] GRID_SIZES = new int[] { 1, 2, 3, 4, 5, 10 };
 		private const int GRID_MAX_LINES = 100;
 		private const int GRID_GAP_BASE = 64;
@@ -74,6 +73,7 @@ namespace Editor
 		//private SizeHandle[] _sizeHandles;
 		private int _handleIndex;
 		private GeometrySolid _selectedSolid;
+		private Entity _selectedEntity;
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
@@ -109,10 +109,14 @@ namespace Editor
 			set
 			{
 				if( _level != null )
+				{
 					_level.OnSolidChange -= _invalidateAction;
+					_level.OnEntityChange -= _invalidateAction;
+				}
 
 				_level = value;
 				_level.OnSolidChange += _invalidateAction;
+				_level.OnEntityChange += _invalidateAction;
 
 				if( _directionType == 0 )
 				{
@@ -485,35 +489,40 @@ namespace Editor
 							_commandSolidChanged.Begin();
 						}
 					}
+
+					if( _handleIndex < 0 )
+					{
+						var hasPrevSelected = false;
+
+						foreach( var entity in _level.Entities )
+						{
+							if( entity.Selected )
+								hasPrevSelected = true;
+
+							entity.Selected = false;
+						}
+
+						var potentialEntities = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
+						if( potentialEntities.Length > 0 )
+						{
+							_selectedEntity = potentialEntities[0];
+							_selectedEntity.Selected = true;
+
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
+						}
+						else if( hasPrevSelected )
+						{
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
+						}
+					}
 				}
 			}
 			else if( EditorTool.Current == EditorTools.Clip )
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					/*if( !_hasClipStart )
-					{
-						_clipStart = e.Location;
-
-						if( _snapToGrid )
-						{
-							_clipStart = SnapToGrid( _clipStart );
-						}
-
-						_clipEnd = _clipStart;
-
-						_clipping = true;
-					}
-					else
-					{
-						_clipEnd = e.Location;
-
-						if( _snapToGrid )
-						{
-							_clipEnd = SnapToGrid( _clipEnd );
-						}
-					}*/
-
 					_clipStart = e.Location;
 					if( _snapToGrid )
 						_clipStart = SnapToGrid( _clipStart );
@@ -603,7 +612,6 @@ namespace Editor
 					else
 					{
 						var hadSelection = false;
-						var minDepth = 99999;
 						_selectedSolid = null;
 						var minBounds = RectangleF.Empty;
 						foreach( var solid in _level.Solids )
@@ -651,6 +659,9 @@ namespace Editor
 					var entity = new Entity( position );
 					entity.Data = new PlayerSpawn();
 					_level.AddEntity( entity );
+
+					var command = new CommandEntityCreated( _level.Entities, entity );
+					_commandStack.Do( command );
 
 					Invalidate();
 					OnGlobalInvalidation?.Invoke();
@@ -771,8 +782,7 @@ namespace Editor
 						solid.Hovered = false;
 
 						var mpos = new Triple( e.X, e.Y, 0 );
-
-						//var faces = solid.Faces.Where( x => Math.Abs( x.Plane.Normal.Dot( _camera.Direction ) ) > Extensions.EPSILON ).ToArray();
+						
 						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 
 						for( int i = 0; i < faces.Length; i++ )
@@ -884,32 +894,35 @@ namespace Editor
 							Cursor.Current = HANDLE_CURSORS[hoverHandleIndex];
 						}
 					}
+
+					// check hover on entities
+					var hasPrevHover = false;
+
+					foreach( var entity in _level.Entities )
+					{
+						if( entity.Hovered )
+							hasPrevHover = true;
+
+						entity.Hovered = false;
+					}
+
+					var potentialEntites = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
+					if( potentialEntites.Length > 0 )
+					{
+						potentialEntites[0].Hovered = true;
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
+					else if( hasPrevHover )
+					{
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
 				}
 				else if( EditorTool.Current == EditorTools.Clip )
 				{
 					if( _clipping )
 					{
-						/*if( !_hasClipStart )
-						{
-							_clipStart = e.Location;
-
-							if( _snapToGrid )
-							{
-								_clipStart = SnapToGrid( _clipStart );
-							}
-
-							_clipEnd = _clipStart;
-						}
-						else
-						{
-							_clipEnd = e.Location;
-
-							if( _snapToGrid )
-							{
-								_clipEnd = SnapToGrid( _clipEnd );
-							}
-						}*/
-
 						_clipEnd = e.Location;
 						if( _snapToGrid )
 							_clipEnd = SnapToGrid( _clipEnd );
@@ -1058,6 +1071,13 @@ namespace Editor
 					_level.RemoveSolid( _selectedSolid );
 
 					var deleteCommand = new CommandSolidCreated( _level.Solids, _selectedSolid, true );
+					_commandStack.Do( deleteCommand );
+				}
+				else if( _selectedEntity != null )
+				{
+					_level.RemoveEntity( _selectedEntity );
+
+					var deleteCommand = new CommandEntityCreated( _level.Entities, _selectedEntity, true );
 					_commandStack.Do( deleteCommand );
 				}
 			}
