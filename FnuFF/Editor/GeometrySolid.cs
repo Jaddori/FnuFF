@@ -169,7 +169,7 @@ namespace Editor
 				//	continue;
 
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes.ToArray() );
+				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 				var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
 				
 				var rr = red;

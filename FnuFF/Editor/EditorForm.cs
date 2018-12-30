@@ -189,10 +189,11 @@ namespace Editor
 					foreach( var face in solid.Faces )
 					{
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes.ToArray() );
+						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 						var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
 
-						writer.Write( (indices.Length-2 ) * 3 );
+						int indexCount = ( indices.Length - 2 ) * 3;
+						writer.Write( indexCount );
 
 						var v0 = points[indices[0]];
 						for( int i = 1; i < indices.Length-1; i++ )
@@ -231,6 +232,8 @@ namespace Editor
 
 				writer.Close();
 				stream.Close();
+
+				MessageBox.Show( "Level exported." );
 			}
 		}
 

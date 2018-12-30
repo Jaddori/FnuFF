@@ -14,7 +14,7 @@ bool Level::load( const char* filepath )
 {
 	bool result = false;
 
-	FILE* file = fopen( filepath, "r" );
+	FILE* file = fopen( filepath, "rb" );
 	if( file )
 	{
 		solidCount = 0;

@@ -366,5 +366,23 @@ namespace Editor
 			writer.Write( t.Y );
 			writer.Write( t.Z );
 		}
+
+		public static void Write( this StreamWriter writer, Face f )
+		{
+			writer.Write( f.Plane );
+		}
+
+		public static void Write( this StreamWriter writer, Plane p )
+		{
+			writer.Write( p.Normal );
+			writer.WriteLine( p.D.ToString() );
+		}
+
+		public static void Write( this StreamWriter writer, Triple t )
+		{
+			writer.WriteLine( t.X.ToString() );
+			writer.WriteLine( t.Y.ToString() );
+			writer.WriteLine( t.Z.ToString() );
+		}
 	}
 }
