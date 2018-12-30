@@ -11,6 +11,7 @@ namespace Editor.Entities
 	{
 		private static Image _icon = Properties.Resources.icon_entity_player_spawn;
 		private static Image _selectedIcon = Properties.Resources.icon_entity_player_spawn_selected;
+		private static UInt32 _icon3D = GL.LoadTexture( "./assets/textures/icon_entity_player_spawn.dds" );
 
 		private float _angle;
 
@@ -20,11 +21,16 @@ namespace Editor.Entities
 		{
 		}
 
-		public override Image GetIcon(bool hovered, bool selected)
+		public override Image GetIcon2D(bool hovered, bool selected)
 		{
 			if( hovered || selected )
 				return _selectedIcon;
 			return _icon;
+		}
+
+		public override UInt32 GetIcon3D()
+		{
+			return _icon3D;
 		}
 	}
 }

@@ -64,3 +64,7 @@ EXPORT void viewMatrix( float px, float py, float pz, float dx, float dy, float 
 
 EXPORT uint32_t loadTexture( const char* path );
 EXPORT void setTexture( uint32_t id );
+
+EXPORT void pointSize( float size );
+EXPORT void enablePointSprite( bool enabled );
+EXPORT void enableDepthMask( bool enabled );

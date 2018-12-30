@@ -122,6 +122,12 @@ namespace Editor
 					solid.Paint3D();
 				}
 
+				// draw entities
+				foreach( var entity in _level.Entities )
+				{
+					entity.Paint3D();
+				}
+
 				GL.SwapBuffers( Handle );
 				_frame++;
 			}

@@ -59,6 +59,15 @@ namespace Editor
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void setTexture( UInt32 texture );
 
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void pointSize( float size );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void enablePointSprite( bool enabled );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void enableDepthMask( bool enabled );
+
 		private static IntPtr _context;
 		
 		public static void CreateContext( IntPtr windowHandle, int width, int height )
@@ -135,6 +144,21 @@ namespace Editor
 		public static void SetTexture( UInt32 texture )
 		{
 			setTexture( texture );
+		}
+
+		public static void PointSize( float size )
+		{
+			pointSize( size );
+		}
+
+		public static void EnablePointSprite( bool enabled )
+		{
+			enablePointSprite( enabled );
+		}
+
+		public static void EnableDepthMask( bool enabled )
+		{
+			enableDepthMask( enabled );
 		}
 	}
 }

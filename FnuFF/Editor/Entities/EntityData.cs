@@ -11,6 +11,7 @@ namespace Editor.Entities
 	{
 		private static Image _icon = Properties.Resources.icon_entity;
 		private static Image _selectedIcon = Properties.Resources.icon_entity_selected;
+		private static UInt32 _icon3D = 0;
 
 		private string _name;
 
@@ -20,11 +21,16 @@ namespace Editor.Entities
 		{
 		}
 
-		public virtual Image GetIcon(bool hovered, bool selected)
+		public virtual Image GetIcon2D(bool hovered, bool selected)
 		{
 			if( hovered || selected )
 				return _selectedIcon;
 			return _icon;
+		}
+
+		public virtual UInt32 GetIcon3D()
+		{
+			return _icon3D;
 		}
 	}
 }

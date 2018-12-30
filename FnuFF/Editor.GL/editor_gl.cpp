@@ -54,6 +54,8 @@ EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
 			glEnable( GL_CULL_FACE );
 			glEnable( GL_DEPTH_TEST );
 			glEnable( GL_TEXTURE_2D );
+			glEnable( GL_BLEND );
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 			glPointSize(8.0f);
 
@@ -207,4 +209,25 @@ EXPORT uint32_t loadTexture( const char* path )
 EXPORT void setTexture( uint32_t id )
 {
 	glBindTexture( GL_TEXTURE_2D, id );
+}
+
+EXPORT void pointSize( float size )
+{
+	glPointSize( size );
+}
+
+EXPORT void enablePointSprite( bool enabled )
+{
+	if( enabled )
+	{
+		glEnable( GL_POINT_SPRITE );
+		glTexEnvi( GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE );
+	}
+	else
+		glDisable( GL_POINT_SPRITE );
+}
+
+EXPORT void enableDepthMask( bool enabled )
+{
+	glDepthMask( enabled ? GL_TRUE : GL_FALSE );
 }

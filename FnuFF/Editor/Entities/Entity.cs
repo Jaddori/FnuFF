@@ -55,13 +55,43 @@ namespace Editor.Entities
 		{
 			var localPosition = camera.ToLocal( camera.Project( _position ).Deflate( gridSize ).Inflate( gridGap ) );
 
-			var icon = _data.GetIcon(_hovered, _selected);
+			var icon = _data.GetIcon2D(_hovered, _selected);
 			var iconBounds = Extensions.FromPoint( localPosition, icon.Width );
 			g.DrawImage( icon, iconBounds );
 		}
 
 		public virtual void Paint3D()
 		{
+			GL.EnablePointSprite( true );
+			GL.EnableDepthMask( false );
+			GL.SetTexture( _data.GetIcon3D() );
+
+			GL.PointSize( 32 );
+			GL.BeginPoints();
+			GL.TexCoord2f( 1.0f, 1.0f );
+			GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+			GL.Vertex3f( _position.X, _position.Y, _position.Z );
+			GL.End();
+
+			GL.SetTexture( 0 );
+			GL.EnableDepthMask( true );
+			GL.EnablePointSprite( false );
+
+			GL.BeginLines();
+
+			GL.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
+			GL.Vertex3f( _position.X, _position.Y, _position.Z );
+			GL.Vertex3f( _position.X + 0.25f, _position.Y, _position.Z );
+
+			GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
+			GL.Vertex3f( _position.X, _position.Y, _position.Z );
+			GL.Vertex3f( _position.X, _position.Y+ 0.25f, _position.Z );
+
+			GL.Color4f( 0.0f, 0.0f, 1.0f, 1.0f );
+			GL.Vertex3f( _position.X, _position.Y, _position.Z );
+			GL.Vertex3f( _position.X, _position.Y, _position.Z + 0.25f );
+
+			GL.End();
 		}
 	}
 }
