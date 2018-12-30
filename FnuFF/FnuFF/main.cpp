@@ -94,14 +94,15 @@ int update( void* args )
 	//level.load( "./assets/levels/level01.txt" );
 	//level.load( "./assets/levels/arena.lvl" );
 	Level& level = *data->coreData->level;
-	level.load( "./assets/levels/arena.lvl" );
+	//level.load( "./assets/levels/arena.lvl" );
+	level.load( "./assets/levels/slope_test.lvl" );
 
 	Ray ray;
 	Triangle triangle;
 	glm::vec3 hitPoint;
 
 	Player player;
-	//player.setLevel( &level );
+	player.setLevel( &level );
 	player.setPosition( level.getRandomSpawnPoint().getPosition() );
 
 	while( *data->coreData->running )
@@ -199,6 +200,7 @@ int update( void* args )
 			debugShapes.addSphere( { hitPoint, 0.5f, green }, false );
 
 			level.render();
+			player.render();
 
 			for( int x=0; x<=10; x++ )
 			{

@@ -19,6 +19,8 @@ public:
 	void render();
 
 	const SpawnPoint& getRandomSpawnPoint() const;
+	const Solid* getSolids() const;
+	int getSolidCount() const;
 
 private:
 	//Transform transform;

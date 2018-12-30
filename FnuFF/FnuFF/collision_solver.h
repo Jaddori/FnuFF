@@ -59,7 +59,7 @@ namespace Physics
 
 		bool ray( const Ray& ray, const Sphere& sphere, Hit* hit = NULL );
 		bool ray( const Ray& ray, const AABB& aabb, Hit* hit = NULL );
-		bool ray( const Ray& ray, const Plane& plane, Hit* hit = NULL );
+		bool ray( const Ray& ray, const Plane& plane, float offset, Hit* hit = NULL );
 		bool ray( const Ray& ray, const Triangle& triangle, Hit* hit = NULL );
 
 		bool sphere( const Sphere& a, const Sphere& b, Hit* hit = NULL );

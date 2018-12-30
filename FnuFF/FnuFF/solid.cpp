@@ -12,12 +12,12 @@ Solid::~Solid()
 
 void Solid::read( FILE* file, void* transientMemory )
 {
-	uint32_t faceCount = 0;
-	fread( &faceCount, sizeof(faceCount), 1, file );
+	planeCount = 0;
+	fread( &planeCount, sizeof(planeCount), 1, file );
 
-	planes = new Plane[faceCount];
+	planes = new Plane[planeCount];
 
-	for( int i=0; i<faceCount; i++ )
+	for( int i=0; i<planeCount; i++ )
 	{
 		fread( &planes[i], sizeof(planes[i]), 1, file );
 	}
@@ -31,7 +31,7 @@ void Solid::read( FILE* file, void* transientMemory )
 	glm::vec3 color( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
 	color = glm::normalize( color );
 
-	for( int i=0; i<faceCount; i++ )
+	for( int i=0; i<planeCount; i++ )
 	{
 		uint32_t faceVertexCount = 0;
 		fread( &faceVertexCount, sizeof(faceVertexCount), 1, file );
@@ -100,4 +100,14 @@ GLuint Solid::getVAO() const
 int Solid::getVertexCount() const
 {
 	return vertexCount;
+}
+
+const Physics::Plane* Solid::getPlanes() const
+{
+	return planes;
+}
+
+int Solid::getPlaneCount() const
+{
+	return planeCount;
 }

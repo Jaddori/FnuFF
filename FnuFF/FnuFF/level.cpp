@@ -73,3 +73,13 @@ const SpawnPoint& Level::getRandomSpawnPoint() const
 	int index = rand() % spawnPointCount; 
 	return spawnPoints[index];
 }
+
+const Solid* Level::getSolids() const
+{
+	return solids;
+}
+
+int Level::getSolidCount() const
+{
+	return solidCount;
+}

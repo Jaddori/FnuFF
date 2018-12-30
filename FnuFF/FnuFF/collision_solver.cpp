@@ -120,12 +120,12 @@ bool CollisionSolver::ray( const Ray& ray, const AABB& aabb, Hit* hit )
 	return true;
 }
 
-bool CollisionSolver::ray( const Ray& ray, const Plane& plane, Hit* hit )
+bool CollisionSolver::ray( const Ray& ray, const Plane& plane, float offset, Hit* hit )
 {
 	float denom = glm::dot( plane.normal, ray.direction ); 
 	if( fabs(denom) > EPSILON )
 	{
-		glm::vec3 center = plane.normal * plane.offset;
+		glm::vec3 center = plane.normal * (plane.offset + offset);
 		float t = glm::dot( center - ray.start, plane.normal ) / denom;
 		if (t >= EPSILON)
 		{

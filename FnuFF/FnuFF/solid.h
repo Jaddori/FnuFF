@@ -22,9 +22,12 @@ public:
 
 	GLuint getVAO() const;
 	int getVertexCount() const;
+	const Physics::Plane* getPlanes() const;
+	int getPlaneCount() const;
 
 private:
 	Physics::Plane* planes;
+	int planeCount;
 	GLuint vao;
 	GLuint vbo;
 	int vertexCount;

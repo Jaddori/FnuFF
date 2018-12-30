@@ -79,12 +79,138 @@ void Player::update()
 
 	CollisionSolver& solver = *coreData->collisionSolver;
 
+	if( input.buttonReleased( SDL_BUTTON_RIGHT ) )
+	{
+		glm::vec3 forward = camera->getForward();
+		Ray ray =
+		{
+			position + glm::vec3( 0, 1, 0 ),
+			glm::normalize( forward ),
+			16.0f
+		};
+
+		rayLine.start = ray.start;
+		rayLine.end = ray.start + ray.direction* 16.0f;
+		rayLine.color = glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f );
+
+		Hit hit = {};
+		float minHitDistance = 9999.0f;
+
+		const Solid* solids = level->getSolids();
+		const int SOLID_COUNT = level->getSolidCount();
+		for( int curSolid=0; curSolid < SOLID_COUNT; curSolid++ )
+		{
+			const Solid& solid = solids[curSolid];
+			const Plane* planes = solid.getPlanes();
+
+			const int PLANE_COUNT = solid.getPlaneCount();
+			for( int curPlane = 0; curPlane < PLANE_COUNT; curPlane++ )
+			{
+				const Plane& plane = planes[curPlane];
+
+				//if( glm::dot( plane.normal, ray.direction ) < 0 )
+				{
+					if( solver.ray( ray, plane, PLAYER_SIZE, &hit ) )
+					{
+						if( hit.length < ray.length )
+						{
+							if( hit.length > 0 && hit.length < minHitDistance )
+							{
+								bool behindAll = true;
+								for( int otherPlane = 0; otherPlane < PLANE_COUNT && behindAll; otherPlane++ )
+								{
+									if( otherPlane != curPlane )
+									{
+										const Plane& oplane = planes[otherPlane];
+
+										float distance = glm::dot( oplane.normal, hit.position ) - oplane.offset;
+										if( distance > EPSILON )
+											behindAll = false;
+									}
+								}
+
+								if( behindAll )
+								{
+									minHitDistance = hit.length;
+									rayHit.position = hit.position;
+									rayHit.radius = 0.5f;
+									rayHit.color = glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f );
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	glm::vec3 start = position;
 	glm::vec3 end = position + globalMovement;
-	glm::vec3 finalPosition = end;
 
-	position = finalPosition;
+	Hit hit;
+
+	float minHitDistance = 9999.0f;
+
+	Ray ray = 
+	{
+		start,
+		glm::normalize( end - start ),
+		glm::distance( start, end ),
+	};
+
+	const Solid* solids = level->getSolids();
+	const int SOLID_COUNT = level->getSolidCount();
+	for( int curSolid=0; curSolid < SOLID_COUNT; curSolid++ )
+	{
+		const Solid& solid = solids[curSolid];
+		const Plane* planes = solid.getPlanes();
+
+		const int PLANE_COUNT = solid.getPlaneCount();
+		for( int curPlane = 0; curPlane < PLANE_COUNT; curPlane++ )
+		{
+			const Plane& plane = planes[curPlane];
+
+			if( glm::dot( plane.normal, ray.direction ) < 0 )
+			{
+				if( solver.ray( ray, plane, PLAYER_SIZE, &hit ) )
+				{
+					if( hit.length < ray.length )
+					{
+						if( hit.length > 0 && hit.length < minHitDistance )
+						{
+							bool behindAll = true;
+							for( int otherPlane = 0; otherPlane < PLANE_COUNT && behindAll; otherPlane++ )
+							{
+								if( otherPlane != curPlane )
+								{
+									const Plane& oplane = planes[otherPlane];
+
+									float distance = glm::dot( oplane.normal, hit.position ) - oplane.offset - PLAYER_SIZE;
+									if( distance > EPSILON )
+										behindAll = false;
+								}
+							}
+
+							if( behindAll )
+							{
+								minHitDistance = hit.length;
+								globalMovement -= plane.normal * glm::dot( globalMovement, plane.normal );
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	position += globalMovement;
 	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
+}
+
+void Player::render()
+{
+	coreData->debugShapes->addLine( rayLine, false );
+	coreData->debugShapes->addSphere( rayHit, false );
 }
 
 void Player::setLevel( Level* lvl )
