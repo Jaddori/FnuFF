@@ -18,8 +18,12 @@ namespace Editor.Entities
 
 		public Triple Position { get { return _position; } set { _position = value; } }
 		public bool Active { get { return _active; } set { _active = value; } }
+
 		public EntityData Data { get { return _data; } set { _data = value; } }
+
+		[XmlIgnore]
 		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
+		[XmlIgnore]
 		public bool Selected { get { return _selected; } set { _selected = value; } }
 
 		public Entity()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.IO;
 
 namespace Editor
 {
@@ -171,12 +172,12 @@ namespace Editor
 
 		public static PointF Inflate( this PointF point, float value )
 		{
-			return new PointF(point.X * value, point.Y * value);
+			return new PointF( point.X * value, point.Y * value );
 		}
 
 		public static PointF Deflate( this PointF point, float value )
 		{
-			return new PointF(point.X / value, point.Y / value);
+			return new PointF( point.X / value, point.Y / value );
 		}
 
 		public static PointF PointLerp( PointF a, PointF b, float t )
@@ -228,7 +229,7 @@ namespace Editor
 			cx /= points.Length;
 			cy /= points.Length;
 
-			var sorted = points.Select((x,i) => new { point = x, index = i }).OrderBy( x => Math.Atan2( x.point.Y - cy, x.point.X - cx ) ).Select( x => x.index ).ToArray();
+			var sorted = points.Select( ( x, i ) => new { point = x, index = i } ).OrderBy( x => Math.Atan2( x.point.Y - cy, x.point.X - cx ) ).Select( x => x.index ).ToArray();
 			return sorted;
 		}
 
@@ -269,7 +270,7 @@ namespace Editor
 
 			var compliment = v1v0.Cross( normal );
 			compliment.Normalize();
-			
+
 			var projectedPoints = new PointF[points.Length];
 			for( int i = 0; i < points.Length; i++ )
 			{
@@ -346,6 +347,24 @@ namespace Editor
 			}
 
 			return points.ToArray();
+		}
+
+		public static void Write( this BinaryWriter writer, Face f )
+		{
+			writer.Write( f.Plane );
+		}
+
+		public static void Write( this BinaryWriter writer, Plane p )
+		{
+			writer.Write( p.Normal );
+			writer.Write( p.D );
+		}
+
+		public static void Write( this BinaryWriter writer, Triple t )
+		{
+			writer.Write( t.X );
+			writer.Write( t.Y );
+			writer.Write( t.Z );
 		}
 	}
 }

@@ -10,7 +10,7 @@
 							<Y>0</Y>
 							<Z>-1</Z>
 						</Normal>
-						<D>1</D>
+						<D>2</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -30,7 +30,7 @@
 							<Y>0</Y>
 							<Z>1</Z>
 						</Normal>
-						<D>6</D>
+						<D>5</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -90,7 +90,7 @@
 							<Y>0</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>1</D>
+						<D>0</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -110,7 +110,7 @@
 							<Y>0</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>6</D>
+						<D>5</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -134,7 +134,7 @@
 							<Y>0</Y>
 							<Z>-1</Z>
 						</Normal>
-						<D>-3</D>
+						<D>-2</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -154,7 +154,7 @@
 							<Y>0</Y>
 							<Z>1</Z>
 						</Normal>
-						<D>4</D>
+						<D>3</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -258,7 +258,7 @@
 							<Y>0</Y>
 							<Z>-1</Z>
 						</Normal>
-						<D>-1</D>
+						<D>0</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -278,7 +278,7 @@
 							<Y>0</Y>
 							<Z>1</Z>
 						</Normal>
-						<D>2</D>
+						<D>1</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -382,7 +382,7 @@
 							<Y>0</Y>
 							<Z>-1</Z>
 						</Normal>
-						<D>-1</D>
+						<D>0</D>
 					</Plane>
 					<U>
 						<X>0</X>
@@ -402,9 +402,274 @@
 							<Y>0</Y>
 							<Z>1</Z>
 						</Normal>
+						<D>1</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>0</X>
+							<Y>1</Y>
+							<Z>0</Z>
+						</Normal>
+						<D>1</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>0</X>
+							<Y>-1</Y>
+							<Z>0</Z>
+						</Normal>
+						<D>0</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>-1</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Normal>
+						<D>-1</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>1</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Normal>
 						<D>2</D>
 					</Plane>
 					<U>
 						<X>0</X>
 						<Y>0</Y>
-						<Z>0</
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+			</Faces>
+		</GeometrySolid>
+		<GeometrySolid>
+			<Faces>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>0</X>
+							<Y>0</Y>
+							<Z>-1</Z>
+						</Normal>
+						<D>-2</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>0</X>
+							<Y>0</Y>
+							<Z>1</Z>
+						</Normal>
+						<D>3</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>0</X>
+							<Y>1</Y>
+							<Z>0</Z>
+						</Normal>
+						<D>1</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>0</X>
+							<Y>-1</Y>
+							<Z>0</Z>
+						</Normal>
+						<D>0</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>-1</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Normal>
+						<D>-3</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+				<Face>
+					<Plane>
+						<Normal>
+							<X>1</X>
+							<Y>0</Y>
+							<Z>0</Z>
+						</Normal>
+						<D>4</D>
+					</Plane>
+					<U>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</U>
+					<V>
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</V>
+				</Face>
+			</Faces>
+		</GeometrySolid>
+	</Solids>
+	<Entities>
+		<Entity>
+			<Position>
+				<X>1</X>
+				<Y>1</Y>
+				<Z>-1</Z>
+			</Position>
+			<Active>true</Active>
+			<Data xsi:type="PlayerSpawn">
+				<Name />
+				<Angle>0</Angle>
+			</Data>
+		</Entity>
+		<Entity>
+			<Position>
+				<X>4</X>
+				<Y>1</Y>
+				<Z>-1</Z>
+			</Position>
+			<Active>true</Active>
+			<Data xsi:type="PlayerSpawn">
+				<Name />
+				<Angle>0</Angle>
+			</Data>
+		</Entity>
+		<Entity>
+			<Position>
+				<X>1</X>
+				<Y>1</Y>
+				<Z>4</Z>
+			</Position>
+			<Active>true</Active>
+			<Data xsi:type="PlayerSpawn">
+				<Name />
+				<Angle>0</Angle>
+			</Data>
+		</Entity>
+		<Entity>
+			<Position>
+				<X>4</X>
+				<Y>1</Y>
+				<Z>4</Z>
+			</Position>
+			<Active>true</Active>
+			<Data xsi:type="PlayerSpawn">
+				<Name />
+				<Angle>0</Angle>
+			</Data>
+		</Entity>
+	</Entities>
+</Level>

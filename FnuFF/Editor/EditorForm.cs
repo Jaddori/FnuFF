@@ -162,7 +162,74 @@ namespace Editor
 
 		private void exportToolStripMenuItem_Click( object sender, EventArgs e )
 		{
+			saveFileDialog.DefaultExt = ".lvl";
+			saveFileDialog.Filter = "Level files|*.lvl|All files|*.*";
 
+			if( saveFileDialog.ShowDialog() == DialogResult.OK )
+			{
+				var path = saveFileDialog.FileName;
+
+				var solids = _level.Solids;
+				var entities = _level.Entities;
+				
+				var stream = new FileStream( path, FileMode.Create, FileAccess.Write );
+				var writer = new BinaryWriter( stream );
+				
+				writer.Write( solids.Count );
+				writer.Write( entities.Count );
+
+				foreach( var solid in solids )
+				{
+					writer.Write( solid.Faces.Count );
+					foreach( var face in solid.Faces )
+					{
+						writer.Write( face.Plane );
+					}
+					
+					foreach( var face in solid.Faces )
+					{
+						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes.ToArray() );
+						var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
+
+						var v0 = points[indices[0]];
+						for( int i = 1; i < indices.Length-1; i++ )
+						{
+							var i1 = indices[i];
+							var i2 = indices[i + 1];
+
+							var v1 = points[i1];
+							var v2 = points[i2];
+
+							var v1v0 = v0 - v1;
+							var v2v0 = v0 - v2;
+
+							var n = v2v0.Cross( v1v0 );
+							n.Normalize();
+
+							var flip = face.Plane.Normal.Dot( n ) > 0;
+							if( flip )
+							{
+								var temp = v2;
+								v2 = v1;
+								v1 = temp;
+							}
+
+							writer.Write( v0 );
+							writer.Write( v1 );
+							writer.Write( v2 );
+						}
+					}
+				}
+
+				foreach( var entity in entities )
+				{
+					writer.Write( entity.Position );
+				}
+
+				writer.Close();
+				stream.Close();
+			}
 		}
 
 		private void exitToolStripMenuItem_Click( object sender, EventArgs e )

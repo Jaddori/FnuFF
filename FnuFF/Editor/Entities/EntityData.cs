@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace Editor.Entities
 {
+	[XmlInclude( typeof( PlayerSpawn ) )]
 	public class EntityData
 	{
 		private static Image _icon = Properties.Resources.icon_entity;
@@ -19,6 +21,7 @@ namespace Editor.Entities
 
 		public EntityData()
 		{
+			_name = string.Empty;
 		}
 
 		public virtual Image GetIcon2D(bool hovered, bool selected)

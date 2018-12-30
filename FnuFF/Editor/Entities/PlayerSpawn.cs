@@ -18,6 +18,7 @@ namespace Editor.Entities
 		public float Angle { get { return _angle; } set { _angle = value; } }
 
 		public PlayerSpawn()
+			: base()
 		{
 		}
 
