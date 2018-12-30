@@ -273,7 +273,7 @@
 			this.btn_entity.Name = "btn_entity";
 			this.btn_entity.Pressed = false;
 			this.btn_entity.Selected = false;
-			this.btn_entity.SelectedImage = global::Editor.Properties.Resources.icon_entity;
+			this.btn_entity.SelectedImage = global::Editor.Properties.Resources.icon_entity_selected;
 			this.btn_entity.Size = new System.Drawing.Size(58, 32);
 			this.btn_entity.TabIndex = 7;
 			this.btn_entity.Tag = "";

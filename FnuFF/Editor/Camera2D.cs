@@ -77,7 +77,7 @@ namespace Editor
 			return new PointF( x, y );
 		}
 
-		public Triple Unproject( PointF point, int depth = 0 )
+		public Triple Unproject( PointF point, float depth = 0.0f )
 		{
 			var bx = _direction.Y * point.X;
 			var cx = _direction.Z * point.X;

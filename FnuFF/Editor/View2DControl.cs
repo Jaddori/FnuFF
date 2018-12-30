@@ -74,12 +74,14 @@ namespace Editor
 		private int _handleIndex;
 		private GeometrySolid _selectedSolid;
 		private Entity _selectedEntity;
+		private bool _movingEntity;
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
 		
 		private CommandStack _commandStack;
 		private CommandSolidChanged _commandSolidChanged;
+		private CommandEntityChanged _commandEntityChanged;
 
         public int Direction
         {
@@ -492,29 +494,45 @@ namespace Editor
 
 					if( _handleIndex < 0 )
 					{
-						var hasPrevSelected = false;
-
-						foreach( var entity in _level.Entities )
+						// check if we're trying to move the selected entity
+						if( _selectedEntity != null )
 						{
-							if( entity.Selected )
-								hasPrevSelected = true;
+							if( _selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
+							{
+								_movingEntity = true;
 
-							entity.Selected = false;
+								_commandEntityChanged = new CommandEntityChanged( _selectedEntity );
+								_commandEntityChanged.Begin();
+							}
 						}
 
-						var potentialEntities = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
-						if( potentialEntities.Length > 0 )
+						// check if we're trying to select an entity
+						if( !_movingEntity )
 						{
-							_selectedEntity = potentialEntities[0];
-							_selectedEntity.Selected = true;
+							var hasPrevSelected = false;
 
-							Invalidate();
-							OnGlobalInvalidation?.Invoke();
-						}
-						else if( hasPrevSelected )
-						{
-							Invalidate();
-							OnGlobalInvalidation?.Invoke();
+							foreach( var entity in _level.Entities )
+							{
+								if( entity.Selected )
+									hasPrevSelected = true;
+
+								entity.Selected = false;
+							}
+
+							var potentialEntities = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
+							if( potentialEntities.Length > 0 )
+							{
+								_selectedEntity = potentialEntities[0];
+								_selectedEntity.Selected = true;
+
+								Invalidate();
+								OnGlobalInvalidation?.Invoke();
+							}
+							else if( hasPrevSelected )
+							{
+								Invalidate();
+								OnGlobalInvalidation?.Invoke();
+							}
 						}
 					}
 				}
@@ -608,6 +626,19 @@ namespace Editor
 
 						_commandSolidChanged.End();
 						_commandStack.Do( _commandSolidChanged );
+
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
+					else if( _movingEntity )
+					{
+						_movingEntity = false;
+
+						_commandEntityChanged.End();
+						_commandStack.Do( _commandEntityChanged );
+
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
 					}
 					else
 					{
@@ -697,7 +728,7 @@ namespace Editor
 				var localSnap = SnapToGrid( e.Location );
 				_hoverPosition = localSnap;
 
-				var globalSnap = _camera.Unproject( _camera.ToGlobal(localSnap).Deflate( _gridGap ).Inflate( _gridSize ) );
+				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ) );
 
 				var localDirection = new PointF( 0, 0 );
 
@@ -712,7 +743,7 @@ namespace Editor
 					localDirection.Y = 1.0f;
 
 				var globalDirection = _camera.Unproject( localDirection );
-				
+
 				var faceChanged = false;
 				var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
 				for( int i = 0; i < faces.Length; i++ )
@@ -727,6 +758,21 @@ namespace Editor
 
 				if( faceChanged )
 				{
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
+			}
+			else if( _movingEntity )
+			{
+				var localSnap = SnapToGrid( e.Location );
+				_hoverPosition = localSnap;
+
+				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ), _selectedEntity.Position.Dot( _camera.Direction ) );
+
+				if( globalSnap != _selectedEntity.Position )
+				{
+					_selectedEntity.Position = globalSnap;
+
 					Invalidate();
 					OnGlobalInvalidation?.Invoke();
 				}
@@ -782,7 +828,7 @@ namespace Editor
 						solid.Hovered = false;
 
 						var mpos = new Triple( e.X, e.Y, 0 );
-						
+
 						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 
 						for( int i = 0; i < faces.Length; i++ )
@@ -896,27 +942,40 @@ namespace Editor
 					}
 
 					// check hover on entities
-					var hasPrevHover = false;
-
-					foreach( var entity in _level.Entities )
+					var hoveredSelectedEntity = false;
+					if( _selectedEntity != null )
 					{
-						if( entity.Hovered )
-							hasPrevHover = true;
-
-						entity.Hovered = false;
+						if( _selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
+						{
+							Cursor.Current = Cursors.SizeAll;
+							hoveredSelectedEntity = true;
+						}
 					}
 
-					var potentialEntites = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
-					if( potentialEntites.Length > 0 )
+					if( !hoveredSelectedEntity )
 					{
-						potentialEntites[0].Hovered = true;
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
-					}
-					else if( hasPrevHover )
-					{
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
+						var hasPrevHover = false;
+
+						foreach( var entity in _level.Entities )
+						{
+							if( entity.Hovered )
+								hasPrevHover = true;
+
+							entity.Hovered = false;
+						}
+
+						var potentialEntites = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
+						if( potentialEntites.Length > 0 )
+						{
+							potentialEntites[0].Hovered = true;
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
+						}
+						else if( hasPrevHover )
+						{
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
+						}
 					}
 				}
 				else if( EditorTool.Current == EditorTools.Clip )
