@@ -74,78 +74,15 @@ void Player::update()
 
 	CollisionSolver& solver = *coreData->collisionSolver;
 
-	if( input.buttonReleased( SDL_BUTTON_RIGHT ) )
+	if( velocity.x < 0.0f )
 	{
-		glm::vec3 forward = camera->getForward();
-		Ray ray =
-		{
-			position + glm::vec3( 0, 1, 0 ),
-			glm::normalize( forward ),
-			16.0f
-		};
-
-		rayLine.start = ray.start;
-		rayLine.end = ray.start + ray.direction* 16.0f;
-		rayLine.color = glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f );
-
-		Hit hit = {};
-		float minHitDistance = 9999.0f;
-
-		const Solid* solids = level->getSolids();
-		const int SOLID_COUNT = level->getSolidCount();
-		for( int curSolid=0; curSolid < SOLID_COUNT; curSolid++ )
-		{
-			const Solid& solid = solids[curSolid];
-			const Plane* planes = solid.getPlanes();
-
-			const int PLANE_COUNT = solid.getPlaneCount();
-			for( int curPlane = 0; curPlane < PLANE_COUNT; curPlane++ )
-			{
-				const Plane& plane = planes[curPlane];
-
-				//if( glm::dot( plane.normal, ray.direction ) < 0 )
-				{
-					if( solver.ray( ray, plane, PLAYER_SIZE, &hit ) )
-					{
-						if( hit.length < ray.length )
-						{
-							if( hit.length > 0 && hit.length < minHitDistance )
-							{
-								bool behindAll = true;
-								for( int otherPlane = 0; otherPlane < PLANE_COUNT && behindAll; otherPlane++ )
-								{
-									if( otherPlane != curPlane )
-									{
-										const Plane& oplane = planes[otherPlane];
-
-										float distance = glm::dot( oplane.normal, hit.position ) - oplane.offset;
-										if( distance > EPSILON )
-											behindAll = false;
-									}
-								}
-
-								if( behindAll )
-								{
-									minHitDistance = hit.length;
-									rayHit.position = hit.position;
-									rayHit.radius = 0.5f;
-									rayHit.color = glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f );
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		int f = 0;
 	}
 
 	glm::vec3 start = position;
-	//glm::vec3 end = position + globalMovement;
 	glm::vec3 end = position + velocity;
 
 	Hit hit;
-
-	float minHitDistance = 9999.0f;
 
 	Ray ray = 
 	{
@@ -153,6 +90,9 @@ void Player::update()
 		glm::normalize( end - start ),
 		glm::distance( start, end ),
 	};
+
+	const Plane* collisionPlanes[5] = {};
+	int numplanes = 0;
 
 	const Solid* solids = level->getSolids();
 	const int SOLID_COUNT = level->getSolidCount();
@@ -189,8 +129,11 @@ void Player::update()
 
 							if( behindAll )
 							{
-								//globalMovement -= plane.normal * glm::dot( globalMovement, plane.normal );
-								velocity -= plane.normal * glm::dot( velocity, plane.normal );
+								if( numplanes < 5 )
+								{
+									collisionPlanes[numplanes] = &plane;
+									numplanes++;
+								}
 							}
 						}
 					}
@@ -199,8 +142,66 @@ void Player::update()
 		}
 	}
 
-	//position += globalMovement;
+	if( numplanes > 0 )
+	{
+		if( numplanes > 1 )
+		{
+			int f = 0;
+		}
+
+		glm::vec3 newVelocity = velocity;
+		bool allParallel = false;
+		for( int i=0; i<numplanes && !allParallel; i++ )
+		{
+			const Plane* plane = collisionPlanes[i];
+			float backoff = glm::dot( velocity, plane->normal );
+
+			for( int j=0; j<3; j++ )
+			{
+				float change = plane->normal[j]*backoff;
+				newVelocity[j] = velocity[j] - change;
+
+				if( fabs( newVelocity[j] ) < EPSILON )
+					newVelocity[j] = 0.0f;
+			}
+
+			allParallel = true;
+			for( int j=0; j<numplanes && allParallel; j++ )
+			{
+				if( j != i )
+				{
+					float dotValue = glm::dot( newVelocity, collisionPlanes[j]->normal );
+					if( dotValue < 0.0f )
+						allParallel = false;
+				}
+			}
+		}
+
+		if( allParallel )
+			velocity = newVelocity;
+		else
+		{
+			if( numplanes == 2 )
+			{
+				glm::vec3 dir = glm::cross( collisionPlanes[0]->normal, collisionPlanes[1]->normal );
+				float d = glm::dot( velocity, dir );
+				velocity = dir * d;
+			}
+			else
+			{
+				velocity = glm::vec3( 0.0f, 0.0f, 0.0f );
+			}
+		}
+	}
+
 	position += velocity;
+
+	if( position.y < 0 )
+	{
+		position.y = 0.0f;
+		velocity.y = 0.0f;
+	}
+
 	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
 }
 
