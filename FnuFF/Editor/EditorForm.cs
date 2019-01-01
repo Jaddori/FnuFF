@@ -190,7 +190,7 @@ namespace Editor
 					{
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-						var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
+						var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
 
 						int indexCount = ( indices.Length - 2 ) * 3;
 						writer.Write( indexCount );

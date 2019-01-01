@@ -12,6 +12,26 @@ namespace Editor
 	{
 		public const float EPSILON = 0.001f;
 
+		/*public static readonly Triple[] BASE_AXIS =
+		{
+			new Triple(0,0,1), new Triple(1,0,0), new Triple(0,-1,0),
+			new Triple(0,0,-1), new Triple(1,0,0), new Triple(0,-1,0),
+			new Triple(1,0,0), new Triple(0,1,0), new Triple(0,0,-1),
+			new Triple(-1,0,0), new Triple(0,1,0), new Triple(0,0,-1),
+			new Triple(0,1,0), new Triple(1,0,0), new Triple(0,0,-1),
+			new Triple(0,-1,0), new Triple(1,0,0), new Triple(0,0,-1)
+		};*/
+
+		public static readonly Triple[] BASE_AXIS =
+		{
+			new Triple(0,1,0),	new Triple(1,0,0), new Triple(0,0,1),
+			new Triple(0,-1,0), new Triple(-1,0,0), new Triple(0,0,-1),
+			new Triple(0,0,1),	new Triple(1,0,0), new Triple(0,-1,0),
+			new Triple(0,0,-1), new Triple(-1,0,0), new Triple(0,-1,0),
+			new Triple(1,0,0),	new Triple(0,0,-1), new Triple(0,-1,0),
+			new Triple(-1,0,0),	new Triple(0,0,1), new Triple(0,-1,0)
+		};
+		
 		public static RectangleF FromMinMax( PointF min, PointF max )
 		{
 			var result = new RectangleF();
@@ -233,54 +253,66 @@ namespace Editor
 			return sorted;
 		}
 
+		/*public static int[] WindingIndex3D( Triple[] points, Triple normal )
+		{
+			var projectedPoints = ProjectPoints( points, normal );
+
+			if( projectedPoints == null )
+				return null;
+
+			return WindingIndex2D( projectedPoints );
+		}*/
+
 		public static int[] WindingIndex3D( Triple[] points, Triple normal )
 		{
+			var xaxis = new Triple();
+			var yaxis = new Triple();
+
+			TextureAxisFromPlane( normal, ref xaxis, ref yaxis );
+
 			normal.Normalize();
-			var projectedPoints = points.Select( x => x.Project( normal ) ).ToArray();
+
+			var projectedPoints = points.Select( x => new PointF( x.Dot( xaxis ), x.Dot( yaxis ) ) ).ToArray();
 
 			return WindingIndex2D( projectedPoints );
 		}
 
-		public static int[] WindingIndex2DF( PointF[] points )
+		public static void TextureAxisFromPlane( Triple normal, ref Triple xaxis, ref Triple yaxis )
 		{
-			var cx = 0.0f;
-			var cy = 0.0f;
-			foreach( var p in points )
+			var bestAxis = 0;
+			float dot = 0.0f, best = 0.0f;
+
+			for( int i = 0; i < 6; i++ )
 			{
-				cx += p.X;
-				cy += p.Y;
+				dot = normal.Dot( BASE_AXIS[i * 3] );
+				if( dot > best )
+				{
+					best = dot;
+					bestAxis = i;
+				}
 			}
 
-			cx /= points.Length;
-			cy /= points.Length;
-
-			var sorted = points.Select( ( x, i ) => new { point = x, index = i } ).OrderBy( x => Math.Atan2( x.point.Y - cy, x.point.X - cx ) ).Select( x => x.index ).ToArray();
-			return sorted;
+			xaxis = BASE_AXIS[bestAxis * 3 + 1];
+			yaxis = BASE_AXIS[bestAxis * 3 + 2];
 		}
 
-		public static int[] WindingIndex3DF( Triple[] points, Triple normal )
+		public static PointF EmitTextureCoordinates( Triple normal, Triple point )
 		{
-			if( points.Length < 2 )
-				return null;
+			float ns = 0.0f, nt = 0.0f;
+			float sinv = 0.0f, cosv = 1.0f;
+			float s = 0.0f, t = 0.0f;
 
-			normal.Normalize();
+			Triple xaxis = new Triple();
+			Triple yaxis = new Triple();
+			TextureAxisFromPlane( normal, ref xaxis, ref yaxis );
 
-			var v1v0 = points[1] - points[0];
-			v1v0.Normalize();
+			s = point.Dot( xaxis );
+			t = point.Dot( yaxis );
 
-			var compliment = v1v0.Cross( normal );
-			compliment.Normalize();
-
-			var projectedPoints = new PointF[points.Length];
-			for( int i = 0; i < points.Length; i++ )
-			{
-				var x = points[i].Dot( v1v0 );
-				var y = points[i].Dot( compliment );
-
-				projectedPoints[i] = new PointF( x, y );
-			}
-
-			return WindingIndex2DF( projectedPoints );
+			ns = cosv * s - sinv * t;
+			nt = sinv * s + cosv * t;
+			
+			return new PointF( ns, nt );
 		}
 
 		public static Triple[] IntersectPlanes( Plane p0, Plane[] ps )

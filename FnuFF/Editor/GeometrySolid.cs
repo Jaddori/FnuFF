@@ -13,6 +13,7 @@ namespace Editor
 	public class GeometrySolid
 	{
 		private static Random random = new Random();
+		private static UInt32 textureID = UInt32.MaxValue;
 
 		[XmlIgnore]
 		public static CommandStack CommandStack;
@@ -35,6 +36,9 @@ namespace Editor
 
 		public GeometrySolid()
 		{
+			if( textureID == UInt32.MaxValue )
+				textureID = GL.LoadTexture( "./assets/textures/marker.dds" );
+
 			_hovered = _selected = false;
 			_faces = new List<Face>();
 
@@ -43,6 +47,9 @@ namespace Editor
 
 		public GeometrySolid( Triple min, Triple max )
 		{
+			if( textureID == UInt32.MaxValue )
+				textureID = GL.LoadTexture( "./assets/textures/marker.dds" );
+
 			_hovered = _selected = false;
 			_faces = new List<Face>();
 
@@ -146,6 +153,8 @@ namespace Editor
 
 		public void Paint3D()
 		{
+			GL.SetTexture( textureID );
+
 			GL.BeginTriangles();
 			//GL.BeginPoints();
 
@@ -165,12 +174,13 @@ namespace Editor
 			foreach( var face in _faces )
 			{
 				//cur++;
-				//if( cur < 7 )
+				//if( cur != 4 )
 				//	continue;
 
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-				var indices = Extensions.WindingIndex3DF( points, face.Plane.Normal );
+				var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
+				var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x ) ).ToArray();
 				
 				var rr = red;
 				var gg = green;
@@ -186,6 +196,8 @@ namespace Editor
 				}
 
 				var v0 = points[indices[0]];
+				var uv0 = texCoords[indices[0]];
+
 				for( int j = 1; j < indices.Length - 1; j++ )
 				{
 					var i1 = indices[j];
@@ -193,6 +205,9 @@ namespace Editor
 
 					var v1 = points[i1];
 					var v2 = points[i2];
+
+					var uv1 = texCoords[i1];
+					var uv2 = texCoords[i2];
 
 					var v1v0 = v0 - v1;
 					var v2v0 = v0 - v2;
@@ -206,17 +221,27 @@ namespace Editor
 						var temp = v2;
 						v2 = v1;
 						v1 = temp;
+
+						var tempUV = uv2;
+						uv2 = uv1;
+						uv1 = tempUV;
 					}
 
-					GL.Color4f( rr, gg, bb, alpha );
-					//GL.Color4f( red, green, blue, alpha );
+					//GL.Color4f( rr, gg, bb, alpha );
+					GL.TexCoord2f( uv0.X, uv0.Y );
 					GL.Vertex3f( v0.X, v0.Y, v0.Z );
+
+					GL.TexCoord2f( uv1.X, uv1.Y );
 					GL.Vertex3f( v1.X, v1.Y, v1.Z );
+
+					GL.TexCoord2f( uv2.X, uv2.Y );
 					GL.Vertex3f( v2.X, v2.Y, v2.Z );
 				}
 			}
 
 			GL.End();
+
+			GL.SetTexture( 0 );
 		}
     }
 }
