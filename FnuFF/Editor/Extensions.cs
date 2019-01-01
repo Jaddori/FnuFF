@@ -399,6 +399,12 @@ namespace Editor
 			writer.Write( t.Z );
 		}
 
+		public static void Write( this BinaryWriter writer, PointF p )
+		{
+			writer.Write( p.X );
+			writer.Write( p.Y );
+		}
+
 		public static void Write( this StreamWriter writer, Face f )
 		{
 			writer.Write( f.Plane );
@@ -415,6 +421,12 @@ namespace Editor
 			writer.WriteLine( t.X.ToString() );
 			writer.WriteLine( t.Y.ToString() );
 			writer.WriteLine( t.Z.ToString() );
+		}
+
+		public static void Write( this StreamWriter writer, PointF p )
+		{
+			writer.WriteLine( p.X.ToString() );
+			writer.WriteLine( p.Y.ToString() );
 		}
 	}
 }

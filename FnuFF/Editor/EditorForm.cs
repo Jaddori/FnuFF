@@ -188,14 +188,21 @@ namespace Editor
 					
 					foreach( var face in solid.Faces )
 					{
+						if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) > 1 - Extensions.EPSILON )
+						{
+							int f = 0;
+						}
+
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 						var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
+						var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x ) ).ToArray();
 
 						int indexCount = ( indices.Length - 2 ) * 3;
 						writer.Write( indexCount );
 
 						var v0 = points[indices[0]];
+						var uv0 = texCoords[indices[0]];
 						for( int i = 1; i < indices.Length-1; i++ )
 						{
 							var i1 = indices[i];
@@ -203,6 +210,9 @@ namespace Editor
 
 							var v1 = points[i1];
 							var v2 = points[i2];
+
+							var uv1 = texCoords[i1];
+							var uv2 = texCoords[i2];
 
 							var v1v0 = v0 - v1;
 							var v2v0 = v0 - v2;
@@ -216,11 +226,20 @@ namespace Editor
 								var temp = v2;
 								v2 = v1;
 								v1 = temp;
+
+								var tempUV = uv2;
+								uv2 = uv1;
+								uv1 = tempUV;
 							}
 
 							writer.Write( v0 );
+							writer.Write( uv0 );
+
 							writer.Write( v1 );
+							writer.Write( uv1 );
+
 							writer.Write( v2 );
+							writer.Write( uv2 );
 						}
 					}
 				}

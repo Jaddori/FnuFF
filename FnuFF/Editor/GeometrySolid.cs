@@ -37,7 +37,7 @@ namespace Editor
 		public GeometrySolid()
 		{
 			if( textureID == UInt32.MaxValue )
-				textureID = GL.LoadTexture( "./assets/textures/marker.dds" );
+				textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
 
 			_hovered = _selected = false;
 			_faces = new List<Face>();
@@ -48,7 +48,7 @@ namespace Editor
 		public GeometrySolid( Triple min, Triple max )
 		{
 			if( textureID == UInt32.MaxValue )
-				textureID = GL.LoadTexture( "./assets/textures/marker.dds" );
+				textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
 
 			_hovered = _selected = false;
 			_faces = new List<Face>();
@@ -176,6 +176,11 @@ namespace Editor
 				//cur++;
 				//if( cur != 4 )
 				//	continue;
+
+				if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) > 1 - Extensions.EPSILON )
+				{
+					int f = 0;
+				}
 
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );

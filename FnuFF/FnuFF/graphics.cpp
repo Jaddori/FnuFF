@@ -27,7 +27,7 @@ void Graphics::load()
 	perspectiveCamera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
 	perspectiveCamera.setPosition( glm::vec3( 0, 0, -10 ) );
 
-	texture.load( "./assets/textures/palette.dds" );
+	texture.load( "./assets/textures/bricks.dds" );
 	texture.upload();
 	
 	shader.bind();
@@ -221,6 +221,8 @@ void Graphics::render( float deltaTime )
 	basicShader.bind();
 	basicShader.setMat4( basicShaderProjectionLocation, perspectiveCamera.getProjectionMatrix() );
 	basicShader.setMat4( basicShaderViewLocation, perspectiveCamera.getViewMatrix() );
+
+	texture.bind();
 
 	const int VAO_COUNT = vaoQueue.getRead().getSize();
 	for( int curVao = 0; curVao < VAO_COUNT; curVao++ )

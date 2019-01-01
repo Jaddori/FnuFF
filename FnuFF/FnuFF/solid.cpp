@@ -55,11 +55,17 @@ void Solid::read( FILE* file, void* transientMemory )
 			fread( (void*)((char*)transientMemory + offset), sizeof(glm::vec3), 1, file );
 			offset += sizeof(glm::vec3);
 
-			memcpy( (void*)((char*)transientMemory + offset), &planes[i].normal, sizeof(glm::vec3) );
+			//fread( (void*)((char*)transientMemory + offset), sizeof(glm::vec2), 1, file );
+			glm::vec2 uv;
+			fread( &uv, sizeof(uv), 1, file );
+			memcpy( (void*)((char*)transientMemory + offset), &uv, sizeof(uv));
+			offset += sizeof(glm::vec2);
+
+			/*memcpy( (void*)((char*)transientMemory + offset), &planes[i].normal, sizeof(glm::vec3) );
 			offset += sizeof(glm::vec3);
 
 			memcpy( (void*)((char*)transientMemory + offset), &faceColor, sizeof(glm::vec3) );
-			offset += sizeof(glm::vec3);
+			offset += sizeof(glm::vec3);*/
 		}
 
 		vertexCount += faceVertexCount;
@@ -77,15 +83,15 @@ void Solid::upload()
 
 	glEnableVertexAttribArray( 0 );
 	glEnableVertexAttribArray( 1 );
-	glEnableVertexAttribArray( 2 );
+	//glEnableVertexAttribArray( 2 );
 
 	glGenBuffers( 1, &vbo );
 	glBindBuffer( GL_ARRAY_BUFFER, vbo );
 	glBufferData( GL_ARRAY_BUFFER, sizeof(SolidVertex)*vertexCount, vertices, GL_STATIC_DRAW );
 
 	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), 0 );
-	glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)) );
-	glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)*2) );
+	glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)) );
+	//glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)*2) );
 
 	glBindVertexArray( 0 );
 
