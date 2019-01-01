@@ -95,7 +95,7 @@ int update( void* args )
 	//level.load( "./assets/levels/arena.lvl" );
 	Level& level = *data->coreData->level;
 	//level.load( "./assets/levels/arena.lvl" );
-	level.load( "./assets/levels/slope_test.lvl" );
+	level.load( "./assets/levels/double_wall_test.lvl" );
 
 	Ray ray;
 	Triangle triangle;

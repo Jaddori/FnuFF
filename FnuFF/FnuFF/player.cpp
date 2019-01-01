@@ -176,7 +176,7 @@ void Player::update()
 				{
 					if( hit.length < ray.length )
 					{
-						if( hit.length > 0 && hit.length < minHitDistance )
+						if( hit.length > 0 )//&& hit.length < minHitDistance )
 						{
 							bool behindAll = true;
 							for( int otherPlane = 0; otherPlane < PLANE_COUNT && behindAll; otherPlane++ )
@@ -193,7 +193,7 @@ void Player::update()
 
 							if( behindAll )
 							{
-								minHitDistance = hit.length;
+								//minHitDistance = hit.length;
 								globalMovement -= plane.normal * glm::dot( globalMovement, plane.normal );
 							}
 						}
