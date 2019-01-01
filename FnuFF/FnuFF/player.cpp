@@ -28,8 +28,6 @@ void Player::update()
 	if( input.keyDown( SDL_SCANCODE_A ) )
 		localMovement.x -= 1.0f;
 
-	//localMovement.z = 1.0f;
-
 	glm::vec3 direction = camera->getDirection();
 	glm::vec3 globalMovement;
 
@@ -54,18 +52,12 @@ void Player::update()
 	if( glm::length( globalMovement ) > EPSILON )
 		globalMovement = glm::normalize( globalMovement ) * 0.05f;
 
-	/*if( input.keyPressed( SDL_SCANCODE_SPACE ) )
+	if( input.keyPressed( SDL_SCANCODE_SPACE ) )
 	{
-		if( platform )
-		{
-			glm::vec3 a = platform->v[1] - platform->v[0];
-			glm::vec3 b = platform->v[2] - platform->v[0];
-			glm::vec3 normal = glm::normalize( glm::cross( a, b ) );
-			globalMovement += normal * 0.1f;
-		}
+		globalMovement.y = 0.2f;
 	}
 	else
-		globalMovement.y -= PLAYER_GRAVITY;*/
+		globalMovement.y -= PLAYER_GRAVITY;
 
 	if( input.buttonDown( SDL_BUTTON_LEFT ) )
 	{
@@ -75,6 +67,9 @@ void Player::update()
 
 	velocity.x *= 0.48f;
 	velocity.z *= 0.48f;
+	if( velocity.y < PLAYER_TERMINAL_VELOCITY )
+		velocity.y = PLAYER_TERMINAL_VELOCITY;
+
 	velocity += globalMovement;
 
 	CollisionSolver& solver = *coreData->collisionSolver;
@@ -145,7 +140,8 @@ void Player::update()
 	}
 
 	glm::vec3 start = position;
-	glm::vec3 end = position + globalMovement;
+	//glm::vec3 end = position + globalMovement;
+	glm::vec3 end = position + velocity;
 
 	Hit hit;
 
@@ -176,7 +172,7 @@ void Player::update()
 				{
 					if( hit.length < ray.length )
 					{
-						if( hit.length > 0 )//&& hit.length < minHitDistance )
+						if( hit.length > 0 )
 						{
 							bool behindAll = true;
 							for( int otherPlane = 0; otherPlane < PLANE_COUNT && behindAll; otherPlane++ )
@@ -193,8 +189,8 @@ void Player::update()
 
 							if( behindAll )
 							{
-								//minHitDistance = hit.length;
-								globalMovement -= plane.normal * glm::dot( globalMovement, plane.normal );
+								//globalMovement -= plane.normal * glm::dot( globalMovement, plane.normal );
+								velocity -= plane.normal * glm::dot( velocity, plane.normal );
 							}
 						}
 					}
@@ -203,7 +199,8 @@ void Player::update()
 		}
 	}
 
-	position += globalMovement;
+	//position += globalMovement;
+	position += velocity;
 	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
 }
 

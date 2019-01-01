@@ -188,11 +188,6 @@ namespace Editor
 					
 					foreach( var face in solid.Faces )
 					{
-						if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) > 1 - Extensions.EPSILON )
-						{
-							int f = 0;
-						}
-
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 						var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );

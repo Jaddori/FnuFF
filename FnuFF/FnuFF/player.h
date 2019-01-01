@@ -6,6 +6,7 @@
 
 #define PLAYER_SIZE 0.5f
 #define PLAYER_GRAVITY 0.00982f
+#define PLAYER_TERMINAL_VELOCITY -0.175f
 
 class Player : public Entity
 {

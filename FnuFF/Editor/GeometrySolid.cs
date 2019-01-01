@@ -177,11 +177,6 @@ namespace Editor
 				//if( cur != 4 )
 				//	continue;
 
-				if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) > 1 - Extensions.EPSILON )
-				{
-					int f = 0;
-				}
-
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 				var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
