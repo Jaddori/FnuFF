@@ -98,6 +98,9 @@ int update( void* args )
 	level.load( "./assets/levels/vertical_slope_test.lvl" );
 	//level.load( "./assets/levels/slope_test02.lvl" );
 	//level.load( "./assets/levels/collision_test.lvl" );
+	//level.load( "./assets/levels/window_test.lvl" );
+	//level.load( "./assets/levels/platform.lvl" );
+	//level.load( "./assets/levels/stepsize_test.lvl" );
 
 	Ray ray;
 	Triangle triangle;

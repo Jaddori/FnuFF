@@ -2,6 +2,8 @@
 using namespace System;
 using namespace Physics;
 
+#define MAX_COLLISION_PLANES 5
+
 Player::Player()
 	: level( NULL )
 {
@@ -14,6 +16,21 @@ Player::~Player()
 }
 
 void Player::update()
+{
+	categorizePosition();
+
+	move();
+
+	Camera* camera = coreData->graphics->getPerspectiveCamera();
+	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
+
+	categorizePosition();
+
+	printf( "Position: (%f, %f, %f)\n", position.x, position.y, position.z );
+	printf( "On ground: %d\n", ( flags & PLAYER_FLAG_ON_GROUND ) );
+}
+
+void Player::move()
 {
 	Input& input = *coreData->input;
 	Camera* camera = coreData->graphics->getPerspectiveCamera();
@@ -57,7 +74,12 @@ void Player::update()
 		globalMovement.y = 0.2f;
 	}
 	else
-		globalMovement.y -= PLAYER_GRAVITY;
+	{
+		if( (flags & PLAYER_FLAG_ON_GROUND) == 0 )
+			globalMovement.y -= PLAYER_GRAVITY;
+		else
+			globalMovement.y = 0.0f;
+	}
 
 	if( input.buttonDown( SDL_BUTTON_LEFT ) )
 	{
@@ -71,138 +93,287 @@ void Player::update()
 		velocity.y = PLAYER_TERMINAL_VELOCITY;
 
 	velocity += globalMovement;
+	if( ( flags & PLAYER_FLAG_ON_GROUND ) && velocity.y < 0.0f )
+		velocity.y = 0.0f;
+
+	trace_t trace = lineTrace( position, position + velocity );
+	if( trace.fraction >= 1.0f )
+	{
+		position = trace.position;
+		return;
+	}
+
+	glm::vec3 originalPosition = position;
+	glm::vec3 originalVelocity = velocity;
+
+	slideMove();
+
+	glm::vec3 down = position;
+	glm::vec3 downVelocity = velocity;
+
+	//originalPosition = position;
+	//originalVelocity = velocity;
+
+	position = originalPosition;
+	velocity = originalVelocity;
+
+	glm::vec3 dest = position;
+	dest.y += PLAYER_STEP_SIZE;
+
+	trace = lineTrace( position, dest );
+	//if( trace.fraction > 0.0f )
+	if( !trace.startSolid && !trace.allSolid )
+	{
+		position = trace.position;
+	}
+
+	slideMove();
+
+	dest = position;
+	dest.y -= PLAYER_STEP_SIZE;
+
+	trace = lineTrace( position, dest );
+	if( trace.normal.y < PLAYER_FLOOR_MIN_NORMAL )
+	{
+		position = down;
+		velocity = downVelocity;
+	}
+	else
+	{
+		//if( trace.fraction > 0.0f )
+		if( !trace.startSolid && !trace.allSolid )
+		{
+			position = trace.position;
+		}
+
+		glm::vec3 up = position;
+
+		float downdist =
+			( down.x - originalPosition.x ) * ( down.x - originalPosition.x ) +
+			( down.z - originalPosition.z ) * ( down.z - originalPosition.z );
+
+		float updist =
+			( up.x - originalPosition.x ) * ( up.x - originalPosition.x ) +
+			( up.z - originalPosition.z ) * ( up.z - originalPosition.z );
+
+		if( downdist > updist )
+		{
+			position = down;
+			velocity = downVelocity;
+		}
+		else
+			velocity.y = downVelocity.y;
+	}
+
+	/*if( position.y < 0 )
+	{
+		position.y = 0.0f;
+		velocity.y = 0.0f;
+	}*/
+}
+
+void Player::slideMove()
+{
+	glm::vec3 planes[MAX_COLLISION_PLANES];
+	int numplanes = 0;
+
+	float timeLeft = 1.0f;
+
+	glm::vec3 primalVelocity = velocity;
+	for( int bumpcount = 0; bumpcount < 4; bumpcount++ )
+	{
+		//if( ( flags & PLAYER_FLAG_ON_GROUND ) && velocity.y < 0.0f )
+			//velocity.y = 0.0f;
+
+		if( fabs( velocity.x ) < EPSILON && fabs( velocity.y ) < EPSILON && fabs( velocity.z ) < EPSILON )
+			break;
+
+		glm::vec3 nextPosition = position + velocity * timeLeft;
+
+		trace_t trace = lineTrace( position, nextPosition );
+
+		if( trace.startSolid || trace.allSolid )
+		{
+			velocity = glm::vec3( 0.0f );
+			break;
+		}
+
+		if( trace.fraction > 0 )
+		{
+			position = trace.position;
+			numplanes = 0;
+		}
+
+		if( trace.fraction >= 1.0f )
+			break;
+
+		timeLeft -= timeLeft * trace.fraction;
+
+		planes[numplanes] = trace.normal;
+		numplanes++;
+
+		bool validDirection = false;
+		for( int i=0; i<numplanes && !validDirection; i++ )
+		{
+			velocity = clipVelocity( velocity, planes[i], 1.01f );
+
+			validDirection = true;
+			for( int j=0; j<numplanes && validDirection; j++ )
+			{
+				if( j != i )
+				{
+					if( glm::dot( velocity, planes[j] ) < 0 )
+						validDirection = false;
+				}
+			}
+		}
+
+		if( !validDirection )
+		{
+			if( numplanes == 2 )
+			{
+				glm::vec3 direction = glm::cross( planes[0], planes[1] );
+				float distance = glm::dot( direction, velocity );
+				velocity = direction * distance;
+			}
+			else
+			{
+				velocity = glm::vec3( 0.0f );
+				break;
+			}
+		}
+
+		/*if( glm::dot( velocity, primalVelocity ) <= 0.0f )
+		{
+		velocity = glm::vec3( 0.0f );
+		break;
+		}*/
+	}
+}
+
+trace_t Player::lineTrace( const glm::vec3& start, const glm::vec3& end )
+{
+	trace_t result;
+	result.fraction = 1.0f;
+	result.position = end;
+	result.startSolid = false;
+	
+	bool endSolid = false;
 
 	CollisionSolver& solver = *coreData->collisionSolver;
 
-	if( velocity.x < 0.0f )
-	{
-		int f = 0;
-	}
-
-	glm::vec3 start = position;
-	glm::vec3 end = position + velocity;
-
-	Hit hit;
-
-	Ray ray = 
+	Hit hit = {};
+	Ray ray =
 	{
 		start,
 		glm::normalize( end - start ),
-		glm::distance( start, end ),
+		glm::distance( start, end )
 	};
-
-	const Plane* collisionPlanes[5] = {};
-	int numplanes = 0;
 
 	const Solid* solids = level->getSolids();
 	const int SOLID_COUNT = level->getSolidCount();
-	for( int curSolid=0; curSolid < SOLID_COUNT; curSolid++ )
+
+	for( int curSolid = 0; curSolid < SOLID_COUNT; curSolid++ )
 	{
 		const Solid& solid = solids[curSolid];
 		const Plane* planes = solid.getPlanes();
-
 		const int PLANE_COUNT = solid.getPlaneCount();
+
+		bool startInsideSolid = true;
+		bool endInsideSolid = true;
 		for( int curPlane = 0; curPlane < PLANE_COUNT; curPlane++ )
 		{
 			const Plane& plane = planes[curPlane];
+
+			if( startInsideSolid )
+			{
+				float distance = glm::dot( plane.normal, start ) - plane.offset;
+				if( distance > EPSILON )
+					startInsideSolid = false;
+			}
+
+			if( endInsideSolid )
+			{
+				float distance = glm::dot( plane.normal, end ) - plane.offset;
+				if( distance > EPSILON )
+					endInsideSolid = false;
+			}
 
 			if( glm::dot( plane.normal, ray.direction ) < 0 )
 			{
 				if( solver.ray( ray, plane, PLAYER_SIZE, &hit ) )
 				{
-					if( hit.length < ray.length )
+					if( hit.length > -EPSILON && hit.length < ray.length )
 					{
-						if( hit.length > 0 )
+						bool behindAll = true;
+						for( int curOtherPlane = 0; curOtherPlane < PLANE_COUNT; curOtherPlane++ )
 						{
-							bool behindAll = true;
-							for( int otherPlane = 0; otherPlane < PLANE_COUNT && behindAll; otherPlane++ )
+							if( curOtherPlane != curPlane )
 							{
-								if( otherPlane != curPlane )
-								{
-									const Plane& oplane = planes[otherPlane];
+								const Plane& otherPlane = planes[curOtherPlane];
 
-									float distance = glm::dot( oplane.normal, hit.position ) - oplane.offset - PLAYER_SIZE;
-									if( distance > EPSILON )
-										behindAll = false;
-								}
+								float distance = glm::dot( otherPlane.normal, hit.position ) - otherPlane.offset - PLAYER_SIZE;
+								if( distance > EPSILON )
+									behindAll = false;
 							}
+						}
 
-							if( behindAll )
+						if( behindAll )
+						{
+							float fraction = hit.length / ray.length;
+							if( fraction < result.fraction )
 							{
-								if( numplanes < 5 )
-								{
-									collisionPlanes[numplanes] = &plane;
-									numplanes++;
-								}
+								result.fraction = fraction;
+								if( result.fraction > 1.0f )
+									result.fraction = 1.0f;
+								result.position = hit.position;
+								result.normal = plane.normal;
 							}
 						}
 					}
 				}
 			}
 		}
+
+		if( startInsideSolid )
+			result.startSolid = true;
+		if( endInsideSolid )
+			endSolid = true;
 	}
 
-	if( numplanes > 0 )
+	result.allSolid = (result.startSolid && endSolid);
+
+	return result;
+}
+
+void Player::categorizePosition()
+{
+	flags = 0;
+
+	glm::vec3 below = position - glm::vec3( 0.0f, 0.0125f, 0.0f );
+
+	trace_t trace = lineTrace( position, below );
+	if( trace.startSolid || (trace.fraction < 1.0f && trace.normal.y > PLAYER_FLOOR_MIN_NORMAL) )
 	{
-		if( numplanes > 1 )
-		{
-			int f = 0;
-		}
-
-		glm::vec3 newVelocity = velocity;
-		bool allParallel = false;
-		for( int i=0; i<numplanes && !allParallel; i++ )
-		{
-			const Plane* plane = collisionPlanes[i];
-			float backoff = glm::dot( velocity, plane->normal );
-
-			for( int j=0; j<3; j++ )
-			{
-				float change = plane->normal[j]*backoff;
-				newVelocity[j] = velocity[j] - change;
-
-				if( fabs( newVelocity[j] ) < EPSILON )
-					newVelocity[j] = 0.0f;
-			}
-
-			allParallel = true;
-			for( int j=0; j<numplanes && allParallel; j++ )
-			{
-				if( j != i )
-				{
-					float dotValue = glm::dot( newVelocity, collisionPlanes[j]->normal );
-					if( dotValue < 0.0f )
-						allParallel = false;
-				}
-			}
-		}
-
-		if( allParallel )
-			velocity = newVelocity;
-		else
-		{
-			if( numplanes == 2 )
-			{
-				glm::vec3 dir = glm::cross( collisionPlanes[0]->normal, collisionPlanes[1]->normal );
-				float d = glm::dot( velocity, dir );
-				velocity = dir * d;
-			}
-			else
-			{
-				velocity = glm::vec3( 0.0f, 0.0f, 0.0f );
-			}
-		}
+		flags |= PLAYER_FLAG_ON_GROUND;
 	}
+}
 
-	position += velocity;
+glm::vec3 Player::clipVelocity( const glm::vec3& v, const glm::vec3& normal, float overbounce )
+{
+	glm::vec3 result;
 
-	if( position.y < 0 )
+	float backoff = glm::dot( v, normal ) * overbounce;
+
+	for( int i=0; i<3; i++ )
 	{
-		position.y = 0.0f;
-		velocity.y = 0.0f;
+		float change = normal[i] * backoff;
+		result[i] = v[i] - change;
+		if( result[i] > -EPSILON && result[i] < EPSILON )
+			result[i] = 0;
 	}
 
-	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
+	return result;
 }
 
 void Player::render()

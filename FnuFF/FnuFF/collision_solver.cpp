@@ -127,7 +127,8 @@ bool CollisionSolver::ray( const Ray& ray, const Plane& plane, float offset, Hit
 	{
 		glm::vec3 center = plane.normal * (plane.offset + offset);
 		float t = glm::dot( center - ray.start, plane.normal ) / denom;
-		if (t >= EPSILON)
+		//if (t >= EPSILON)
+		if( t >= -0.0f )
 		{
 			if( hit )
 			{
