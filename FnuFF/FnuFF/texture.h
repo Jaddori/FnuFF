@@ -2,42 +2,25 @@
 
 #include "common.h"
 
-#define DDS_MAGIC_NUMBER 0x20534444 // 'DDS ' in hex
-#define ID_DXT1 0x31545844
-#define ID_DXT3 0x33545844
-#define ID_DXT5 0x35545844
-
 namespace Rendering
 {
-	struct DDS_PIXELFORMAT
+#pragma pack(push, 1)
+	struct TargaHeader
 	{
-		int32_t size;
-		int32_t flags;
-		int32_t fourCC;
-		int32_t bitCount;
-		int32_t rMask;
-		int32_t gMask;
-		int32_t bMask;
-		int32_t aMask;
+		int8_t idLength;
+		int8_t colormapType;
+		int8_t imageType;
+		int16_t colormapOrigin;
+		int16_t colormapLength;
+		int8_t colormapDepth;
+		int16_t xorigin;
+		int16_t yorigin;
+		int16_t width;
+		int16_t height;
+		uint8_t bpp;
+		int8_t imageDescriptor;
 	};
-
-	struct DDS_HEADER
-	{
-		int32_t				size;
-		int32_t				flags;
-		int32_t				height;
-		int32_t				width;
-		int32_t				pitchOrLinearSize;
-		int32_t				depth;
-		int32_t				mipMaps;
-		int32_t				reserved1[11];
-		DDS_PIXELFORMAT		format;
-		int32_t				caps1;
-		int32_t				caps2;
-		int32_t				caps3;
-		int32_t				caps4;
-		int32_t				reserved2;
-	};
+#pragma pack(pop)
 
 	class Texture
 	{

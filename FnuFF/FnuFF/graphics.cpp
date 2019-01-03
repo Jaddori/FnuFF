@@ -27,7 +27,8 @@ void Graphics::load()
 	perspectiveCamera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
 	perspectiveCamera.setPosition( glm::vec3( 0, 0, -10 ) );
 
-	texture.load( "./assets/textures/bricks.dds" );
+	//texture.load( "./assets/textures/bricks.dds" );
+	texture.load( "./assets/textures/bricks.tga" );
 	texture.upload();
 	
 	shader.bind();
