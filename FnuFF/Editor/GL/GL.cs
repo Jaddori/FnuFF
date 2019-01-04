@@ -138,7 +138,8 @@ namespace Editor
 
 		public static UInt32 LoadTexture( string path )
 		{
-			return loadTexture( path );
+			var id = loadTexture( path );
+			return id;
 		}
 
 		public static void SetTexture( UInt32 texture )

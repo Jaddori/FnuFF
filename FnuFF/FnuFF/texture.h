@@ -17,7 +17,7 @@ namespace Rendering
 		int16_t yorigin;
 		int16_t width;
 		int16_t height;
-		uint8_t bpp;
+		int8_t bpp;
 		int8_t imageDescriptor;
 	};
 #pragma pack(pop)

@@ -165,47 +165,35 @@ EXPORT uint32_t loadTexture( const char* path )
 	FILE* file = fopen( path, "rb" );
 	if( file )
 	{
-		int32_t magicNumber;
-		fread( &magicNumber, sizeof(magicNumber), 1, file );
+		TargaHeader header;
+		fread( &header, sizeof(header), 1, file );
 
-		if( magicNumber == DDS_MAGIC_NUMBER )
-		{
-			DDS_HEADER header = {};
-			fread( &header, sizeof(header), 1, file );
+		int bpp = header.bpp / 8;
+		int size = header.width * header.height * bpp;
 
-			int width = header.width;
-			int height = header.height;
-			int size = header.pitchOrLinearSize;
+		GLenum format = GL_BGR;
+		if( bpp == 4 )
+			format = GL_BGRA;
 
-			int format = -1;
-			switch( header.format.fourCC )
-			{
-				default:
-				case ID_DXT1: format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT; break;
-				case ID_DXT3: format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT; break;
-				case ID_DXT5: format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT; break;
-			}
-
-			GLbyte* pixels = new GLbyte[size];
-			fread( pixels, 1, size, file );
-
-			GLuint id;
-			glGenTextures( 1, &id );
-			glBindTexture( GL_TEXTURE_2D, id );
-#if 0
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-#else
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-#endif
-			glCompressedTexImage2D( GL_TEXTURE_2D, 0, format, width, height, 0, size, pixels );
-
-			result = id;
-			delete[] pixels;
-		}
+		GLubyte* pixels = new GLubyte[size];
+		fread( pixels, 1, size, file );
 
 		fclose( file );
+
+		GLenum error = glGetError();
+
+		glGenTextures( 1, &result );
+
+		glBindTexture( GL_TEXTURE_2D, result );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, header.width, header.height, 0, format, GL_UNSIGNED_BYTE, pixels );
+
+		error = glGetError();
+
+		glBindTexture( GL_TEXTURE_2D, 0 );
+
+		delete[] pixels;
 	}
 
 	return result;

@@ -13,10 +13,12 @@ namespace Editor
 		private Plane _plane;
 		private Triple _u;
 		private Triple _v;
+		private string _textureName;
 
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public Triple U { get { return _u; } set { _u = value; } }
 		public Triple V { get { return _v; } set { _v = value; } }
+		public string TextureName { get { return _textureName; } set { _textureName = value; } }
 
 		public Face()
 		{

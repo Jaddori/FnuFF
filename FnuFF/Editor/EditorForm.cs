@@ -17,6 +17,7 @@ namespace Editor
     public partial class EditorForm : Form
     {
         private List<FlatButtonControl> _toolbarButtons;
+		private List<FlatTabButtonControl> _tabButtons;
 		private Level _level;
 		private CommandStack _commandStack;
 
@@ -49,6 +50,10 @@ namespace Editor
 			_toolbarButtons.Add( btn_face );
 			_toolbarButtons.Add( btn_entity );
 
+			_tabButtons = new List<FlatTabButtonControl>();
+			_tabButtons.Add( btn_tab_entity );
+			_tabButtons.Add( btn_tab_face );
+
 			view_3d.Level = _level;
 			view_topRight.Level = _level;
 			view_bottomLeft.Level = _level;
@@ -77,6 +82,29 @@ namespace Editor
 
 			ViewGlobalInvalidation();
         }
+
+		private void tabButton_Click( object sender, EventArgs e )
+		{
+			foreach( var b in _tabButtons )
+				b.Selected = false;
+
+			var button = sender as FlatTabButtonControl;
+			button.Selected = true;
+		}
+
+		private void btn_texture_Click( object sender, EventArgs e )
+		{
+			var selectedSolid = _level.Solids.FirstOrDefault( x => x.Selected );
+			if( selectedSolid != null )
+			{
+				foreach( var face in selectedSolid.Faces )
+				{
+					face.TextureName = tab_face.TextureName;
+				}
+
+				view_3d.Invalidate();
+			}
+		}
 
 		private void newToolStripMenuItem_Click( object sender, EventArgs e )
 		{

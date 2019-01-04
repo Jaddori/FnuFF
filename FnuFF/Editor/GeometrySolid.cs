@@ -13,7 +13,7 @@ namespace Editor
 	public class GeometrySolid
 	{
 		private static Random random = new Random();
-		private static UInt32 textureID = UInt32.MaxValue;
+		//private static UInt32 textureID = UInt32.MaxValue;
 
 		[XmlIgnore]
 		public static CommandStack CommandStack;
@@ -36,8 +36,8 @@ namespace Editor
 
 		public GeometrySolid()
 		{
-			if( textureID == UInt32.MaxValue )
-				textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
+			//if( textureID == UInt32.MaxValue )
+			//textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
 
 			_hovered = _selected = false;
 			_faces = new List<Face>();
@@ -47,8 +47,8 @@ namespace Editor
 
 		public GeometrySolid( Triple min, Triple max )
 		{
-			if( textureID == UInt32.MaxValue )
-				textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
+			//if( textureID == UInt32.MaxValue )
+			//textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
 
 			_hovered = _selected = false;
 			_faces = new List<Face>();
@@ -153,11 +153,6 @@ namespace Editor
 
 		public void Paint3D()
 		{
-			GL.SetTexture( textureID );
-
-			GL.BeginTriangles();
-			//GL.BeginPoints();
-
 			float red = _color.R / 255.0f;
 			float green = _color.G / 255.0f;
 			float blue = _color.B / 255.0f;
@@ -194,6 +189,19 @@ namespace Editor
 					gg -= 0.25f;
 					bb -= 0.25f;
 				}
+
+				if( string.IsNullOrEmpty( face.TextureName ) )
+				{
+					GL.SetTexture( 0 );
+					GL.Color4f( rr, gg, bb, alpha );
+				}
+				else
+				{
+					var textureID = TextureMap.GetID( face.TextureName );
+					GL.SetTexture( textureID );
+				}
+
+				GL.BeginTriangles();
 
 				var v0 = points[indices[0]];
 				var uv0 = texCoords[indices[0]];
@@ -237,9 +245,9 @@ namespace Editor
 					GL.TexCoord2f( uv2.X, uv2.Y );
 					GL.Vertex3f( v2.X, v2.Y, v2.Z );
 				}
-			}
 
-			GL.End();
+				GL.End();
+			}
 
 			GL.SetTexture( 0 );
 		}

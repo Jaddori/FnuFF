@@ -41,6 +41,7 @@
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnl_left = new System.Windows.Forms.Panel();
 			this.pnl_right = new System.Windows.Forms.Panel();
+			this.pnl_tabPanel = new System.Windows.Forms.Panel();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.ws_viewports = new Editor.WorkspaceControl();
@@ -48,6 +49,9 @@
 			this.view_bottomRight = new Editor.View2DControl();
 			this.view_3d = new Editor.View3DControl();
 			this.view_topRight = new Editor.View2DControl();
+			this.tab_face = new Editor.FaceTabContentControl();
+			this.btn_tab_face = new Editor.FlatTabButtonControl();
+			this.btn_tab_entity = new Editor.FlatTabButtonControl();
 			this.btn_entity = new Editor.FlatButtonControl();
 			this.btn_face = new Editor.FlatButtonControl();
 			this.btn_texture = new Editor.FlatButtonControl();
@@ -58,6 +62,8 @@
 			this.status_editor.SuspendLayout();
 			this.menu_editor.SuspendLayout();
 			this.pnl_left.SuspendLayout();
+			this.pnl_right.SuspendLayout();
+			this.pnl_tabPanel.SuspendLayout();
 			this.ws_viewports.PanelBottomLeft.SuspendLayout();
 			this.ws_viewports.PanelBottomRight.SuspendLayout();
 			this.ws_viewports.PanelTopLeft.SuspendLayout();
@@ -173,11 +179,23 @@
 			// pnl_right
 			// 
 			this.pnl_right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_right.Controls.Add(this.tab_face);
+			this.pnl_right.Controls.Add(this.pnl_tabPanel);
 			this.pnl_right.Dock = System.Windows.Forms.DockStyle.Right;
 			this.pnl_right.Location = new System.Drawing.Point(1039, 24);
 			this.pnl_right.Name = "pnl_right";
 			this.pnl_right.Size = new System.Drawing.Size(200, 702);
 			this.pnl_right.TabIndex = 4;
+			// 
+			// pnl_tabPanel
+			// 
+			this.pnl_tabPanel.Controls.Add(this.btn_tab_face);
+			this.pnl_tabPanel.Controls.Add(this.btn_tab_entity);
+			this.pnl_tabPanel.Dock = System.Windows.Forms.DockStyle.Top;
+			this.pnl_tabPanel.Location = new System.Drawing.Point(0, 0);
+			this.pnl_tabPanel.Name = "pnl_tabPanel";
+			this.pnl_tabPanel.Size = new System.Drawing.Size(200, 30);
+			this.pnl_tabPanel.TabIndex = 0;
 			// 
 			// openFileDialog
 			// 
@@ -265,6 +283,39 @@
 			this.view_topRight.Size = new System.Drawing.Size(488, 349);
 			this.view_topRight.TabIndex = 0;
 			// 
+			// tab_face
+			// 
+			this.tab_face.Location = new System.Drawing.Point(3, 36);
+			this.tab_face.Name = "tab_face";
+			this.tab_face.Size = new System.Drawing.Size(194, 126);
+			this.tab_face.TabIndex = 1;
+			// 
+			// btn_tab_face
+			// 
+			this.btn_tab_face.Hovered = false;
+			this.btn_tab_face.Location = new System.Drawing.Point(84, 3);
+			this.btn_tab_face.Name = "btn_tab_face";
+			this.btn_tab_face.Pressed = false;
+			this.btn_tab_face.Selected = false;
+			this.btn_tab_face.Size = new System.Drawing.Size(75, 23);
+			this.btn_tab_face.TabIndex = 1;
+			this.btn_tab_face.Text = "Face";
+			this.btn_tab_face.UseVisualStyleBackColor = true;
+			this.btn_tab_face.Click += new System.EventHandler(this.tabButton_Click);
+			// 
+			// btn_tab_entity
+			// 
+			this.btn_tab_entity.Hovered = false;
+			this.btn_tab_entity.Location = new System.Drawing.Point(3, 3);
+			this.btn_tab_entity.Name = "btn_tab_entity";
+			this.btn_tab_entity.Pressed = false;
+			this.btn_tab_entity.Selected = true;
+			this.btn_tab_entity.Size = new System.Drawing.Size(75, 23);
+			this.btn_tab_entity.TabIndex = 0;
+			this.btn_tab_entity.Text = "Entity";
+			this.btn_tab_entity.UseVisualStyleBackColor = true;
+			this.btn_tab_entity.Click += new System.EventHandler(this.tabButton_Click);
+			// 
 			// btn_entity
 			// 
 			this.btn_entity.Hovered = false;
@@ -272,6 +323,7 @@
 			this.btn_entity.Location = new System.Drawing.Point(0, 204);
 			this.btn_entity.Name = "btn_entity";
 			this.btn_entity.Pressed = false;
+			this.btn_entity.Selectable = true;
 			this.btn_entity.Selected = false;
 			this.btn_entity.SelectedImage = global::Editor.Properties.Resources.icon_entity_selected;
 			this.btn_entity.Size = new System.Drawing.Size(58, 32);
@@ -287,6 +339,7 @@
 			this.btn_face.Location = new System.Drawing.Point(0, 172);
 			this.btn_face.Name = "btn_face";
 			this.btn_face.Pressed = false;
+			this.btn_face.Selectable = true;
 			this.btn_face.Selected = false;
 			this.btn_face.SelectedImage = global::Editor.Properties.Resources.icon_face_selected;
 			this.btn_face.Size = new System.Drawing.Size(58, 32);
@@ -302,13 +355,14 @@
 			this.btn_texture.Location = new System.Drawing.Point(0, 140);
 			this.btn_texture.Name = "btn_texture";
 			this.btn_texture.Pressed = false;
+			this.btn_texture.Selectable = false;
 			this.btn_texture.Selected = false;
 			this.btn_texture.SelectedImage = global::Editor.Properties.Resources.icon_texture_selected;
 			this.btn_texture.Size = new System.Drawing.Size(58, 32);
 			this.btn_texture.TabIndex = 5;
 			this.btn_texture.Tag = "";
 			this.btn_texture.UseVisualStyleBackColor = true;
-			this.btn_texture.Click += new System.EventHandler(this.toolbarButton_Click);
+			this.btn_texture.Click += new System.EventHandler(this.btn_texture_Click);
 			// 
 			// btn_clip
 			// 
@@ -317,6 +371,7 @@
 			this.btn_clip.Location = new System.Drawing.Point(0, 76);
 			this.btn_clip.Name = "btn_clip";
 			this.btn_clip.Pressed = false;
+			this.btn_clip.Selectable = true;
 			this.btn_clip.Selected = false;
 			this.btn_clip.SelectedImage = global::Editor.Properties.Resources.icon_clip_selected;
 			this.btn_clip.Size = new System.Drawing.Size(58, 32);
@@ -332,6 +387,7 @@
 			this.btn_vertex.Location = new System.Drawing.Point(0, 108);
 			this.btn_vertex.Name = "btn_vertex";
 			this.btn_vertex.Pressed = false;
+			this.btn_vertex.Selectable = true;
 			this.btn_vertex.Selected = false;
 			this.btn_vertex.SelectedImage = global::Editor.Properties.Resources.icon_vertex_selected;
 			this.btn_vertex.Size = new System.Drawing.Size(58, 32);
@@ -347,6 +403,7 @@
 			this.btn_solid.Location = new System.Drawing.Point(0, 44);
 			this.btn_solid.Name = "btn_solid";
 			this.btn_solid.Pressed = false;
+			this.btn_solid.Selectable = true;
 			this.btn_solid.Selected = false;
 			this.btn_solid.SelectedImage = global::Editor.Properties.Resources.icon_solid_selected;
 			this.btn_solid.Size = new System.Drawing.Size(58, 32);
@@ -362,6 +419,7 @@
 			this.btn_select.Location = new System.Drawing.Point(0, 12);
 			this.btn_select.Name = "btn_select";
 			this.btn_select.Pressed = false;
+			this.btn_select.Selectable = true;
 			this.btn_select.Selected = true;
 			this.btn_select.SelectedImage = global::Editor.Properties.Resources.icon_select_selected;
 			this.btn_select.Size = new System.Drawing.Size(58, 32);
@@ -391,6 +449,8 @@
 			this.menu_editor.ResumeLayout(false);
 			this.menu_editor.PerformLayout();
 			this.pnl_left.ResumeLayout(false);
+			this.pnl_right.ResumeLayout(false);
+			this.pnl_tabPanel.ResumeLayout(false);
 			this.ws_viewports.PanelBottomLeft.ResumeLayout(false);
 			this.ws_viewports.PanelBottomRight.ResumeLayout(false);
 			this.ws_viewports.PanelTopLeft.ResumeLayout(false);
@@ -430,6 +490,10 @@
 		private FlatButtonControl btn_face;
 		private FlatButtonControl btn_texture;
 		private FlatButtonControl btn_entity;
+		private System.Windows.Forms.Panel pnl_tabPanel;
+		private FlatTabButtonControl btn_tab_face;
+		private FlatTabButtonControl btn_tab_entity;
+		private FaceTabContentControl tab_face;
 	}
 }
 

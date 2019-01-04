@@ -37,7 +37,7 @@ namespace Editor
 		private bool _mmbDown;
 		private Point _previousMousePosition;
 
-		private UInt32 _texture;
+		//private UInt32 _texture;
 
 		[Browsable( false )]
 		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
@@ -72,7 +72,7 @@ namespace Editor
 			{
 				GL.CreateContext( Handle, Size.Width, Size.Height );
 
-				_texture = GL.LoadTexture( "./assets/textures/palette.dds" );
+				//_texture = GL.LoadTexture( "./assets/textures/palette.dds" );
 			}
 
 			_camera = new Camera3D { HorizontalSensitivity = 0.05f, VerticalSensitivity = 0.05f };
@@ -114,7 +114,7 @@ namespace Editor
 
 				GL.End();
 
-				GL.SetTexture( _texture );
+				//GL.SetTexture( _texture );
 				
 				// draw solids
 				foreach( var solid in _level.Solids )

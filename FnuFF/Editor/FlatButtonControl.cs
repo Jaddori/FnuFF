@@ -16,6 +16,7 @@ namespace Editor
         private bool _pressed;
         private bool _hovered;
         private bool _selected;
+		private bool _selectable;
 
         private Brush _pressedBrush;
         private Brush _hoveredBrush;
@@ -36,11 +37,13 @@ namespace Editor
                 Invalidate();
             }
         }
+		public bool Selectable { get { return _selectable; } set { _selectable = value; } }
 
 		public Image SelectedImage { get { return _selectedImage; } set { _selectedImage = value; } }
 
         public FlatButtonControl()
         {
+			_selectable = true;
             _pressedBrush = new SolidBrush( EditorColors.PRESSED );
             _hoveredBrush = new SolidBrush( EditorColors.HOVERED );
             _selectedBrush = new SolidBrush( EditorColors.SELECTED );
@@ -137,7 +140,7 @@ namespace Editor
         {
             base.OnClick( e );
 
-            _selected = true;
+            _selected = _selectable;
             Invalidate();
         }
 

@@ -76,9 +76,24 @@
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityData.cs" />
     <Compile Include="Entities\PlayerSpawn.cs" />
+    <Compile Include="EntityTabContentControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EntityTabContentControl.Designer.cs">
+      <DependentUpon>EntityTabContentControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="Face.cs" />
+    <Compile Include="FaceTabContentControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FaceTabContentControl.Designer.cs">
+      <DependentUpon>FaceTabContentControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="FlatButtonControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FlatTabButtonControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GeometrySolid.cs" />
@@ -87,6 +102,8 @@
     <Compile Include="Log.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Targa.cs" />
+    <Compile Include="TextureMap.cs" />
     <Compile Include="Triple.cs" />
     <Compile Include="UndoRedo\CommandEntityChanged.cs" />
     <Compile Include="UndoRedo\CommandEntityCreated.cs" />
@@ -110,6 +127,9 @@
     </Compile>
     <EmbeddedResource Include="EditorForm.resx">
       <DependentUpon>EditorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FaceTabContentControl.resx">
+      <DependentUpon>FaceTabContentControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
