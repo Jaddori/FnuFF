@@ -163,8 +163,6 @@ namespace Editor
 				red = green = blue = 1.0f;
 			}
 
-			GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-
 			var cur = 0;
 			foreach( var face in _faces )
 			{
@@ -199,6 +197,12 @@ namespace Editor
 				{
 					var textureID = TextureMap.GetID( face.TextureName );
 					GL.SetTexture( textureID );
+					GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+				}
+
+				if( face.Hovered )
+				{
+					GL.Color4f( 1.0f, 0.5f, 0.5f, 1.0f );
 				}
 
 				GL.BeginTriangles();

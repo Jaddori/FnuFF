@@ -51,3 +51,5 @@ EXPORT void setTexture( uint32_t id );
 EXPORT void pointSize( float size );
 EXPORT void enablePointSprite( bool enabled );
 EXPORT void enableDepthMask( bool enabled );
+
+EXPORT void unproject( int x, int y, int z, float* outx, float* outy, float* outz );

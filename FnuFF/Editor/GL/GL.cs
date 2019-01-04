@@ -68,6 +68,9 @@ namespace Editor
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static void enableDepthMask( bool enabled );
 
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void unproject( int x, int y, int z, ref float outx, ref float outy, ref float outz );
+
 		private static IntPtr _context;
 		
 		public static void CreateContext( IntPtr windowHandle, int width, int height )
@@ -160,6 +163,14 @@ namespace Editor
 		public static void EnableDepthMask( bool enabled )
 		{
 			enableDepthMask( enabled );
+		}
+
+		public static Triple Unproject( int x, int y, int z )
+		{
+			float outx = 0.0f, outy = 0.0f, outz = 0.0f;
+			unproject( x, y, z, ref outx, ref outy, ref outz );
+
+			return new Triple( outx, outy, outz );
 		}
 	}
 }

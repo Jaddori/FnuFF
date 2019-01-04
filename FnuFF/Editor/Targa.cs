@@ -16,6 +16,8 @@ namespace Editor
 		private int _height;
 		private int _bpp;
 		private byte[] _pixels;
+		private Image _image;
+		private bool _imageDirty;
 
 		public int Width => _width;
 		public int Height => _height;
@@ -25,6 +27,7 @@ namespace Editor
 		public Targa()
 		{
 			_width = _height = _bpp = 0;
+			_imageDirty = true;
 		}
 
 		public bool Load( string filename )
@@ -79,6 +82,7 @@ namespace Editor
 						_pixels[i] = temp;
 					}
 
+					_imageDirty = true;
 					result = true;
 				}
 			}
@@ -88,26 +92,32 @@ namespace Editor
 
 		public Image ToImage()
 		{
-			if( _width <= 0 || _height <= 0 || _bpp <= 0 )
-				throw new InvalidOperationException( "Targa file has not been loaded." );
-
-			var format = ( _bpp == 3 ? PixelFormat.Format24bppRgb : PixelFormat.Format32bppArgb );
-			var result = new Bitmap( _width, _height, format );
-			var bounds = new Rectangle( 0, 0, _width, _height );
-
-			var data = result.LockBits( bounds, ImageLockMode.WriteOnly, format );
-			
-			var lineWidth = _width * _bpp;
-			var ptr = data.Scan0;
-			for( int y = 0; y < _height; y++ )
+			if( _imageDirty )
 			{
-				Marshal.Copy( _pixels, (_height-y-1) * lineWidth, ptr, lineWidth );
-				ptr += data.Stride;
+				if( _width <= 0 || _height <= 0 || _bpp <= 0 )
+					throw new InvalidOperationException( "Targa file has not been loaded." );
+
+				var format = ( _bpp == 3 ? PixelFormat.Format24bppRgb : PixelFormat.Format32bppArgb );
+				var result = new Bitmap( _width, _height, format );
+				var bounds = new Rectangle( 0, 0, _width, _height );
+
+				var data = result.LockBits( bounds, ImageLockMode.WriteOnly, format );
+
+				var lineWidth = _width * _bpp;
+				var ptr = data.Scan0;
+				for( int y = 0; y < _height; y++ )
+				{
+					Marshal.Copy( _pixels, ( _height - y - 1 ) * lineWidth, ptr, lineWidth );
+					ptr += data.Stride;
+				}
+
+				result.UnlockBits( data );
+
+				_image = result;
+				_imageDirty = false;
 			}
 
-			result.UnlockBits( data );
-
-			return result;
+			return _image;
 		}
 	}
 }

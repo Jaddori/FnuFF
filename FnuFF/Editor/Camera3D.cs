@@ -9,6 +9,8 @@ namespace Editor
 {
 	public class Camera3D
 	{
+		private float _speed;
+
 		private Triple _position;
 		private Triple _direction;
 		private Triple _right;
@@ -20,8 +22,11 @@ namespace Editor
 		private float _horizontalSensitivity;
 		private float _verticalSensitivity;
 
-		private float[] _viewMatrix;
-		private float[] _projectionMatrix;
+		public float Speed
+		{
+			get { return _speed; }
+			set { _speed = value; }
+		}
 
 		public Triple Position
 		{
@@ -139,6 +144,8 @@ namespace Editor
 
 		public Camera3D()
 		{
+			_speed = 0.1f;
+
 			_position = new Triple();
 			_direction = new Triple(0,0,1);
 			_right = new Triple(1,0,0);
@@ -149,9 +156,6 @@ namespace Editor
 
 			_horizontalSensitivity = 1.0f;
 			_verticalSensitivity = 1.0f;
-
-			_viewMatrix = new float[16];
-			_projectionMatrix = new float[16];
 		}
 
 		public Point Project( Triple point )
@@ -172,7 +176,7 @@ namespace Editor
 				Triple forward = _direction;
 				forward.Normalize();
 
-				_position += forward * localMovement.Z;
+				_position += forward * localMovement.Z * _speed;
 			}
 
 			// move left and right
@@ -185,14 +189,14 @@ namespace Editor
 					(float)Math.Cos(_horizontalAngle - Math.PI*0.5f)
 				);
 
-				_position += right * localMovement.X;
+				_position += right * localMovement.X * _speed;
 			}
 
 			// move up and down
 			if( Math.Abs( localMovement.Y ) > Extensions.EPSILON )
 			{
 				Triple up = new Triple( 0, 1, 0 );
-				_position += up * localMovement.Y;
+				_position += up * localMovement.Y * _speed;
 			}
 		}
 

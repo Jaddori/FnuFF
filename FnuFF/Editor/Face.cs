@@ -14,17 +14,20 @@ namespace Editor
 		private Triple _u;
 		private Triple _v;
 		private string _textureName;
+		private bool _hovered;
 
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public Triple U { get { return _u; } set { _u = value; } }
 		public Triple V { get { return _v; } set { _v = value; } }
 		public string TextureName { get { return _textureName; } set { _textureName = value; } }
+		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
 
 		public Face()
 		{
 			_plane = new Plane();
 			_u = new Triple();
 			_v = new Triple();
+			_hovered = false;
 		}
 
 		public Face( Triple normal, float d )
@@ -37,6 +40,7 @@ namespace Editor
 			_plane = new Plane( normal, d );
 			_u = u;
 			_v = v;
+			_hovered = false;
 		}
 
 		public Face Copy()

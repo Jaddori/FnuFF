@@ -46,7 +46,7 @@ EXPORT HGLRC createContext( HWND windowHandle, int width, int height )
 			
 			glMatrixMode( GL_PROJECTION );
 			glLoadIdentity();
-			gluPerspective( 90.0f, (float)width / (float)height, 0.1f, 1000.0f );
+			gluPerspective( 90.0f, (float)width / (float)height, 0.1f, 100.0f );
 
 			glMatrixMode( GL_MODELVIEW );
 			glLoadIdentity();
@@ -223,4 +223,22 @@ EXPORT void enablePointSprite( bool enabled )
 EXPORT void enableDepthMask( bool enabled )
 {
 	glDepthMask( enabled ? GL_TRUE : GL_FALSE );
+}
+
+EXPORT void unproject( int x, int y, int z, float* outx, float* outy, float* outz )
+{
+	GLdouble viewMatrix[16];
+	GLdouble projectionMatrix[16];
+	GLint viewport[4];
+
+	glGetDoublev( GL_MODELVIEW_MATRIX, viewMatrix );
+	glGetDoublev( GL_PROJECTION_MATRIX, projectionMatrix );
+	glGetIntegerv( GL_VIEWPORT, viewport );
+
+	GLdouble gx, gy, gz;
+	gluUnProject( x, y, z, viewMatrix, projectionMatrix, viewport, &gx, &gy, &gz );
+
+	*outx = gx;
+	*outy = gy;
+	*outz = gz;
 }
