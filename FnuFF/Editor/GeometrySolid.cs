@@ -13,7 +13,6 @@ namespace Editor
 	public class GeometrySolid
 	{
 		private static Random random = new Random();
-		//private static UInt32 textureID = UInt32.MaxValue;
 
 		[XmlIgnore]
 		public static CommandStack CommandStack;
@@ -36,9 +35,6 @@ namespace Editor
 
 		public GeometrySolid()
 		{
-			//if( textureID == UInt32.MaxValue )
-			//textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
-
 			_hovered = _selected = false;
 			_faces = new List<Face>();
 
@@ -47,9 +43,6 @@ namespace Editor
 
 		public GeometrySolid( Triple min, Triple max )
 		{
-			//if( textureID == UInt32.MaxValue )
-			//textureID = GL.LoadTexture( "./assets/textures/bricks.dds" );
-
 			_hovered = _selected = false;
 			_faces = new List<Face>();
 
@@ -174,40 +167,30 @@ namespace Editor
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 				var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
 				var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x ) ).ToArray();
-				
-				var rr = red;
-				var gg = green;
-				var bb = blue;
 
+				var shade = 1.0f;
 				if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) < 0 ||
 					face.Plane.Normal.Dot( new Triple( 0, 1, 0 ) ) < 0 ||
 					face.Plane.Normal.Dot( new Triple( 0, 0, 1 ) ) < 0 )
 				{
-					rr -= 0.25f;
-					gg -= 0.25f;
-					bb -= 0.25f;
+					shade = 0.75f;
 				}
 
 				if( string.IsNullOrEmpty( face.TextureName ) )
 				{
 					GL.SetTexture( 0 );
-					GL.Color4f( rr, gg, bb, alpha );
+					GL.Color4f( red * shade, green * shade, blue * shade, alpha );
 				}
 				else
 				{
-					//var textureID = TextureMap.GetID( face.TextureName );
-					/*UInt32 textureID = 0;
+					var textureID = TextureMap.GetID( face.PackName, face.TextureName );
 					GL.SetTexture( textureID );
-					GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );*/
+					GL.Color4f( shade, alpha );
 				}
-
-				var textureID = TextureMap.GetID( "pack02", "bricks" );
-				GL.SetTexture( textureID );
-				GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
 				if( face.Hovered )
 				{
-					GL.Color4f( 1.0f, 0.5f, 0.5f, 1.0f );
+					GL.Color4f( 1.0f, 0.5f, 0.5f, alpha );
 				}
 
 				GL.BeginTriangles();

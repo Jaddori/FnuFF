@@ -137,6 +137,16 @@ namespace Editor
 			color4f( r, g, b, a );
 		}
 
+		public static void Color4f( float all )
+		{
+			color4f( all, all, all, all );
+		}
+
+		public static void Color4f( float rgb, float a )
+		{
+			color4f( rgb, rgb, rgb, a );
+		}
+
 		public static void ViewMatrix( Triple position, Triple direction )
 		{
 			viewMatrix( position.X, position.Y, position.Z, direction.X, direction.Y, direction.Z );

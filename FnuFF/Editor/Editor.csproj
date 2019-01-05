@@ -105,7 +105,16 @@
     <Compile Include="Ray.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Targa.cs" />
+    <Compile Include="TextureBrowserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextureBrowserForm.Designer.cs">
+      <DependentUpon>TextureBrowserForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TextureMap.cs" />
+    <Compile Include="TexturePreviewControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Triple.cs" />
     <Compile Include="UndoRedo\CommandEntityChanged.cs" />
     <Compile Include="UndoRedo\CommandEntityCreated.cs" />
@@ -143,6 +152,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="TextureBrowserForm.resx">
+      <DependentUpon>TextureBrowserForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

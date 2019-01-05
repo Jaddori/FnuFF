@@ -203,9 +203,9 @@ EXPORT uint32_t uploadTexture( int width, int height, int bpp, char* pixels )
 {
 	uint32_t result = 0;
 
-	GLenum format = GL_RGB;
+	GLenum format = GL_BGR;
 	if( bpp == 4 )
-		format = GL_RGBA;
+		format = GL_BGRA;
 
 	glGenTextures( 1, &result );
 

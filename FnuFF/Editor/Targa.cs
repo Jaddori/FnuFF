@@ -78,10 +78,6 @@ namespace Editor
 						var temp = _pixels[i];
 						_pixels[i] = _pixels[i + 2];
 						_pixels[i + 2] = temp;
-
-						temp = _pixels[i+1];
-						_pixels[i + 1] = _pixels[i];
-						_pixels[i] = temp;
 					}
 
 					_imageDirty = true;
@@ -119,12 +115,12 @@ namespace Editor
 					reader.Read( _pixels, 0, pixelCount );
 
 					// convert from GBR(A) to RGB(A)
-					for( int i = 0; i < pixelCount; i += _bpp )
+					/*for( int i = 0; i < pixelCount; i += _bpp )
 					{
 						var temp = _pixels[i];
 						_pixels[i] = _pixels[i + 2];
 						_pixels[i + 2] = temp;
-					}
+					}*/
 
 					_imageDirty = true;
 					result = true;

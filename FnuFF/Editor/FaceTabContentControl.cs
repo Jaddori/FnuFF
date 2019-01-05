@@ -30,7 +30,7 @@ namespace Editor
 
 		private void btn_browse_Click( object sender, EventArgs e )
 		{
-			openFileDialog.Title = "Load texture";
+			/*openFileDialog.Title = "Load texture";
 			openFileDialog.DefaultExt = ".tga";
 			openFileDialog.Filter = "Targa Files|*.tga|All Files|*.*";
 
@@ -40,7 +40,10 @@ namespace Editor
 
 				_texturePath = filename;
 				LoadPreview();
-			}
+			}*/
+
+			var tbf = new TextureBrowserForm();
+			tbf.ShowDialog();
 		}
 
 		private void LoadPreview()

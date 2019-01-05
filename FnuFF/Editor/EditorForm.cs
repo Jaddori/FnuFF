@@ -99,8 +99,8 @@ namespace Editor
 			{
 				foreach( var face in selectedSolid.Faces )
 				{
-					//face.TextureName = tab_face.TextureName;
-					//face.TextureName = TextureMap.GetCurrent();
+					face.PackName = TextureMap.CurrentPackName;
+					face.TextureName = TextureMap.CurrentTextureName;
 				}
 
 				view_3d.Invalidate();

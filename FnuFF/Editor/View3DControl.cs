@@ -69,6 +69,7 @@ namespace Editor
 			{
 				GL.CreateContext( Handle, Size.Width, Size.Height );
 
+				TextureMap.LoadPack( "./assets/textures/pack01.bin" );
 				TextureMap.LoadPack( "./assets/textures/pack02.bin" );
 			}
 
@@ -198,7 +199,8 @@ namespace Editor
 
 					if( minFace != null )
 					{
-						//minFace.TextureName = TextureMap.GetCurrent();
+						minFace.PackName = TextureMap.CurrentPackName;
+						minFace.TextureName = TextureMap.CurrentTextureName;
 						Invalidate();
 					}
 				}

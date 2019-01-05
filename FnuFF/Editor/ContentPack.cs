@@ -17,6 +17,9 @@ namespace Editor
 		private UInt32[] _ids;
 
 		public string Name => _name;
+		public string[] Names => _names;
+		public Targa[] Targas => _targas;
+		public UInt32[] IDs => _ids;
 
 		public ContentPack()
 		{

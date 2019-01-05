@@ -1,2 +1,2 @@
-bricks.tga
-bricks02.tga
+test.tga
+test02.tga
