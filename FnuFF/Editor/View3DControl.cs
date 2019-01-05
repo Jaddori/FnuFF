@@ -37,8 +37,6 @@ namespace Editor
 		private bool _mmbDown;
 		private Point _previousMousePosition;
 
-		//private UInt32 _texture;
-
 		[Browsable( false )]
 		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
 		public Level Level
@@ -63,7 +61,6 @@ namespace Editor
 
 		public View3DControl()
         {
-			//DoubleBuffered = true;
         }
 
 		protected override void OnCreateControl()
@@ -72,7 +69,7 @@ namespace Editor
 			{
 				GL.CreateContext( Handle, Size.Width, Size.Height );
 
-				//_texture = GL.LoadTexture( "./assets/textures/palette.dds" );
+				TextureMap.LoadPack( "./assets/textures/pack02.bin" );
 			}
 
 			_camera = new Camera3D { HorizontalSensitivity = 0.05f, VerticalSensitivity = 0.05f };
@@ -201,7 +198,7 @@ namespace Editor
 
 					if( minFace != null )
 					{
-						minFace.TextureName = TextureMap.GetCurrent();
+						//minFace.TextureName = TextureMap.GetCurrent();
 						Invalidate();
 					}
 				}

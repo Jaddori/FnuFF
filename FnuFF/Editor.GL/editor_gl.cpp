@@ -199,6 +199,25 @@ EXPORT uint32_t loadTexture( const char* path )
 	return result;
 }
 
+EXPORT uint32_t uploadTexture( int width, int height, int bpp, char* pixels )
+{
+	uint32_t result = 0;
+
+	GLenum format = GL_RGB;
+	if( bpp == 4 )
+		format = GL_RGBA;
+
+	glGenTextures( 1, &result );
+
+	glBindTexture( GL_TEXTURE_2D, result );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, pixels );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+
+	return result;
+}
+
 EXPORT void setTexture( uint32_t id )
 {
 	glBindTexture( GL_TEXTURE_2D, id );

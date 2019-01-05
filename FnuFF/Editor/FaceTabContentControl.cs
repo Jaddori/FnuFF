@@ -47,12 +47,12 @@ namespace Editor
 		{
 			if( File.Exists( _texturePath ) )
 			{
-				var name = TextureMap.LoadTexture( _texturePath );
+				/*var name = TextureMap.LoadTexture( _texturePath );
 				if( !string.IsNullOrEmpty( name ) )
 				{
 					TextureMap.SetCurrent( name );
 					pb_texture.Image = TextureMap.GetTarga( name ).ToImage();
-				}
+				}*/
 			}
 		}
 	}

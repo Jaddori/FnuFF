@@ -4,9 +4,3 @@ bricks03.tga
 cloud02.tga
 concrete01.tga
 concrete02.tga
-test.tga
-test02.tga
-test03.tga
-test04.tga
-test05.tga
-test06.tga

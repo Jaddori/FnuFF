@@ -64,6 +64,8 @@ namespace Editor
 				_bpp = buffer[4];
 				_bpp /= 8;
 
+				stream.ReadByte(); // skip image descriptor
+
 				if( _width > 0 && _height > 0 && ( _bpp == 3 || _bpp == 4 ) )
 				{
 					int pixelCount = _width * _height * _bpp;
@@ -80,6 +82,48 @@ namespace Editor
 						temp = _pixels[i+1];
 						_pixels[i + 1] = _pixels[i];
 						_pixels[i] = temp;
+					}
+
+					_imageDirty = true;
+					result = true;
+				}
+			}
+
+			return result;
+		}
+
+		public bool Read( BinaryReader reader )
+		{
+			var result = false;
+
+			reader.ReadByte(); // skip id length
+			reader.ReadByte(); // skip colormap type
+
+			var imageType = reader.ReadByte();
+			if( imageType == 2 ) // can only handle unmapped RGB(A)
+			{
+				byte[] buffer = new byte[16];
+				reader.Read( buffer, 0, 9 ); // skip colormap and origin info
+
+				_width = reader.ReadInt16();
+				_height = reader.ReadInt16();
+				_bpp = reader.ReadByte();
+				_bpp /= 8;
+
+				reader.ReadByte(); // skip image descriptor
+
+				if( _width > 0 && _height > 0 && ( _bpp == 3 || _bpp == 4 ) )
+				{
+					int pixelCount = _width * _height * _bpp;
+					_pixels = new byte[pixelCount];
+					reader.Read( _pixels, 0, pixelCount );
+
+					// convert from GBR(A) to RGB(A)
+					for( int i = 0; i < pixelCount; i += _bpp )
+					{
+						var temp = _pixels[i];
+						_pixels[i] = _pixels[i + 2];
+						_pixels[i + 2] = temp;
 					}
 
 					_imageDirty = true;

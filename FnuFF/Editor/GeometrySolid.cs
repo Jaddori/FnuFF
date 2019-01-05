@@ -195,10 +195,15 @@ namespace Editor
 				}
 				else
 				{
-					var textureID = TextureMap.GetID( face.TextureName );
+					//var textureID = TextureMap.GetID( face.TextureName );
+					/*UInt32 textureID = 0;
 					GL.SetTexture( textureID );
-					GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+					GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );*/
 				}
+
+				var textureID = TextureMap.GetID( "pack02", "bricks" );
+				GL.SetTexture( textureID );
+				GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
 				if( face.Hovered )
 				{
