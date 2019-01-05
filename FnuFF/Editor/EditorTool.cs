@@ -8,7 +8,21 @@ namespace Editor
 {
     public static class EditorTool
     {
-        public static EditorTools Current { get; set; } = EditorTools.Select;
+		public delegate void EditorToolChangedHandler( EditorTools prev, EditorTools current );
+		public static event EditorToolChangedHandler OnEditorToolChanged;
+
+		private static EditorTools _current;
+		
+		public static EditorTools Current
+		{
+			get { return _current; }
+			set
+			{
+				var prev = _current;
+				_current = value;
+				OnEditorToolChanged?.Invoke( prev, _current );
+			}
+		}
     }
 
     public enum EditorTools

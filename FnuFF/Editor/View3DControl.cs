@@ -8,6 +8,7 @@ using System.Drawing;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Windows.Forms.ComponentModel;
+using Editor.UndoRedo;
 
 namespace Editor
 {
@@ -16,7 +17,7 @@ namespace Editor
 		public delegate void GlobalInvalidationHandler();
 		public event GlobalInvalidationHandler OnGlobalInvalidation;
 
-		public delegate void FaceHandler( Face face );
+		public delegate void FaceHandler( GeometrySolid solid, Face face );
 		public event FaceHandler OnFaceSelected;
 
 		private const float CAMERA_SCROLL_SPEED = 10.0f;
@@ -37,12 +38,12 @@ namespace Editor
 		};
 
 		private Level _level;
-		private int _frame;
 		private Camera3D _camera;
 		private GeometrySolid _hoveredSolid;
 		private GeometrySolid _selectedSolid;
 		private Face _hoveredFace;
 		private Face _selectedFace;
+		private CommandStack _commandStack;
 
 		private bool _mmbDown;
 		private Point _previousMousePosition;
@@ -69,6 +70,14 @@ namespace Editor
 			set { _camera = value; }
 		}
 
+		[Browsable( false )]
+		[DesignerSerializationVisibility( DesignerSerializationVisibility.Hidden )]
+		public CommandStack CommandStack
+		{
+			get { return _commandStack; }
+			set { _commandStack = value; }
+		}
+
 		public View3DControl()
         {
         }
@@ -84,8 +93,7 @@ namespace Editor
 
 			_camera = new Camera3D { HorizontalSensitivity = 0.05f, VerticalSensitivity = 0.05f };
 
-			_frame = 0;
-			Log.AddFunctor( Name, () => "Frame: " + _frame.ToString() );
+			EditorTool.OnEditorToolChanged += OnEditorToolChanged;
 		}
 
 		protected override void OnPaintBackground( PaintEventArgs pevent )
@@ -96,8 +104,6 @@ namespace Editor
 
 		protected override void OnPaint( PaintEventArgs e )
 		{
-			//base.OnPaint( e );
-
 			if( !DesignMode )
 			{
 				GL.ClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -121,8 +127,6 @@ namespace Editor
 
 				GL.End();
 
-				//GL.SetTexture( _texture );
-				
 				// draw solids
 				foreach( var solid in _level.Solids )
 				{
@@ -136,7 +140,6 @@ namespace Editor
 				}
 
 				GL.SwapBuffers( Handle );
-				_frame++;
 			}
 		}
 
@@ -204,7 +207,7 @@ namespace Editor
 						_selectedFace = hitFace;
 						Invalidate();
 
-						OnFaceSelected?.Invoke( _selectedFace );
+						OnFaceSelected?.Invoke( hitSolid, _selectedFace );
 					}
 					else
 					{
@@ -214,7 +217,7 @@ namespace Editor
 							_selectedFace = null;
 							Invalidate();
 
-							OnFaceSelected?.Invoke( _selectedFace );
+							OnFaceSelected?.Invoke( null, null );
 						}
 					}
 				}
@@ -225,9 +228,15 @@ namespace Editor
 
 					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
 					{
+						var command = new CommandSolidChanged( hitSolid );
+						command.Begin();
+
 						hitFace.PackName = TextureMap.CurrentPackName;
 						hitFace.TextureName = TextureMap.CurrentTextureName;
 						Invalidate();
+
+						command.End();
+						_commandStack.Do( command );
 					}
 				}
 			}
@@ -409,6 +418,20 @@ namespace Editor
 			}
 
 			return result;
+		}
+
+		private void OnEditorToolChanged( EditorTools previous, EditorTools current )
+		{
+			if( previous == EditorTools.Face )
+			{
+				if( _selectedFace != null )
+				{
+					_selectedFace.Selected = false;
+					_selectedFace = null;
+
+					OnFaceSelected?.Invoke( null, null );
+				}
+			}
 		}
 	}
 }

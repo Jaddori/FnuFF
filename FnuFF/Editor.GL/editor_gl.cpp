@@ -180,7 +180,7 @@ EXPORT uint32_t loadTexture( const char* path )
 
 		fclose( file );
 
-		// need flip image data vertically
+		// need to flip image data vertically
 		if( header.yorigin == 0 )
 		{
 			char* buffer = new char[header.width*bpp];

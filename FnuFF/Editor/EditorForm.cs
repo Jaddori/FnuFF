@@ -20,6 +20,8 @@ namespace Editor
 		private List<FlatTabButtonControl> _tabButtons;
 		private Level _level;
 		private CommandStack _commandStack;
+		
+		private CommandSolidChanged _solidChangedCommand;
 
         public EditorForm()
         {
@@ -62,6 +64,7 @@ namespace Editor
 			view_topRight.CommandStack = _commandStack;
 			view_bottomLeft.CommandStack = _commandStack;
 			view_bottomRight.CommandStack = _commandStack;
+			view_3d.CommandStack = _commandStack;
 
 			view_topRight.OnGlobalInvalidation += ViewGlobalInvalidation;
 			view_bottomLeft.OnGlobalInvalidation += ViewGlobalInvalidation;
@@ -102,11 +105,18 @@ namespace Editor
 			var selectedSolid = _level.Solids.FirstOrDefault( x => x.Selected );
 			if( selectedSolid != null )
 			{
+				var command = new CommandSolidChanged( selectedSolid );
+				command.Begin();
+
 				foreach( var face in selectedSolid.Faces )
 				{
 					face.PackName = TextureMap.CurrentPackName;
 					face.TextureName = TextureMap.CurrentTextureName;
 				}
+
+				command.End();
+				if( command.HasChanges )
+					_commandStack.Do( command );
 
 				view_3d.Invalidate();
 			}
@@ -125,8 +135,24 @@ namespace Editor
 			view_bottomRight.Invalidate();
 		}
 
-		private void OnFaceSelected( Face face )
+		private void OnFaceSelected( GeometrySolid solid, Face face )
 		{
+			if( _solidChangedCommand != null )
+			{
+				_solidChangedCommand.End();
+
+				if( _solidChangedCommand.HasChanges )
+					_commandStack.Do( _solidChangedCommand );
+
+				_solidChangedCommand = null;
+			}
+
+			if( solid != null )
+			{
+				_solidChangedCommand = new CommandSolidChanged( solid );
+				_solidChangedCommand.Begin();
+			}
+
 			tab_face.SetFace( face );
 		}
 
