@@ -1,16 +1,16 @@
-#include "content_pack.h"
+#include "asset_pack.h"
 using namespace Rendering;
 
-ContentPack::ContentPack()
+AssetPack::AssetPack()
 	: textureCount( 0 ), textures( NULL ), uploaded( false )
 {
 }
 
-ContentPack::~ContentPack()
+AssetPack::~AssetPack()
 {
 }
 
-bool ContentPack::load( const char* path )
+bool AssetPack::load( const char* path )
 {
 	bool result = false;
 
@@ -43,7 +43,7 @@ bool ContentPack::load( const char* path )
 	return result;
 }
 
-void ContentPack::unload()
+void AssetPack::unload()
 {
 	for( int i=0; i<textureCount; i++ )
 	{
@@ -57,7 +57,7 @@ void ContentPack::unload()
 	name[0] = 0;
 }
 
-void ContentPack::upload()
+void AssetPack::upload()
 {
 	if( !uploaded )
 	{
@@ -70,7 +70,7 @@ void ContentPack::upload()
 	}
 }
 
-int ContentPack::getIndex( const char* name )
+int AssetPack::getIndex( const char* name )
 {
 	int result = -1;
 	
@@ -81,7 +81,7 @@ int ContentPack::getIndex( const char* name )
 	return result;
 }
 
-const Texture* ContentPack::getTexture( int index ) const
+const Texture* AssetPack::getTexture( int index ) const
 {
 	assert( index >= 0 && index < textureCount );
 

@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.UnitTests", "Editor.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor.GL", "Editor.GL\Editor.GL.vcxproj", "{FD9DA442-551F-407E-8C3D-73328A458586}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ContentPacker", "ContentPacker\ContentPacker.vcxproj", "{76E7D3B3-3094-4F23-8DAD-207F649CD823}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetPacker", "AssetPacker\AssetPacker.vcxproj", "{76E7D3B3-3094-4F23-8DAD-207F649CD823}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

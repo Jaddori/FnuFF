@@ -118,7 +118,7 @@
     <ClCompile Include="spawn_point.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="content_pack.cpp">
+    <ClCompile Include="asset_pack.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -249,7 +249,7 @@
     <ClInclude Include="spawn_point.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="content_pack.h">
+    <ClInclude Include="asset_pack.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
   </ItemGroup>

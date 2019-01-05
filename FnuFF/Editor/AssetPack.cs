@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Editor
 {
-	public class ContentPack
+	public class AssetPack
 	{
 		private const int NAME_LENGTH = 64;
 
@@ -21,7 +21,7 @@ namespace Editor
 		public Targa[] Targas => _targas;
 		public UInt32[] IDs => _ids;
 
-		public ContentPack()
+		public AssetPack()
 		{
 		}
 

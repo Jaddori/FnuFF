@@ -10,12 +10,12 @@ namespace Editor
 	{
 		private static Dictionary<string, string> _names = new Dictionary<string, string>();
 		private static Dictionary<string, string> _paths = new Dictionary<string, string>();
-		private static Dictionary<string, ContentPack> _packs = new Dictionary<string, ContentPack>();
+		private static Dictionary<string, AssetPack> _packs = new Dictionary<string, AssetPack>();
 
 		private static string _currentPackName;
 		private static string _currentTextureName;
 
-		public static Dictionary<string, ContentPack> Packs => _packs;
+		public static Dictionary<string, AssetPack> Packs => _packs;
 
 		public static string CurrentPackName { get { return _currentPackName; } set { _currentPackName = value; } }
 		public static string CurrentTextureName { get { return _currentTextureName; } set { _currentTextureName = value; } }
@@ -24,7 +24,7 @@ namespace Editor
 		{
 			if( !_packs.ContainsKey( filename ) )
 			{
-				var pack = new ContentPack();
+				var pack = new AssetPack();
 				if( pack.Load( filename ) )
 				{
 					var name = pack.Name;
@@ -62,7 +62,7 @@ namespace Editor
 			return result;
 		}
 
-		public static ContentPack GetPack( string name )
+		public static AssetPack GetPack( string name )
 		{
 			if( _packs.ContainsKey( name ) )
 				return _packs[name];

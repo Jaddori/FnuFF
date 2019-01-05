@@ -6,11 +6,11 @@
 #define CONTENT_PACK_NAME_LEN 64
 #define TEXTURE_NAME_LEN 64
 
-class ContentPack
+class AssetPack
 {
 public:
-	ContentPack();
-	~ContentPack();
+	AssetPack();
+	~AssetPack();
 
 	bool load( const char* path );
 	void unload();

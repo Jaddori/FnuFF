@@ -11,7 +11,7 @@
 #include "font.h"
 #include "gbuffer.h"
 #include "billboard.h"
-#include "content_pack.h"
+#include "asset_pack.h"
 
 namespace Rendering
 {
@@ -97,7 +97,7 @@ namespace Rendering
 		GLuint viewLocation;
 
 		Assets assets;
-		ContentPack contentPack;
+		AssetPack contentPack;
 
 		Shader basicShader;
 		GLuint basicShaderProjectionLocation;

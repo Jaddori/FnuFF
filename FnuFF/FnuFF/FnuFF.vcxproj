@@ -151,7 +151,7 @@
     <ClCompile Include="client.cpp" />
     <ClCompile Include="collision_solver.cpp" />
     <ClCompile Include="communicator.cpp" />
-    <ClCompile Include="content_pack.cpp" />
+    <ClCompile Include="asset_pack.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="gbuffer.cpp" />
@@ -188,7 +188,7 @@
     <ClInclude Include="collision_solver.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="communicator.h" />
-    <ClInclude Include="content_pack.h" />
+    <ClInclude Include="asset_pack.h" />
     <ClInclude Include="core_data.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="font.h" />
