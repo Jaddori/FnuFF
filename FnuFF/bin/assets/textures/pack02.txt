@@ -1,6 +1,0 @@
-bricks.tga
-bricks02.tga
-bricks03.tga
-cloud02.tga
-concrete01.tga
-concrete02.tga

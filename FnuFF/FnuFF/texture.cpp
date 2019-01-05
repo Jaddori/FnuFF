@@ -17,22 +17,6 @@ bool Texture::load( const char* path )
 	FILE* file = fopen( path, "rb" );
 	if( file )
 	{
-		/*TargaHeader header;
-		fread( &header, sizeof(header), 1, file );
-
-		width = header.width;
-		height = header.height;
-
-		int bpp = header.bpp / 8;
-		size = width * height * bpp;
-
-		format = GL_BGR;
-		if( bpp == 4 )
-			format = GL_BGRA;
-
-		pixels = new GLbyte[size];
-		fread( pixels, sizeof(GLbyte), size, file );*/
-
 		read( file );
 
 		fclose( file );
@@ -61,6 +45,25 @@ bool Texture::read( FILE* file )
 
 	pixels = new GLbyte[size];
 	fread( pixels, sizeof(GLbyte), size, file );
+
+	// need to flip the image data vertically
+	if( header.yorigin == 0 )
+	{
+		int lineSize = width*bpp;
+		GLbyte* buffer = new GLbyte[lineSize];
+
+		for( int y = 0; y<height / 2; y++ )
+		{
+			GLbyte* top = pixels + y * lineSize;
+			GLbyte* bottom = pixels + ( height - y - 1 ) * lineSize;
+
+			memcpy( buffer, top, lineSize );
+			memcpy( top, bottom, lineSize );
+			memcpy( bottom, buffer, lineSize );
+		}
+
+		delete[] buffer;
+	}
 
 	uploaded = false;
 

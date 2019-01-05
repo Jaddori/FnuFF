@@ -46,7 +46,7 @@ EXPORT void color4f( float r, float g, float b, float a );
 EXPORT void viewMatrix( float px, float py, float pz, float dx, float dy, float dz );
 
 EXPORT uint32_t loadTexture( const char* path );
-EXPORT uint32_t uploadTexture( int width, int height, int bpp, char* pixels );
+EXPORT uint32_t uploadTexture( int width, int height, int bpp, char* pixels, bool flipVertically );
 EXPORT void setTexture( uint32_t id );
 
 EXPORT void pointSize( float size );

@@ -32,7 +32,6 @@ void Graphics::load()
 	texture.upload();
 
 	assets.loadPack( "./assets/textures/pack01.bin" );
-	assets.loadPack( "./assets/textures/pack02.bin" );
 	
 	shader.bind();
 	projectionLocation = shader.getLocation( "projectionMatrix" );

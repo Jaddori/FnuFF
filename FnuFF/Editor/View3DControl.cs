@@ -80,7 +80,6 @@ namespace Editor
 				GL.CreateContext( Handle, Size.Width, Size.Height );
 
 				TextureMap.LoadPack( "./assets/textures/pack01.bin" );
-				TextureMap.LoadPack( "./assets/textures/pack02.bin" );
 			}
 
 			_camera = new Camera3D { HorizontalSensitivity = 0.05f, VerticalSensitivity = 0.05f };

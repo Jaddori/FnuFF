@@ -11,7 +11,7 @@ namespace Editor.Entities
 	{
 		private static Image _icon = Properties.Resources.icon_entity_player_spawn;
 		private static Image _selectedIcon = Properties.Resources.icon_entity_player_spawn_selected;
-		private static UInt32 _icon3D = GL.LoadTexture( "./assets/textures/icon_entity_player_spawn.dds" );
+		private static UInt32 _icon3D = GL.LoadTexture( "./assets/textures/icon_entity_player_spawn.tga" );
 
 		private float _angle;
 

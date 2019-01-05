@@ -180,7 +180,22 @@ EXPORT uint32_t loadTexture( const char* path )
 
 		fclose( file );
 
-		GLenum error = glGetError();
+		// need flip image data vertically
+		if( header.yorigin == 0 )
+		{
+			char* buffer = new char[header.width*bpp];
+			int lineSize = header.width * bpp;
+			for( int y=0; y<header.height / 2; y++ )
+			{
+				GLubyte* top = pixels + y * lineSize;
+				GLubyte* bottom = pixels + ( header.height - y - 1  ) * lineSize;
+
+				memcpy( buffer, top, lineSize );
+				memcpy( top, bottom, lineSize );
+				memcpy( bottom, buffer, lineSize );
+			}
+			delete[] buffer;
+		}
 
 		glGenTextures( 1, &result );
 
@@ -188,8 +203,6 @@ EXPORT uint32_t loadTexture( const char* path )
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, header.width, header.height, 0, format, GL_UNSIGNED_BYTE, pixels );
-
-		error = glGetError();
 
 		glBindTexture( GL_TEXTURE_2D, 0 );
 
@@ -199,13 +212,31 @@ EXPORT uint32_t loadTexture( const char* path )
 	return result;
 }
 
-EXPORT uint32_t uploadTexture( int width, int height, int bpp, char* pixels )
+EXPORT uint32_t uploadTexture( int width, int height, int bpp, char* pixels, bool flipVertically )
 {
 	uint32_t result = 0;
 
 	GLenum format = GL_BGR;
 	if( bpp == 4 )
 		format = GL_BGRA;
+
+	if( flipVertically )
+	{
+		int lineSize = width*bpp;
+		char* buffer = new char[lineSize];
+
+		for( int y=0; y<height/2; y++ )
+		{
+			char* top = pixels + y * lineSize;
+			char* bottom = pixels + ( height - y - 1 ) * lineSize;
+
+			memcpy( buffer, top, lineSize );
+			memcpy( top, bottom, lineSize );
+			memcpy( bottom, buffer, lineSize );
+		}
+
+		delete[] buffer;
+	}
 
 	glGenTextures( 1, &result );
 
