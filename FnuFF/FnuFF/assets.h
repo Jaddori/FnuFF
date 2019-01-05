@@ -4,13 +4,14 @@
 #include "texture.h"
 #include "mesh.h"
 #include "font.h"
+#include "asset_pack.h"
 
 #define ASSETS_PATH_MAX_LEN 128
 #define ASSETS_HOTLOAD_DELAY 1000
 
 namespace Rendering
 {
-	class Assets
+	/*class Assets
 	{
 	public:
 		Assets();
@@ -59,5 +60,27 @@ namespace Rendering
 
 		uint64_t lastHotload;
 #endif
+	};*/
+
+	class Assets
+	{
+	public:
+		Assets();
+		~Assets();
+
+		void unload();
+		void upload();
+
+		void loadPack( const char* path );
+
+		int getTextureIndex( const char* name, int len = 0 );
+
+		const Texture* getTexture( int index ) const;
+
+	private:
+		Array<AssetPack> packs;
+		Array<const Texture*> textures;
+		Array<const char*> textureNames;
+		bool dirtyPacks;
 	};
 }

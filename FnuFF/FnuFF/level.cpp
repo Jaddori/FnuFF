@@ -28,12 +28,19 @@ bool Level::load( const char* filepath )
 		for( int i=0; i<contentPacks; i++ )
 			fseek( file, 64, SEEK_CUR );
 
+		int textureNameCount = 0;
+		fread( &textureNameCount, sizeof(textureNameCount), 1, file );
+
+		name_t* textureNames = new name_t[textureNameCount];
+		for( int i=0; i<textureNameCount; i++ )
+			fread( textureNames[i], 1, ASSET_PACK_NAME_LEN, file );
+
 		solids = new Solid[solidCount];
 		spawnPoints = new SpawnPoint[spawnPointCount];
 
 		for( int i=0; i<solidCount; i++ )
 		{
-			solids[i].read( file, coreData->transientMemory );
+			solids[i].read( coreData->assets, textureNames, file, coreData->transientMemory );
 		}
 
 		for( int i=0; i<spawnPointCount; i++ )
@@ -42,6 +49,8 @@ bool Level::load( const char* filepath )
 		}
 
 		fclose( file );
+
+		delete[] textureNames;
 	}
 
 	return result;

@@ -1,7 +1,7 @@
 #include "assets.h"
 using namespace Rendering;
 
-Assets::Assets()
+/*Assets::Assets()
 	: dirtyTextures( false ), dirtyMeshes( false )
 {
 #if _DEBUG
@@ -205,7 +205,7 @@ uint64_t Assets::hashPath( const char* path )
 	int c;
 
 	while( c = *path++ )
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		hash = ((hash << 5) + hash) + c; // hash * 33 + c
 
 	return hash;
 }
@@ -243,4 +243,74 @@ void Assets::reloadMesh( int index )
 	meshes[index].load( meshPaths[index] );
 	dirtyMeshes = true;
 }
-#endif
+#endif*/
+
+Assets::Assets()
+	: dirtyPacks( false )
+{
+}
+
+Assets::~Assets()
+{
+}
+
+void Assets::unload()
+{
+	const int PACK_COUNT = packs.getSize();
+	for( int i=0; i<PACK_COUNT; i++ )
+		packs[i].unload();
+
+	packs.clear();
+}
+
+void Assets::upload()
+{
+	if( dirtyPacks )
+	{
+		const int PACK_COUNT = packs.getSize();
+		for( int i=0; i<PACK_COUNT; i++ )
+			packs[i].upload();
+
+		dirtyPacks = false;
+	}
+}
+
+void Assets::loadPack( const char* path )
+{
+	AssetPack& pack = packs.append();
+	if( pack.load( path ) )
+	{
+		const int TEXTURE_COUNT = pack.getTextureCount();
+		for( int i=0; i<pack.getTextureCount(); i++ )
+		{
+			textures.add( pack.getTexture( i ) );
+			textureNames.add( pack.getName( i ) );
+		}
+
+		dirtyPacks = true;
+	}
+}
+
+int Assets::getTextureIndex( const char* name, int len )
+{
+	int index = -1;
+
+	if( len <= 0 )
+		len = strlen( name );
+	
+	assert( len < ASSET_PACK_NAME_LEN );
+
+	const int TEXTURE_COUNT = textureNames.getSize();
+	for( int i=0; i<TEXTURE_COUNT && index < 0; i++ )
+		if( strncmp( name, textureNames[i], len ) == 0 )
+			index = i;
+
+	return index;
+}
+
+const Texture* Assets::getTexture( int index ) const
+{
+	assert( index >= 0 && index < textures.getSize() );
+
+	return textures[index];
+}

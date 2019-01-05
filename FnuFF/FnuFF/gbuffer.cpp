@@ -128,12 +128,12 @@ bool Gbuffer::load( Assets* a, int w, int h )
 		result = false;
 	}
 
-	sphereMesh = assets->loadMesh( GBUFFER_SPHERE_MESH_PATH );
+	/*sphereMesh = assets->loadMesh( GBUFFER_SPHERE_MESH_PATH );
 	if( sphereMesh < 0 )
 	{
 		LOG( VERBOSITY_ERROR, "Failed to load sphere mesh for point light pass." );
 		result = false;
-	}
+	}*/
 
 	// BILLBOARD PASS
 	if( billboardPass.load( "./assets/shaders/billboard.vs",
@@ -586,12 +586,12 @@ void Gbuffer::renderPointLight( const PointLight& light )
 	pointLightPass.setMat4( pointLightWorldMatrix, worldMatrix );
 
 	//Mesh* sphere = assets->getMesh( sphereMesh );
-	const Mesh* sphere = assets->getMesh( sphereMesh );
+	/*const Mesh* sphere = assets->getMesh( sphereMesh );
 	if( sphere->getUploaded() )
 	{
 		sphere->bind();
 		sphere->render();
-	}
+	}*/
 }
 
 void Gbuffer::beginBillboardPass( Camera* camera )

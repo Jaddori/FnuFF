@@ -236,6 +236,28 @@ namespace Editor
 					writer.Write( buffer );
 				}
 
+				var textureNames = new List<string>();
+				foreach( var solid in solids )
+				{
+					foreach( var face in solid.Faces )
+					{
+						if( !textureNames.Contains( face.TextureName ) )
+						{
+							textureNames.Add( face.TextureName );
+						}
+					}
+				}
+
+				writer.Write( textureNames.Count );
+				foreach( var name in textureNames )
+				{
+					byte[] buffer = new byte[64];
+					byte[] str = Encoding.Default.GetBytes( name );
+					Array.Copy( str, buffer, str.Length );
+
+					writer.Write( buffer );
+				}
+
 				foreach( var solid in solids )
 				{
 					writer.Write( solid.Faces.Count );
@@ -247,15 +269,12 @@ namespace Editor
 					foreach( var face in solid.Faces )
 					{
 						// write texture information
-						var packIndex = -1;
 						var textureIndex = -1;
-						if( !string.IsNullOrEmpty( face.PackName ) && !string.IsNullOrEmpty( face.TextureName ) )
+						if( !string.IsNullOrEmpty( face.TextureName ) )
 						{
-							packIndex = packNames.IndexOf( face.PackName );
-							textureIndex = TextureMap.GetPack( face.PackName ).GetTextureIndex( face.TextureName );
+							textureIndex = textureNames.IndexOf( face.TextureName );
 						}
-
-						writer.Write( packIndex );
+						
 						writer.Write( textureIndex );
 
 						// write vertex information

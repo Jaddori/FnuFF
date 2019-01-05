@@ -3,8 +3,9 @@
 #include "common.h"
 #include "texture.h"
 
-#define CONTENT_PACK_NAME_LEN 64
-#define TEXTURE_NAME_LEN 64
+#define ASSET_PACK_NAME_LEN 64
+
+typedef char name_t[ASSET_PACK_NAME_LEN];
 
 class AssetPack
 {
@@ -18,12 +19,12 @@ public:
 
 	int getIndex( const char* name );
 
+	int getTextureCount() const;
 	const Rendering::Texture* getTexture( int index ) const;
+	const char* getName( int index ) const;
 
 private:
-	typedef char name_t[TEXTURE_NAME_LEN];
-
-	char name[CONTENT_PACK_NAME_LEN];
+	char name[ASSET_PACK_NAME_LEN];
 	int textureCount;
 	name_t* names;
 	Rendering::Texture* textures;

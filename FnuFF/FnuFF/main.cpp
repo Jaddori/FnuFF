@@ -424,7 +424,7 @@ int main( int argc, char* argv[] )
 
 					// finalize objects
 #if _DEBUG
-					graphics.getAssets()->hotload();
+					//graphics.getAssets()->hotload();
 #endif
 					level.upload();
 					graphics.getAssets()->upload();

@@ -31,8 +31,8 @@ void Graphics::load()
 	texture.load( "./assets/textures/bricks.tga" );
 	texture.upload();
 
-	contentPack.load( "./assets/textures/pack02.bin" );
-	contentPack.upload();
+	assets.loadPack( "./assets/textures/pack01.bin" );
+	assets.loadPack( "./assets/textures/pack02.bin" );
 	
 	shader.bind();
 	projectionLocation = shader.getLocation( "projectionMatrix" );
@@ -133,11 +133,11 @@ void Graphics::load()
 		LOG_ERROR( "Failed to load billboard shader." );
 	}
 
-	int normalIndex = assets.loadTexture( "./assets/textures/normal.dds" );
-	int specularIndex = assets.loadTexture( "./assets/textures/specular.dds" );
+	//int normalIndex = assets.loadTexture( "./assets/textures/normal.dds" );
+	//int specularIndex = assets.loadTexture( "./assets/textures/specular.dds" );
 
-	normalMap = assets.getTexture( normalIndex );
-	specularMap = assets.getTexture( specularIndex );
+	//normalMap = assets.getTexture( normalIndex );
+	//specularMap = assets.getTexture( specularIndex );
 }
 
 void Graphics::finalize()
@@ -176,7 +176,7 @@ void Graphics::finalize()
 	pointLights.getWrite().clear();
 
 	// finalize world matrices
-	const int MESH_COUNT = meshQueue.getSize();
+	/*const int MESH_COUNT = meshQueue.getSize();
 	for( int curMesh = 0; curMesh < MESH_COUNT; curMesh++ )
 	{
 		worldMatrixQueue[curMesh].clear();
@@ -198,7 +198,7 @@ void Graphics::finalize()
 		}
 
 		transforms.clear();
-	}
+	}*/
 
 	// finalize vaos
 	vaoQueue.swap();
@@ -239,7 +239,7 @@ void Graphics::render( float deltaTime )
 	for( int curVao = 0; curVao < VAO_COUNT; curVao++ )
 	{
 		int textureIndex = textureIndices.getRead()[curVao];
-		const Texture* t = contentPack.getTexture( textureIndex );
+		const Texture* t = assets.getTexture( textureIndex );
 		t->bind();
 
 		glBindVertexArray( vaoQueue.getRead()[curVao] );
@@ -254,7 +254,7 @@ void Graphics::renderDeferred( float deltaTime )
 	// GEOMETRY PASS
 	gbuffer.beginGeometryPass( &perspectiveCamera );
 
-	const int MESH_COUNT = meshQueue.getSize();
+	/*const int MESH_COUNT = meshQueue.getSize();
 	for( int curMesh = 0; curMesh < MESH_COUNT; curMesh++ )
 	{
 		int meshIndex = meshQueue[curMesh];
@@ -277,7 +277,7 @@ void Graphics::renderDeferred( float deltaTime )
 
 			glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 		}
-	}
+	}*/
 
 	gbuffer.endGeometryPass();
 
@@ -449,7 +449,7 @@ void Graphics::renderBasic()
 
 	texture.bind();
 
-	const int MESH_COUNT = meshQueue.getSize();
+	/*const int MESH_COUNT = meshQueue.getSize();
 	for( int curMesh = 0; curMesh < MESH_COUNT; curMesh++ )
 	{
 		int meshIndex = meshQueue[curMesh];
@@ -468,7 +468,7 @@ void Graphics::renderBasic()
 
 			glBindBuffer( GL_UNIFORM_BUFFER, 0 );
 		}
-	}
+	}*/
 
 	// render billboards
 	glEnable( GL_BLEND );
@@ -702,7 +702,7 @@ void Graphics::queueQuad( int textureIndex, const glm::vec3& position, const glm
 
 void Graphics::queueText( int fontIndex, const char* text, const glm::vec3& position, const glm::vec4& color )
 {
-	const Font* font = assets.getFont( fontIndex );
+	/*const Font* font = assets.getFont( fontIndex );
 
 	const int GLYPH_COLLECTION_COUNT = glyphCollections.getSize();
 	int collectionIndex = -1;
@@ -760,7 +760,7 @@ void Graphics::queueText( int fontIndex, const char* text, const glm::vec3& posi
 		}
 
 		cur++;
-	}
+	}*/
 }
 
 void Graphics::queueBillboard( int diffuseIndex, int normalIndex, int specularIndex, int maskIndex, const glm::vec3& position, const glm::vec2& size, const glm::vec4& uv, bool spherical, const glm::vec3& scroll )

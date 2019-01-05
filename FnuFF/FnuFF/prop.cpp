@@ -11,7 +11,7 @@ Prop::~Prop()
 
 bool Prop::load( const char* mesh )
 {
-	meshIndex = coreData->assets->loadMesh( mesh );
+	//meshIndex = coreData->assets->loadMesh( mesh );
 
 	return ( meshIndex >= 0 );
 }

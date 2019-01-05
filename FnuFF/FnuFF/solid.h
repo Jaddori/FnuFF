@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "collision_solver.h"
+#include "assets.h"
 
 struct SolidVertex
 {
@@ -13,7 +14,7 @@ struct SolidFace
 {
 	SolidVertex* vertices;
 	int vertexCount;
-	int packIndex, textureIndex;
+	int textureIndex;
 };
 
 class Solid
@@ -24,7 +25,7 @@ public:
 
 	void upload();
 
-	void read( FILE* file, void* transientMemory );
+	void read( Rendering::Assets* assets, const name_t* textureNames, FILE* file, void* transientMemory );
 
 	GLuint getVAO( int faceIndex ) const;
 	int getVertexCount( int faceIndex ) const;

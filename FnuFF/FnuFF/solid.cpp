@@ -1,6 +1,7 @@
 #include "solid.h"
 #include "vertex.h"
 using namespace Physics;
+using namespace Rendering;
 
 Solid::Solid()
 	: planes( NULL ), faceCount( 0 ), vaos( NULL ), vbos( NULL ), faces( NULL )
@@ -11,7 +12,7 @@ Solid::~Solid()
 {
 }
 
-void Solid::read( FILE* file, void* transientMemory )
+void Solid::read( Assets* assets, const name_t* textureNames, FILE* file, void* transientMemory )
 {
 	faceCount = 0;
 	fread( &faceCount, sizeof(faceCount), 1, file );
@@ -29,9 +30,10 @@ void Solid::read( FILE* file, void* transientMemory )
 
 	for( int i=0; i<faceCount; i++ )
 	{
-		int packIndex = 0;
-		fread( &packIndex, sizeof(packIndex), 1, file );
-		fread( &faces[i].textureIndex, sizeof(faces[i].textureIndex), 1, file );
+		int textureIndex = 0;
+		fread( &textureIndex, sizeof(textureIndex), 1, file );
+
+		faces[i].textureIndex = assets->getTextureIndex( textureNames[textureIndex] );
 
 		uint32_t faceVertexCount = 0;
 		fread( &faceVertexCount, sizeof(faceVertexCount), 1, file );

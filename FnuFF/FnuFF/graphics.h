@@ -97,7 +97,6 @@ namespace Rendering
 		GLuint viewLocation;
 
 		Assets assets;
-		AssetPack contentPack;
 
 		Shader basicShader;
 		GLuint basicShaderProjectionLocation;

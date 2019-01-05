@@ -26,7 +26,7 @@ bool AssetPack::load( const char* path )
 		names = new name_t[textureCount];
 		for( int i=0; i<textureCount; i++ )
 		{
-			fread( names[i], 1, TEXTURE_NAME_LEN, file );
+			fread( names[i], 1, ASSET_PACK_NAME_LEN, file );
 		}
 
 		// read textures
@@ -81,9 +81,21 @@ int AssetPack::getIndex( const char* name )
 	return result;
 }
 
+int AssetPack::getTextureCount() const
+{
+	return textureCount;
+}
+
 const Texture* AssetPack::getTexture( int index ) const
 {
 	assert( index >= 0 && index < textureCount );
 
 	return &textures[index];
+}
+
+const char* AssetPack::getName( int index ) const
+{
+	assert( index >= 0 && index < textureCount );
+
+	return names[index];
 }
