@@ -287,7 +287,7 @@
 			// 
 			this.tab_face.Location = new System.Drawing.Point(3, 36);
 			this.tab_face.Name = "tab_face";
-			this.tab_face.Size = new System.Drawing.Size(194, 126);
+			this.tab_face.Size = new System.Drawing.Size(194, 269);
 			this.tab_face.TabIndex = 1;
 			// 
 			// btn_tab_face

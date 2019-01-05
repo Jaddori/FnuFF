@@ -166,8 +166,8 @@ namespace Editor
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 				var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
-				var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x ) ).ToArray();
-
+				var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x, face ) ).ToArray();
+				
 				var shade = 1.0f;
 				if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) < 0 ||
 					face.Plane.Normal.Dot( new Triple( 0, 1, 0 ) ) < 0 ||
@@ -188,9 +188,13 @@ namespace Editor
 					GL.Color4f( shade, alpha );
 				}
 
-				if( face.Hovered )
+				if( face.Hovered || _hovered )
 				{
 					GL.Color4f( 1.0f, 0.5f, 0.5f, alpha );
+				}
+				else if( face.Selected )
+				{
+					GL.Color4f( 0.75f, 0.35f, 0.35f, alpha );
 				}
 
 				GL.BeginTriangles();

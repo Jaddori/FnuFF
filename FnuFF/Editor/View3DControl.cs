@@ -13,6 +13,12 @@ namespace Editor
 {
     public class View3DControl : Control
     {
+		public delegate void GlobalInvalidationHandler();
+		public event GlobalInvalidationHandler OnGlobalInvalidation;
+
+		public delegate void FaceHandler( Face face );
+		public event FaceHandler OnFaceSelected;
+
 		private const float CAMERA_SCROLL_SPEED = 10.0f;
 		private const float CAMERA_FORWARD_SPEED = 5.0f;
 		private const float CAMERA_STRAFE_SPEED = 5.0f;
@@ -33,6 +39,10 @@ namespace Editor
 		private Level _level;
 		private int _frame;
 		private Camera3D _camera;
+		private GeometrySolid _hoveredSolid;
+		private GeometrySolid _selectedSolid;
+		private Face _hoveredFace;
+		private Face _selectedFace;
 
 		private bool _mmbDown;
 		private Point _previousMousePosition;
@@ -150,57 +160,74 @@ namespace Editor
 			if( e.Button == MouseButtons.Middle )
 				_mmbDown = true;
 
-			if( EditorTool.Current == EditorTools.Face )
+			if( EditorTool.Current == EditorTools.Select )
 			{
-				if( e.Button == MouseButtons.Right )
+				if( e.Button == MouseButtons.Left )
 				{
-					var start = GL.Unproject( e.X, Size.Height - e.Y, 0 );
-					var end = GL.Unproject( e.X, Size.Height - e.Y, 1 );
+					GeometrySolid hitSolid;
+					Face hitFace;
 
-					var ray = new Ray( start, end );
-
-					var minLength = float.MaxValue;
-					Face minFace = null;
-
-					foreach( var solid in _level.Solids )
+					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
 					{
-						for( int i = 0; i < solid.Faces.Count; i++ )
+						if( _selectedSolid != null )
+							_selectedSolid.Selected = false;
+
+						hitSolid.Selected = true;
+						_selectedSolid = hitSolid;
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
+					else
+					{
+						if( _selectedSolid != null )
 						{
-							Face face = solid.Faces[i];
-
-							var length = 0.0f;
-							if( ray.Intersect( face.Plane, ref length ) )
-							{
-								if( length < minLength )
-								{
-									// make sure point is behind all other planes of the solid
-									var point = ray.Start + ( ray.Direction * length );
-
-									bool behind = true;
-									for( int j = 0; j < solid.Faces.Count && behind; j++ )
-									{
-										if( j != i )
-										{
-											Face otherFace = solid.Faces[j];
-											if( otherFace.Plane.InFront( point ) )
-												behind = false;
-										}
-									}
-
-									if( behind )
-									{
-										minLength = length;
-										minFace = face;
-									}
-								}
-							}
+							_selectedSolid.Selected = false;
+							_selectedSolid = null;
+							Invalidate();
+							OnGlobalInvalidation?.Invoke();
 						}
 					}
+				}
+			}
+			else if( EditorTool.Current == EditorTools.Face )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					GeometrySolid hitSolid;
+					Face hitFace;
 
-					if( minFace != null )
+					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
 					{
-						minFace.PackName = TextureMap.CurrentPackName;
-						minFace.TextureName = TextureMap.CurrentTextureName;
+						if( _selectedFace != null )
+							_selectedFace.Selected = false;
+
+						hitFace.Selected = true;
+						_selectedFace = hitFace;
+						Invalidate();
+
+						OnFaceSelected?.Invoke( _selectedFace );
+					}
+					else
+					{
+						if( _selectedFace != null )
+						{
+							_selectedFace.Selected = false;
+							_selectedFace = null;
+							Invalidate();
+
+							OnFaceSelected?.Invoke( _selectedFace );
+						}
+					}
+				}
+				else if( e.Button == MouseButtons.Right )
+				{
+					GeometrySolid hitSolid;
+					Face hitFace;
+
+					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
+					{
+						hitFace.PackName = TextureMap.CurrentPackName;
+						hitFace.TextureName = TextureMap.CurrentTextureName;
 						Invalidate();
 					}
 				}
@@ -240,62 +267,55 @@ namespace Editor
 				Invalidate();
 			}
 
-			if( EditorTool.Current == EditorTools.Face )
+			if( EditorTool.Current == EditorTools.Select )
 			{
-				var start = GL.Unproject( e.X, Size.Height - e.Y, 0 );
-				var end = GL.Unproject( e.X, Size.Height - e.Y, 1 );
+				GeometrySolid hitSolid;
+				Face hitFace;
 
-				var ray = new Ray( start, end );
-
-				var minLength = float.MaxValue;
-				Face minFace = null;
-
-				bool prevHovered = false;
-				foreach( var solid in _level.Solids )
+				if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
 				{
-					for( int i = 0; i < solid.Faces.Count; i++ )
+					if( _hoveredSolid != null )
+						_hoveredSolid.Hovered = false;
+
+					hitSolid.Hovered = true;
+					_hoveredSolid = hitSolid;
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
+				else
+				{
+					if( _hoveredSolid != null )
 					{
-						Face face = solid.Faces[i];
-						if( face.Hovered )
-							prevHovered = true;
-						face.Hovered = false;
-
-						var length = 0.0f;
-						if( ray.Intersect( face.Plane, ref length ) )
-						{
-							if( length < minLength )
-							{
-								// make sure point is behind all other planes of the solid
-								var point = ray.Start + ( ray.Direction * length );
-
-								bool behind = true;
-								for( int j = 0; j < solid.Faces.Count && behind; j++ )
-								{
-									if( j != i )
-									{
-										Face otherFace = solid.Faces[j];
-										if( otherFace.Plane.InFront( point ) )
-											behind = false;
-									}
-								}
-
-								if( behind )
-								{
-									minLength = length;
-									minFace = face;
-								}
-							}
-						}
+						_hoveredSolid.Hovered = false;
+						_hoveredSolid = null;
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
 					}
 				}
+			}
+			else if( EditorTool.Current == EditorTools.Face )
+			{
+				GeometrySolid hitSolid;
+				Face hitFace;
 
-				if( minFace != null )
+				if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
 				{
-					minFace.Hovered = true;
+					if( _hoveredFace != null )
+						_hoveredFace.Hovered = false;
+
+					hitFace.Hovered = true;
+					_hoveredFace = hitFace;
 					Invalidate();
 				}
-				else if( prevHovered )
-					Invalidate();
+				else
+				{
+					if( _hoveredFace != null )
+					{
+						_hoveredFace.Hovered = false;
+						_hoveredFace = null;
+						Invalidate();
+					}
+				}
 			}
 
 			_previousMousePosition = e.Location;
@@ -336,6 +356,60 @@ namespace Editor
 		protected override void OnKeyUp( KeyEventArgs e )
 		{
 			base.OnKeyUp( e );
+		}
+
+		private bool IntersectFace( int x, int y, out GeometrySolid hitSolid, out Face hitFace )
+		{
+			var result = false;
+
+			hitSolid = null;
+			hitFace = null;
+
+			var start = GL.Unproject( x, Size.Height - y, 0 );
+			var end = GL.Unproject( x, Size.Height - y, 1 );
+
+			var ray = new Ray( start, end );
+
+			var minLength = float.MaxValue;
+
+			foreach( var solid in _level.Solids )
+			{
+				for( int i = 0; i < solid.Faces.Count; i++ )
+				{
+					Face face = solid.Faces[i];
+
+					var length = 0.0f;
+					if( ray.Intersect( face.Plane, ref length ) )
+					{
+						if( length < minLength )
+						{
+							// make sure point is behind all other planes of the solid
+							var point = ray.Start + ( ray.Direction * length );
+
+							bool behind = true;
+							for( int j = 0; j < solid.Faces.Count && behind; j++ )
+							{
+								if( j != i )
+								{
+									Face otherFace = solid.Faces[j];
+									if( otherFace.Plane.InFront( point ) )
+										behind = false;
+								}
+							}
+
+							if( behind )
+							{
+								minLength = length;
+								hitFace = face;
+								hitSolid = solid;
+								result = true;
+							}
+						}
+					}
+				}
+			}
+
+			return result;
 		}
 	}
 }

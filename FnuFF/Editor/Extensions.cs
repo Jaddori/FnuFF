@@ -296,23 +296,26 @@ namespace Editor
 			yaxis = BASE_AXIS[bestAxis * 3 + 2];
 		}
 
-		public static PointF EmitTextureCoordinates( Triple normal, Triple point )
+		public static PointF EmitTextureCoordinates( Triple normal, Triple point, Face face )
 		{
-			float ns = 0.0f, nt = 0.0f;
-			float sinv = 0.0f, cosv = 1.0f;
-			float s = 0.0f, t = 0.0f;
-
 			Triple xaxis = new Triple();
 			Triple yaxis = new Triple();
 			TextureAxisFromPlane( normal, ref xaxis, ref yaxis );
 
-			s = point.Dot( xaxis );
-			t = point.Dot( yaxis );
-
-			ns = cosv * s - sinv * t;
-			nt = sinv * s + cosv * t;
+			float ang = face.Rotation / 180.0f * (float)Math.PI;
+			float sinv = (float)Math.Sin( ang );
+			float cosv = (float)Math.Cos( ang );
 			
-			return new PointF( ns, nt );
+			float s = point.Dot( xaxis );
+			float t = point.Dot( yaxis );
+
+			float ns = cosv * s - sinv * t;
+			float nt = sinv * s + cosv * t;
+
+			s = ns / face.Scale.X + face.Offset.X;
+			t = nt / face.Scale.Y + face.Offset.Y;
+			
+			return new PointF( s, t );
 		}
 
 		public static Triple[] IntersectPlanes( Plane p0, Plane[] ps )

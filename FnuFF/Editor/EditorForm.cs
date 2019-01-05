@@ -66,6 +66,11 @@ namespace Editor
 			view_topRight.OnGlobalInvalidation += ViewGlobalInvalidation;
 			view_bottomLeft.OnGlobalInvalidation += ViewGlobalInvalidation;
 			view_bottomRight.OnGlobalInvalidation += ViewGlobalInvalidation;
+			view_3d.OnGlobalInvalidation += ViewGlobalInvalidation;
+
+			view_3d.OnFaceSelected += OnFaceSelected;
+
+			tab_face.OnFaceMetricsChanged += OnFaceMetricsChanged;
 		}
 
         private void toolbarButton_Click( object sender, EventArgs e )
@@ -118,6 +123,16 @@ namespace Editor
 			view_topRight.Invalidate();
 			view_bottomLeft.Invalidate();
 			view_bottomRight.Invalidate();
+		}
+
+		private void OnFaceSelected( Face face )
+		{
+			tab_face.SetFace( face );
+		}
+
+		private void OnFaceMetricsChanged()
+		{
+			view_3d.Invalidate();
 		}
 
 		private void loadToolStripMenuItem_Click( object sender, EventArgs e )
@@ -220,7 +235,7 @@ namespace Editor
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 						var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
-						var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x ) ).ToArray();
+						var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x, face ) ).ToArray();
 
 						int indexCount = ( indices.Length - 2 ) * 3;
 						writer.Write( indexCount );
