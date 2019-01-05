@@ -23,6 +23,11 @@ bool Level::load( const char* filepath )
 		fread( &solidCount, sizeof(solidCount), 1, file );
 		fread( &spawnPointCount, sizeof(spawnPointCount), 1, file );
 
+		int contentPacks = 0;
+		fread( &contentPacks, sizeof(contentPacks), 1, file );
+		for( int i=0; i<contentPacks; i++ )
+			fseek( file, 64, SEEK_CUR );
+
 		solids = new Solid[solidCount];
 		spawnPoints = new SpawnPoint[spawnPointCount];
 
@@ -62,9 +67,15 @@ void Level::upload()
 
 void Level::render()
 {
-	for( int i=0; i<solidCount; i++ )
+	for( int curSolid=0; curSolid<solidCount; curSolid++ )
 	{
-		coreData->graphics->queueVao( solids[i].getVAO(), solids[i].getVertexCount() );
+		const Solid& solid = solids[curSolid];
+
+		const int FACE_COUNT = solid.getFaceCount();
+		for( int curFace = 0; curFace < FACE_COUNT; curFace++ )
+		{
+			coreData->graphics->queueVao( solid.getVAO( curFace ), solid.getVertexCount( curFace ), solid.getTextureIndex( curFace ) );
+		}
 	}
 }
 

@@ -222,6 +222,20 @@ namespace Editor
 				writer.Write( solids.Count );
 				writer.Write( entities.Count );
 
+				writer.Write( TextureMap.Packs.Count );
+
+				var packNames = new List<string>();
+				foreach( var pack in TextureMap.Packs.Values )
+				{
+					packNames.Add( pack.Name );
+
+					byte[] buffer = new byte[64];
+					byte[] str = Encoding.Default.GetBytes( pack.Name );
+					Array.Copy( str, buffer, str.Length );
+
+					writer.Write( buffer );
+				}
+
 				foreach( var solid in solids )
 				{
 					writer.Write( solid.Faces.Count );
@@ -232,6 +246,19 @@ namespace Editor
 					
 					foreach( var face in solid.Faces )
 					{
+						// write texture information
+						var packIndex = -1;
+						var textureIndex = -1;
+						if( !string.IsNullOrEmpty( face.PackName ) && !string.IsNullOrEmpty( face.TextureName ) )
+						{
+							packIndex = packNames.IndexOf( face.PackName );
+							textureIndex = TextureMap.GetPack( face.PackName ).GetTextureIndex( face.TextureName );
+						}
+
+						writer.Write( packIndex );
+						writer.Write( textureIndex );
+
+						// write vertex information
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 						var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );

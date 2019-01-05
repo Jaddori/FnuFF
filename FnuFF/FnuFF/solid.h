@@ -7,8 +7,13 @@ struct SolidVertex
 {
 	glm::vec3 position;
 	glm::vec2 uv;
-	//glm::vec3 normal;
-	//glm::vec3 color;
+};
+
+struct SolidFace
+{
+	SolidVertex* vertices;
+	int vertexCount;
+	int packIndex, textureIndex;
 };
 
 class Solid
@@ -21,17 +26,16 @@ public:
 
 	void read( FILE* file, void* transientMemory );
 
-	GLuint getVAO() const;
-	int getVertexCount() const;
+	GLuint getVAO( int faceIndex ) const;
+	int getVertexCount( int faceIndex ) const;
+	int getTextureIndex( int faceIndex ) const;
 	const Physics::Plane* getPlanes() const;
-	int getPlaneCount() const;
+	int getFaceCount() const;
 
 private:
 	Physics::Plane* planes;
-	int planeCount;
-	GLuint vao;
-	GLuint vbo;
-	int vertexCount;
-	//glm::vec3* vertices;
-	SolidVertex* vertices;
+	int faceCount;
+	GLuint* vaos;
+	GLuint* vbos;
+	SolidFace* faces;
 };

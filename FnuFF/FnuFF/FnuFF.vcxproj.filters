@@ -118,6 +118,9 @@
     <ClCompile Include="spawn_point.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="content_pack.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array.h">
@@ -244,6 +247,9 @@
       <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="spawn_point.h">
+      <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="content_pack.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
   </ItemGroup>

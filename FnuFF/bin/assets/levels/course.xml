@@ -24,7 +24,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -47,7 +55,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -70,7 +86,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>concrete01</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -93,7 +117,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -116,7 +148,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -139,7 +179,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 			</Faces>
 		</GeometrySolid>
@@ -166,7 +214,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -189,7 +245,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -212,7 +276,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>concrete02</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>0.5</X>
+						<Y>0.5</Y>
+					</Scale>
+					<Rotation>45</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -235,7 +307,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -258,7 +338,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -281,7 +369,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 			</Faces>
 		</GeometrySolid>
@@ -308,7 +404,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -331,7 +435,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -354,7 +466,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>concrete01</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -377,7 +497,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -400,7 +528,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -423,7 +559,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 			</Faces>
 		</GeometrySolid>
@@ -450,7 +594,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -473,7 +625,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -496,7 +656,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>concrete01</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -519,7 +687,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -542,7 +718,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -565,7 +749,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks02</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 			</Faces>
 		</GeometrySolid>
@@ -592,7 +784,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -615,7 +815,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -638,7 +846,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>concrete01</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -661,7 +877,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -684,7 +908,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -707,7 +939,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 			</Faces>
 		</GeometrySolid>
@@ -734,7 +974,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -757,7 +1005,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -780,7 +1036,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -803,7 +1067,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -826,7 +1098,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -849,7 +1129,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>bricks</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 				<Face>
 					<Plane>
@@ -872,7 +1160,15 @@
 					</V>
 					<PackName>pack02</PackName>
 					<TextureName>concrete01</TextureName>
-					<Hovered>false</Hovered>
+					<Offset>
+						<X>0</X>
+						<Y>0</Y>
+					</Offset>
+					<Scale>
+						<X>1</X>
+						<Y>1</Y>
+					</Scale>
+					<Rotation>0</Rotation>
 				</Face>
 			</Faces>
 		</GeometrySolid>

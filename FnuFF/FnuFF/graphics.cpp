@@ -30,6 +30,9 @@ void Graphics::load()
 	//texture.load( "./assets/textures/bricks.dds" );
 	texture.load( "./assets/textures/bricks.tga" );
 	texture.upload();
+
+	contentPack.load( "./assets/textures/pack02.bin" );
+	contentPack.upload();
 	
 	shader.bind();
 	projectionLocation = shader.getLocation( "projectionMatrix" );
@@ -203,6 +206,9 @@ void Graphics::finalize()
 
 	vaoCountQueue.swap();
 	vaoCountQueue.getWrite().clear();
+
+	textureIndices.swap();
+	textureIndices.getWrite().clear();
 }
 
 void Graphics::render( float deltaTime )
@@ -223,11 +229,19 @@ void Graphics::render( float deltaTime )
 	basicShader.setMat4( basicShaderProjectionLocation, perspectiveCamera.getProjectionMatrix() );
 	basicShader.setMat4( basicShaderViewLocation, perspectiveCamera.getViewMatrix() );
 
-	texture.bind();
+	//texture.bind();
+
+	// TODO: Move this to load function
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	const int VAO_COUNT = vaoQueue.getRead().getSize();
 	for( int curVao = 0; curVao < VAO_COUNT; curVao++ )
 	{
+		int textureIndex = textureIndices.getRead()[curVao];
+		const Texture* t = contentPack.getTexture( textureIndex );
+		t->bind();
+
 		glBindVertexArray( vaoQueue.getRead()[curVao] );
 		glDrawArrays( GL_TRIANGLES, 0, vaoCountQueue.getRead()[curVao] );
 	}
@@ -610,10 +624,11 @@ void Graphics::renderBasic()
 	glDisable( GL_BLEND );
 }
 
-void Graphics::queueVao( GLuint vao, int vertexCount )
+void Graphics::queueVao( GLuint vao, int vertexCount, int textureIndex )
 {
 	vaoQueue.getWrite().add( vao );
 	vaoCountQueue.getWrite().add( vertexCount );
+	textureIndices.getWrite().add( textureIndex );
 }
 
 void Graphics::queueMesh( int meshIndex, Transform* transform )

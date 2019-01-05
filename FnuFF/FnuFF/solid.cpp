@@ -3,6 +3,7 @@
 using namespace Physics;
 
 Solid::Solid()
+	: planes( NULL ), faceCount( 0 ), vaos( NULL ), vbos( NULL ), faces( NULL )
 {
 }
 
@@ -12,100 +13,75 @@ Solid::~Solid()
 
 void Solid::read( FILE* file, void* transientMemory )
 {
-	planeCount = 0;
-	fread( &planeCount, sizeof(planeCount), 1, file );
+	faceCount = 0;
+	fread( &faceCount, sizeof(faceCount), 1, file );
 
-	planes = new Plane[planeCount];
+	planes = new Plane[faceCount];
 
-	for( int i=0; i<planeCount; i++ )
+	for( int i=0; i<faceCount; i++ )
 	{
 		fread( &planes[i], sizeof(planes[i]), 1, file );
 	}
 
-	glm::vec3 x( 1.0f, 0.0f, 0.0f );
-	glm::vec3 y( 0.0f, 1.0f, 0.0f );
-	glm::vec3 z( 0.0f, 0.0f, 1.0f );
+	faces = new SolidFace[faceCount];
+	vaos = new GLuint[faceCount];
+	vbos = new GLuint[faceCount];
 
-	vertexCount = 0;
-	int offset = 0;
-	glm::vec3 color( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
-	color = glm::normalize( color );
-
-	for( int i=0; i<planeCount; i++ )
+	for( int i=0; i<faceCount; i++ )
 	{
+		int packIndex = 0;
+		fread( &packIndex, sizeof(packIndex), 1, file );
+		fread( &faces[i].textureIndex, sizeof(faces[i].textureIndex), 1, file );
+
 		uint32_t faceVertexCount = 0;
 		fread( &faceVertexCount, sizeof(faceVertexCount), 1, file );
 
-		//fread( (void*)((char*)transientMemory + offset), sizeof(glm::vec3), faceVertexCount, file );
-		//offset += sizeof(glm::vec3) * faceVertexCount;
-		//vertexCount += faceVertexCount;
-
-		glm::vec3 faceColor( color.r, color.g, color.b );
-		if( glm::dot( planes[i].normal, x ) < 0 ||
-			glm::dot( planes[i].normal, y ) < 0 ||
-			glm::dot( planes[i].normal, z ) < 0 )
-		{
-			faceColor.r -= 0.25f;
-			faceColor.g -= 0.25f;
-			faceColor.b -= 0.25f;
-		}
-
-		for( int j=0; j<faceVertexCount; j++ )
-		{
-			fread( (void*)((char*)transientMemory + offset), sizeof(glm::vec3), 1, file );
-			offset += sizeof(glm::vec3);
-
-			//fread( (void*)((char*)transientMemory + offset), sizeof(glm::vec2), 1, file );
-			glm::vec2 uv;
-			fread( &uv, sizeof(uv), 1, file );
-			memcpy( (void*)((char*)transientMemory + offset), &uv, sizeof(uv));
-			offset += sizeof(glm::vec2);
-
-			/*memcpy( (void*)((char*)transientMemory + offset), &planes[i].normal, sizeof(glm::vec3) );
-			offset += sizeof(glm::vec3);
-
-			memcpy( (void*)((char*)transientMemory + offset), &faceColor, sizeof(glm::vec3) );
-			offset += sizeof(glm::vec3);*/
-		}
-
-		vertexCount += faceVertexCount;
+		faces[i].vertexCount = faceVertexCount;
+		faces[i].vertices = new SolidVertex[faceVertexCount];
+		fread( faces[i].vertices, sizeof(SolidVertex), faceVertexCount, file );
 	}
-
-	//vertices = new glm::vec3[vertexCount*2];
-	vertices = new SolidVertex[vertexCount];
-	memcpy( vertices, transientMemory, offset );
 }
 
 void Solid::upload()
 {
-	glGenVertexArrays( 1, &vao );
-	glBindVertexArray( vao );
+	glGenVertexArrays( faceCount, vaos );
+	glGenBuffers( faceCount, vbos );
 
-	glEnableVertexAttribArray( 0 );
-	glEnableVertexAttribArray( 1 );
-	//glEnableVertexAttribArray( 2 );
+	for( int i=0; i<faceCount; i++ )
+	{
+		SolidFace& face = faces[i];
 
-	glGenBuffers( 1, &vbo );
-	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-	glBufferData( GL_ARRAY_BUFFER, sizeof(SolidVertex)*vertexCount, vertices, GL_STATIC_DRAW );
+		glBindVertexArray( vaos[i] );
 
-	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), 0 );
-	glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)) );
-	//glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)*2) );
+		glEnableVertexAttribArray( 0 );
+		glEnableVertexAttribArray( 1 );
+
+		glBindBuffer( GL_ARRAY_BUFFER, vbos[i] );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(SolidVertex)*face.vertexCount, face.vertices, GL_STATIC_DRAW );
+
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), 0 );
+		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)) );
+
+		delete[] face.vertices;
+		face.vertices = NULL;
+	}
 
 	glBindVertexArray( 0 );
-
-	delete[] vertices;
 }
 
-GLuint Solid::getVAO() const
+GLuint Solid::getVAO( int faceIndex ) const
 {
-	return vao;
+	return vaos[faceIndex];
 }
 
-int Solid::getVertexCount() const
+int Solid::getVertexCount( int faceIndex ) const
 {
-	return vertexCount;
+	return faces[faceIndex].vertexCount;
+}
+
+int Solid::getTextureIndex( int faceIndex ) const
+{
+	return faces[faceIndex].textureIndex;
 }
 
 const Physics::Plane* Solid::getPlanes() const
@@ -113,7 +89,7 @@ const Physics::Plane* Solid::getPlanes() const
 	return planes;
 }
 
-int Solid::getPlaneCount() const
+int Solid::getFaceCount() const
 {
-	return planeCount;
+	return faceCount;
 }

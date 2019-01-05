@@ -29,9 +29,10 @@ namespace Rendering
 		~Texture();
 
 		bool load( const char* path );
+		bool read( FILE* file );
 		void unload();
 		void upload();
-
+		
 		inline void bind( GLenum target = GL_TEXTURE0 ) const
 		{
 			glActiveTexture( target );

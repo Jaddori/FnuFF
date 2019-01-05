@@ -277,11 +277,11 @@ trace_t Player::lineTrace( const glm::vec3& start, const glm::vec3& end )
 	{
 		const Solid& solid = solids[curSolid];
 		const Plane* planes = solid.getPlanes();
-		const int PLANE_COUNT = solid.getPlaneCount();
+		const int FACE_COUNT = solid.getFaceCount();
 
 		bool startInsideSolid = true;
 		bool endInsideSolid = true;
-		for( int curPlane = 0; curPlane < PLANE_COUNT; curPlane++ )
+		for( int curPlane = 0; curPlane < FACE_COUNT; curPlane++ )
 		{
 			const Plane& plane = planes[curPlane];
 
@@ -306,7 +306,7 @@ trace_t Player::lineTrace( const glm::vec3& start, const glm::vec3& end )
 					if( hit.length > -EPSILON && hit.length < ray.length )
 					{
 						bool behindAll = true;
-						for( int curOtherPlane = 0; curOtherPlane < PLANE_COUNT; curOtherPlane++ )
+						for( int curOtherPlane = 0; curOtherPlane < FACE_COUNT; curOtherPlane++ )
 						{
 							if( curOtherPlane != curPlane )
 							{

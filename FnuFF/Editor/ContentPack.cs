@@ -35,7 +35,7 @@ namespace Editor
 			if( slashIndex < 0 )
 				slashIndex = 0;
 			var dotIndex = filename.LastIndexOf( '.' );
-			_name = filename.Substring( slashIndex+1, dotIndex - slashIndex - 1 );
+			_name = filename.Substring( slashIndex + 1, dotIndex - slashIndex - 1 );
 
 			var stream = new FileStream( filename, FileMode.Open, FileAccess.Read );
 			var reader = new BinaryReader( stream );
@@ -118,6 +118,17 @@ namespace Editor
 
 			if( index >= 0 && index < _targas.Length )
 				result = _ids[index];
+
+			return result;
+		}
+
+		public int GetTextureIndex( string name )
+		{
+			var result = -1;
+
+			for( int i = 0; i < _names.Length && result < 0; i++ )
+				if( _names[i] == name )
+					result = i;
 
 			return result;
 		}

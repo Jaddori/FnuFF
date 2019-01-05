@@ -17,7 +17,7 @@ bool Texture::load( const char* path )
 	FILE* file = fopen( path, "rb" );
 	if( file )
 	{
-		TargaHeader header;
+		/*TargaHeader header;
 		fread( &header, sizeof(header), 1, file );
 
 		width = header.width;
@@ -26,13 +26,14 @@ bool Texture::load( const char* path )
 		int bpp = header.bpp / 8;
 		size = width * height * bpp;
 
-		if( bpp == 3 )
-			format = GL_BGR;
-		else if( bpp == 4 )
+		format = GL_BGR;
+		if( bpp == 4 )
 			format = GL_BGRA;
 
 		pixels = new GLbyte[size];
-		fread( pixels, sizeof(GLbyte), size, file );
+		fread( pixels, sizeof(GLbyte), size, file );*/
+
+		read( file );
 
 		fclose( file );
 
@@ -41,6 +42,29 @@ bool Texture::load( const char* path )
 	}
 
 	return result;
+}
+
+bool Texture::read( FILE* file )
+{
+	TargaHeader header;
+	fread( &header, sizeof(header), 1, file );
+
+	width = header.width;
+	height = header.height;
+
+	int bpp = header.bpp / 8;
+	size = width * height * bpp;
+
+	format = GL_BGR;
+	if( bpp == 4 )
+		format = GL_BGRA;
+
+	pixels = new GLbyte[size];
+	fread( pixels, sizeof(GLbyte), size, file );
+
+	uploaded = false;
+
+	return true;
 }
 
 void Texture::unload()
