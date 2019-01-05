@@ -154,10 +154,8 @@
     <ClCompile Include="asset_pack.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="font.cpp" />
-    <ClCompile Include="gbuffer.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="input.cpp" />
-    <ClCompile Include="instanced_model.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
@@ -166,7 +164,6 @@
     <ClCompile Include="model.cpp" />
     <ClCompile Include="network_message.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="prop.cpp" />
     <ClCompile Include="ray.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -192,10 +189,8 @@
     <ClInclude Include="core_data.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="font.h" />
-    <ClInclude Include="gbuffer.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="input.h" />
-    <ClInclude Include="instanced_model.h" />
     <ClInclude Include="level.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="mesh.h" />
@@ -204,7 +199,6 @@
     <ClInclude Include="network.h" />
     <ClInclude Include="network_message.h" />
     <ClInclude Include="player.h" />
-    <ClInclude Include="prop.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="ray.h" />
     <ClInclude Include="rendering.h" />

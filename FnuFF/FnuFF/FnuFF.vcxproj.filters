@@ -49,13 +49,7 @@
     <ClCompile Include="font.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="gbuffer.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="graphics.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="instanced_model.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="mesh.cpp">
@@ -101,9 +95,6 @@
       <Filter>Source Files\Network</Filter>
     </ClCompile>
     <ClCompile Include="entity.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="prop.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="level.cpp">
@@ -171,13 +162,7 @@
     <ClInclude Include="font.h">
       <Filter>Source Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="gbuffer.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="graphics.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="instanced_model.h">
       <Filter>Source Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="mesh.h">
@@ -232,9 +217,6 @@
       <Filter>Source Files\Network</Filter>
     </ClInclude>
     <ClInclude Include="entity.h">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="prop.h">
       <Filter>Source Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="level.h">

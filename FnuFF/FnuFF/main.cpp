@@ -172,20 +172,8 @@ int update( void* args )
 
 						player.update();
 					}
-
-					if( input.keyPressed( SDL_SCANCODE_G ) )
-					{
-						data->coreData->graphics->getGbuffer()->toggleDebugMode();
-					}
 				}
 				*updateAccumulator = acc;
-			}
-			else
-			{
-				if( input.keyPressed( SDL_SCANCODE_G ) )
-				{
-					data->coreData->graphics->getGbuffer()->toggleDebugMode();
-				}
 			}
 
 			// update subsystems
@@ -426,6 +414,7 @@ int main( int argc, char* argv[] )
 #if _DEBUG
 					//graphics.getAssets()->hotload();
 #endif
+
 					level.upload();
 					graphics.getAssets()->upload();
 					graphics.finalize();

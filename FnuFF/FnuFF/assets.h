@@ -72,15 +72,23 @@ namespace Rendering
 		void upload();
 
 		void loadPack( const char* path );
+		int loadFont( const char* info, const char* texture );
 
 		int getTextureIndex( const char* name, int len = 0 );
 
 		const Texture* getTexture( int index ) const;
+		const Font* getFont( int index ) const;
 
 	private:
+		uint64_t hashPath( const char* path );
+
 		Array<AssetPack> packs;
 		Array<const Texture*> textures;
 		Array<const char*> textureNames;
 		bool dirtyPacks;
+
+		Array<uint64_t> fontHashes;
+		Array<Font> fonts;
+		bool dirtyFonts;
 	};
 }

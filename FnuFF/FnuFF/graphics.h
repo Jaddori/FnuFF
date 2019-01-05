@@ -5,13 +5,12 @@
 #include "shader.h"
 #include "camera.h"
 #include "texture.h"
-#include "instanced_model.h"
 #include "assets.h"
 #include "transform.h"
 #include "font.h"
-#include "gbuffer.h"
 #include "billboard.h"
 #include "asset_pack.h"
+#include "solid.h"
 
 namespace Rendering
 {
@@ -46,8 +45,6 @@ namespace Rendering
 	struct BillboardCollection
 	{
 		const Texture* diffuseMap;
-		const Texture* normalMap;
-		const Texture* specularMap;
 		const Texture* maskMap;
 		Array<Billboard> billboards[2];
 	};
@@ -63,52 +60,28 @@ namespace Rendering
 		void finalize();
 		void render( float deltaTime );
 
-		void queueVao( GLuint vao, int vertexCount, int textureIndex );
-		void queueMesh( int meshIndex, Transform* transform );
+		void queueSolid( const Solid* solid );
 		void queueQuad( int textureIndex, const glm::vec3& position, const glm::vec2& size, const glm::vec2& uvStart, const glm::vec2& uvEnd, const glm::vec4& color );
 		void queueText( int fontIndex, const char* text, const glm::vec3& position, const glm::vec4& color );
-		void queueBillboard( int diffuseIndex, int normalIndex, int specularIndex, int maskIndex, const glm::vec3& position, const glm::vec2& size, const glm::vec4& uv, bool spherical, const glm::vec3& scroll );
-		void queueDirectionalLight( const glm::vec3& direction, const glm::vec3& color, float intensity );
-		void queuePointLight( const glm::vec3& position, const glm::vec3& color, float intensity, float linear, float constant, float exponent );
+		void queueBillboard( int diffuseIndex, int maskIndex, const glm::vec3& position, const glm::vec2& size, const glm::vec4& uv, bool spherical, const glm::vec3& scroll );
 
-		void setLightingEnabled( bool enabled );
-
-		//Camera* getCamera();
 		Camera* getPerspectiveCamera();
 		Camera* getOrthographicCamera();
 		Assets* getAssets();
-		Gbuffer* getGbuffer();
-		bool getLightingEnabled();
 
 	private:
-		void renderDeferred( float deltaTime );
-		void renderForward();
-		void renderBasic();
-
-		Gbuffer gbuffer;
+		void renderSolids();
+		void renderBillboards();
+		void renderQuads();
+		void renderText();
 
 		Camera perspectiveCamera;
-		Shader shader;
-		Texture texture;
-		const Texture* normalMap;
-		const Texture* specularMap;
-
-		GLuint projectionLocation;
-		GLuint viewLocation;
-
 		Assets assets;
 
-		Shader basicShader;
-		GLuint basicShaderProjectionLocation;
-		GLuint basicShaderViewLocation;
-		SwapArray<GLuint> vaoQueue;
-		SwapArray<int> vaoCountQueue;
-		SwapArray<int> textureIndices;
-
-		Array<int> meshQueue;
-		Array<Array<Transform*>> transformQueue;
-		Array<Array<glm::mat4>> worldMatrixQueue;
-		GLuint uniformBuffer;
+		Shader solidShader;
+		GLuint solidShaderProjectionLocation;
+		GLuint solidShaderViewLocation;
+		SwapArray<const Solid*> solidQueue;
 
 		Shader textShader;
 		GLuint textProjectionLocation;
@@ -128,15 +101,13 @@ namespace Rendering
 		GLint billboardProjectionLocation;
 		GLint billboardViewLocation;
 		GLint billboardDeltaTimeLocation;
+		GLint billboardDiffuseLocation;
+		GLint billboardMaskLocation;
 		GLuint billboardVAO;
 		GLuint billboardVBO;
 		Array<BillboardCollection> billboardCollections;
 
-		SwapArray<DirectionalLight> directionalLights;
-		SwapArray<PointLight> pointLights;
-
 		int writeIndex, readIndex;
 		float elapsedTime;
-		bool lightingEnabled;
 	};
 }

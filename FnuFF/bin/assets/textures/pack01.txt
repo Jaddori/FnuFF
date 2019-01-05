@@ -7,3 +7,5 @@ concrete02.tga
 test.tga
 test02.tga
 orientation.tga
+billboard_mask_opaque.tga
+billboard_mask_transparent.tga

@@ -273,6 +273,15 @@ void Assets::upload()
 
 		dirtyPacks = false;
 	}
+
+	if( dirtyFonts )
+	{
+		const int FONT_COUNT = fonts.getSize();
+		for( int i=0; i<FONT_COUNT; i++ )
+			fonts[i].upload();
+
+		dirtyFonts = false;
+	}
 }
 
 void Assets::loadPack( const char* path )
@@ -291,6 +300,27 @@ void Assets::loadPack( const char* path )
 	}
 }
 
+int Assets::loadFont( const char* info, const char* texture )
+{
+	uint64_t hash = hashPath( info );
+	int result = fontHashes.find( hash );
+	if( result < 0 )
+	{
+		Font font;
+		if( font.load( info, texture ) )
+		{
+			result = fonts.getSize();
+
+			fonts.add( font );
+			fontHashes.add( hash );
+
+			dirtyFonts = true;
+		}
+	}
+
+	return result;
+}
+
 int Assets::getTextureIndex( const char* name, int len )
 {
 	int index = -1;
@@ -298,7 +328,7 @@ int Assets::getTextureIndex( const char* name, int len )
 	if( len <= 0 )
 		len = strlen( name );
 	
-	assert( len < ASSET_PACK_NAME_LEN );
+	LOG_ASSERT( len < ASSET_PACK_NAME_LEN, "Name is too long. Max is %d, got %d.", ASSET_PACK_NAME_LEN, len );
 
 	const int TEXTURE_COUNT = textureNames.getSize();
 	for( int i=0; i<TEXTURE_COUNT && index < 0; i++ )
@@ -310,7 +340,26 @@ int Assets::getTextureIndex( const char* name, int len )
 
 const Texture* Assets::getTexture( int index ) const
 {
-	assert( index >= 0 && index < textures.getSize() );
+	LOG_ASSERT( index >= 0 && index < textures.getSize(), "Index %d out of range %d.", index, textures.getSize() );
 
 	return textures[index];
+}
+
+const Font* Assets::getFont( int index ) const
+{
+	LOG_ASSERT( index >= 0 && index < fonts.getSize(), "Index %d out of range %d.",
+		index, fonts.getSize() );
+
+	return &fonts[index];
+}
+
+uint64_t Assets::hashPath( const char* path )
+{
+	uint64_t hash = 5381;
+	int c;
+
+	while( c = *path++ )
+		hash = ((hash << 5) + hash) + c; // hash * 33 + c
+
+	return hash;
 }

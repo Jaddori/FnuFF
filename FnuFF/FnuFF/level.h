@@ -1,7 +1,6 @@
 #pragma once
 
 #include "entity.h"
-#include "prop.h"
 #include "collision_solver.h"
 #include "solid.h"
 #include "spawn_point.h"

@@ -78,13 +78,7 @@ void Level::render()
 {
 	for( int curSolid=0; curSolid<solidCount; curSolid++ )
 	{
-		const Solid& solid = solids[curSolid];
-
-		const int FACE_COUNT = solid.getFaceCount();
-		for( int curFace = 0; curFace < FACE_COUNT; curFace++ )
-		{
-			coreData->graphics->queueVao( solid.getVAO( curFace ), solid.getVertexCount( curFace ), solid.getTextureIndex( curFace ) );
-		}
+		coreData->graphics->queueSolid( solids + curSolid );
 	}
 }
 
