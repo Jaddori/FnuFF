@@ -61,13 +61,13 @@ namespace Editor
 			return result;
 		}
 
-		public bool InFront( Triple point )
+		public bool InFront( Triple point, float margin = 0.0f )
 		{
 			var distanceAlongNormal = point.Dot( _normal );
 			//var dif = Math.Abs( distanceAlongNormal - _d );
 			//return ( dif > -EPSILON );
 
-			var greater = (distanceAlongNormal - EPSILON_MINOR > _d);
+			var greater = (distanceAlongNormal - EPSILON_MINOR + margin > _d);
 			//var greater = ( distanceAlongNormal > _d );
 			return greater;
 		}

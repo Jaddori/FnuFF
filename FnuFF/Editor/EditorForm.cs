@@ -85,7 +85,9 @@ namespace Editor
             button.Selected = true;
 
             EditorTool.Current = (EditorTools)button.Tag;
-			EditorTool.ClearSelection();
+
+			if( EditorTool.Current != EditorTools.Clip )
+				EditorTool.ClearSelection();
 
             Text = "FnuFF Editor - " + EditorTool.Current.ToString();
 

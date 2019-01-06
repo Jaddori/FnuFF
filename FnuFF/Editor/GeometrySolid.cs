@@ -12,6 +12,7 @@ namespace Editor
 {
 	public class GeometrySolid
 	{
+		private const float CLIP_MARGIN = 0.01f;
 		private static Random random = new Random();
 
 		[XmlIgnore]
@@ -113,9 +114,9 @@ namespace Editor
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 
 				var allInFront = true;
-				for( int i = 0; i < points.Length; i++ )
+				for( int i = 0; i < points.Length && ( allInFront || allVerticesBehind ); i++ )
 				{
-					if( !plane.InFront( points[i] ) )
+					if( !plane.InFront( points[i], CLIP_MARGIN ) )
 						allInFront = false;
 					else
 						allVerticesBehind = false;
