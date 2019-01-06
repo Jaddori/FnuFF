@@ -10,6 +10,7 @@
 #define PLAYER_GRAVITY 0.00982f
 #define PLAYER_TERMINAL_VELOCITY -0.175f
 #define PLAYER_MAX_CLIP_PLANES 5
+#define PLAYER_TRACE_MARGIN 0.01f
 
 #define PLAYER_FLOOR_MIN_NORMAL 0.7f
 #define PLAYER_STEP_SIZE 1.5f
@@ -21,6 +22,7 @@ struct trace_t
 	float fraction;
 	glm::vec3 normal;
 	glm::vec3 position;
+	glm::vec3 safePosition;
 	bool startSolid, allSolid;
 };
 
@@ -55,4 +57,7 @@ private:
 
 	// DEBUG:
 	int fontIndex;
+	bool hasStopped;
+	glm::vec3 raydir;
+	bool automove;
 };

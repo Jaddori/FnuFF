@@ -5,7 +5,7 @@ using namespace Physics;
 #define MAX_COLLISION_PLANES 5
 
 Player::Player()
-	: level( NULL ), fontIndex( -1 )
+	: level( NULL ), fontIndex( -1 ), hasStopped( false ), automove( false )
 {
 	position.y = 0.5f;
 	position.z = 3.0f;
@@ -31,6 +31,13 @@ void Player::update()
 	Camera* camera = coreData->graphics->getPerspectiveCamera();
 	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
 
+	// DEBUG:
+	if( position.y < 0 )
+	{
+		position.y = 0.0f;
+		velocity.y = 0.0f;
+	}
+
 	categorizePosition();
 }
 
@@ -48,6 +55,11 @@ void Player::move()
 		localMovement.x += 1.0f;
 	if( input.keyDown( SDL_SCANCODE_A ) )
 		localMovement.x -= 1.0f;
+	if( input.keyReleased( SDL_SCANCODE_M ) )
+		automove = !automove;
+
+	if( automove )
+		localMovement.z = 1.0f;
 
 	glm::vec3 direction = camera->getDirection();
 	glm::vec3 globalMovement;
@@ -100,7 +112,15 @@ void Player::move()
 	if( ( flags & PLAYER_FLAG_ON_GROUND ) && velocity.y < 0.0f )
 		velocity.y = 0.0f;
 
+	raydir = glm::normalize( velocity );
+
 	trace_t trace = lineTrace( position, position + velocity );
+
+	if( trace.fraction == -0.0f )
+	{
+		hasStopped = true;
+	}
+
 	if( trace.fraction >= 1.0f )
 	{
 		position = trace.position;
@@ -112,11 +132,10 @@ void Player::move()
 
 	slideMove();
 
+	return;
+
 	glm::vec3 down = position;
 	glm::vec3 downVelocity = velocity;
-
-	//originalPosition = position;
-	//originalVelocity = velocity;
 
 	position = originalPosition;
 	velocity = originalVelocity;
@@ -168,12 +187,6 @@ void Player::move()
 		else
 			velocity.y = downVelocity.y;
 	}
-
-	/*if( position.y < 0 )
-	{
-		position.y = 0.0f;
-		velocity.y = 0.0f;
-	}*/
 }
 
 void Player::slideMove()
@@ -186,16 +199,12 @@ void Player::slideMove()
 	glm::vec3 primalVelocity = velocity;
 	for( int bumpcount = 0; bumpcount < 4; bumpcount++ )
 	{
-		//if( ( flags & PLAYER_FLAG_ON_GROUND ) && velocity.y < 0.0f )
-			//velocity.y = 0.0f;
-
 		if( fabs( velocity.x ) < EPSILON && fabs( velocity.y ) < EPSILON && fabs( velocity.z ) < EPSILON )
 			break;
 
 		glm::vec3 nextPosition = position + velocity * timeLeft;
 
 		trace_t trace = lineTrace( position, nextPosition );
-
 		if( trace.startSolid || trace.allSolid )
 		{
 			velocity = glm::vec3( 0.0f );
@@ -204,7 +213,7 @@ void Player::slideMove()
 
 		if( trace.fraction > 0 )
 		{
-			position = trace.position;
+			position = trace.safePosition;
 			numplanes = 0;
 		}
 
@@ -219,7 +228,7 @@ void Player::slideMove()
 		bool validDirection = false;
 		for( int i=0; i<numplanes && !validDirection; i++ )
 		{
-			velocity = clipVelocity( velocity, planes[i], 1.01f );
+			velocity = clipVelocity( velocity, planes[i], 1.1f );
 
 			validDirection = true;
 			for( int j=0; j<numplanes && validDirection; j++ )
@@ -247,11 +256,11 @@ void Player::slideMove()
 			}
 		}
 
-		/*if( glm::dot( velocity, primalVelocity ) <= 0.0f )
+		if( glm::dot( velocity, primalVelocity ) <= 0.0f )
 		{
-		velocity = glm::vec3( 0.0f );
-		break;
-		}*/
+			velocity = glm::vec3( 0.0f );
+			break;
+		}
 	}
 }
 
@@ -260,6 +269,7 @@ trace_t Player::lineTrace( const glm::vec3& start, const glm::vec3& end )
 	trace_t result;
 	result.fraction = 1.0f;
 	result.position = end;
+	result.safePosition = end;
 	result.startSolid = false;
 	
 	bool endSolid = false;
@@ -303,7 +313,7 @@ trace_t Player::lineTrace( const glm::vec3& start, const glm::vec3& end )
 					endInsideSolid = false;
 			}
 
-			if( glm::dot( plane.normal, ray.direction ) < 0 )
+			//if( glm::dot( plane.normal, ray.direction ) < 0 )
 			{
 				if( solver.ray( ray, plane, PLAYER_SIZE, &hit ) )
 				{
@@ -332,6 +342,7 @@ trace_t Player::lineTrace( const glm::vec3& start, const glm::vec3& end )
 									result.fraction = 1.0f;
 								result.position = hit.position;
 								result.normal = plane.normal;
+								result.safePosition = ray.start + ray.direction * ( hit.length - PLAYER_TRACE_MARGIN );
 							}
 						}
 					}
@@ -387,11 +398,14 @@ void Player::render()
 
 	char buffer[1024] = {};
 
-	_snprintf( buffer, 1024, "Position: (%f, %f, %f)\n", position.x, position.y, position.z );
+	_snprintf( buffer, 1024, "Position: (%f, %f, %f)", position.x, position.y, position.z );
 	coreData->graphics->queueText( fontIndex, buffer, glm::vec3( 32, 32, 0 ), glm::vec4( 1.0f ) );
 
-	_snprintf( buffer, 1024, "On ground: %d\n", ( flags & PLAYER_FLAG_ON_GROUND ) );
+	_snprintf( buffer, 1024, "On ground: %d", ( flags & PLAYER_FLAG_ON_GROUND ) );
 	coreData->graphics->queueText( fontIndex, buffer, glm::vec3( 32, 48, 0 ), glm::vec4( 1.0f ) );
+
+	_snprintf( buffer, 1024, "Velocity: (%f, %f, %f)", velocity.x, velocity.y, velocity.z );
+	coreData->graphics->queueText( fontIndex, buffer, glm::vec3( 32, 64, 0 ), glm::vec4( 1.0f ) );
 }
 
 void Player::setLevel( Level* lvl )
