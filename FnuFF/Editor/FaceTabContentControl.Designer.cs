@@ -229,10 +229,15 @@
             0});
 			this.num_rotation.Location = new System.Drawing.Point(6, 216);
 			this.num_rotation.Maximum = new decimal(new int[] {
-            360,
+            361,
             0,
             0,
             0});
+			this.num_rotation.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            -2147483648});
 			this.num_rotation.Name = "num_rotation";
 			this.num_rotation.Size = new System.Drawing.Size(149, 20);
 			this.num_rotation.TabIndex = 11;

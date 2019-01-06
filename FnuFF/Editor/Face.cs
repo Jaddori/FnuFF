@@ -18,15 +18,51 @@ namespace Editor
 		private PointF _offset;
 		private PointF _scale;
 		private float _rotation;
+
+		private List<Triple> _vertices;
+		private List<PointF> _uvs;
 		private bool _hovered;
 		private bool _selected;
 
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public string PackName { get { return _packName; } set { _packName = value; } }
 		public string TextureName { get { return _textureName; } set { _textureName = value; } }
-		public PointF Offset { get { return _offset; } set { _offset = value; } }
-		public PointF Scale { get { return _scale; } set { _scale = value; } }
-		public float Rotation { get { return _rotation; } set { _rotation = value; } }
+
+		public PointF Offset
+		{
+			get { return _offset; }
+			set
+			{
+				_offset = value;
+				UpdateUVs();
+			}
+		}
+
+		public PointF Scale
+		{
+			get { return _scale; }
+			set
+			{
+				_scale = value;
+				UpdateUVs();
+			}
+		}
+
+		public float Rotation
+		{
+			get { return _rotation; }
+			set
+			{
+				_rotation = value;
+				UpdateUVs();
+			}
+		}
+
+		[XmlIgnore]
+		public List<Triple> Vertices => _vertices;
+
+		[XmlIgnore]
+		public List<PointF> UVs => _uvs;
 
 		[XmlIgnore]
 		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
@@ -39,6 +75,8 @@ namespace Editor
 			_plane = new Plane();
 			_offset = new PointF( 0.0f, 0.0f );
 			_scale = new PointF( 1.0f, 1.0f );
+			_vertices = new List<Triple>();
+			_uvs = new List<PointF>();
 			_rotation = 0.0f;
 			_hovered = false;
 		}
@@ -53,13 +91,27 @@ namespace Editor
 			_plane = new Plane( normal, d );
 			_offset = offset;
 			_scale = scale;
+			_vertices = new List<Triple>();
+			_uvs = new List<PointF>();
 			_rotation = rotation;
 			_hovered = false;
 		}
 
 		public Face Copy()
 		{
-			return new Face( _plane.Normal, _plane.D, _offset, _scale, _rotation ) { PackName = _packName, TextureName = _textureName };
+			var result = new Face( _plane.Normal, _plane.D, _offset, _scale, _rotation )
+			{
+				PackName = _packName,
+				TextureName = _textureName
+			};
+
+			foreach( var vertex in _vertices )
+				result._vertices.Add( vertex );
+
+			foreach( var uv in _uvs )
+				result._uvs.Add( uv );
+
+			return result;
 		}
 
 		public override bool Equals( object obj )
@@ -81,6 +133,50 @@ namespace Editor
 			}
 
 			return result;
+		}
+
+		public void BuildVertices( GeometrySolid parent )
+		{
+			_vertices.Clear();
+
+			var otherPlanes = parent.Faces.Where( x => x != this ).Select( x => x.Plane ).ToArray();
+			var points = Extensions.IntersectPlanes( _plane, otherPlanes );
+			var indices = Extensions.WindingIndex3D( points, _plane.Normal );
+			var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( _plane.Normal, x, this ) ).ToArray();
+
+			foreach( var index in indices )
+			{
+				_vertices.Add( points[index] );
+				_uvs.Add( texCoords[index] );
+			}
+		}
+
+		public void UpdateUVs()
+		{
+			if( _vertices.Count > 0 )
+			{
+				_uvs.Clear();
+
+				var texCoords = _vertices.Select( x => Extensions.EmitTextureCoordinates( _plane.Normal, x, this ) ).ToArray();
+				_uvs.AddRange( texCoords );
+			}
+		}
+
+		public void BuildPlane()
+		{
+			var v1v0 = _vertices[1] - _vertices[0];
+			var v2v0 = _vertices[2] - _vertices[0];
+
+			var normal = v2v0.Cross( v1v0 );
+			normal.Normalize();
+
+			var d = _vertices[0].Dot( normal );
+
+			if( _plane.Normal.Dot( normal ) < 0 )
+				normal *= -1;
+
+			_plane.Normal = normal;
+			_plane.D = d;
 		}
 	}
 }

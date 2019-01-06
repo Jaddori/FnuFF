@@ -232,11 +232,11 @@ namespace Editor
 		{
 			base.OnCreateControl();
 
-			if(_directionType == 1 )
+			/*if(_directionType == 1 )
 				_camera.Position = new PointF( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.25f) );
 			else
 				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
-
+				*/
 			EditorTool.OnHoveredSolidChanged += (prev, cur) => Invalidate();
 			EditorTool.OnSelectedSolidChanged += ( prev, cur ) => Invalidate();
 			EditorTool.OnSelectedEntityChanged += ( prev, cur ) => Invalidate();
@@ -516,8 +516,9 @@ namespace Editor
 							if( bounds.Contains( e.X, e.Y ) )
 							{
 								_movingSolid = true;
+								
+								_solidPosition = _camera.ToGlobal( bounds.TopLeft() );
 								_solidOffset = new PointF( e.X - bounds.Left, e.Y - bounds.Top );
-								_solidPosition = bounds.TopLeft();
 
 								_commandSolidChanged = new CommandSolidChanged( selectedSolid );
 								_commandSolidChanged.Begin();
@@ -795,7 +796,7 @@ namespace Editor
 			}
 			else if( _movingSolid )
 			{
-				var localSnap = SnapToGrid( e.Location );
+				/*var localSnap = SnapToGrid( e.Location );
 				_hoverPosition = localSnap;
 				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ) );
 				
@@ -812,7 +813,23 @@ namespace Editor
 					faces[i].Plane.D = d;
 				}
 
-				Invalidate();
+				Invalidate();*/
+
+				var movePosition = new PointF( e.X - _solidOffset.X, e.Y - _solidOffset.Y );
+				var localSnap = SnapToGrid( movePosition );
+				var globalSnap = _camera.ToGlobal( localSnap );
+
+				if( globalSnap != _solidPosition )
+				{
+					var localMovement = new PointF( globalSnap.X - _solidPosition.X, globalSnap.Y - _solidPosition.Y );
+					var unprojectedMovement = _camera.Unproject( localMovement.Deflate( _gridGap ).Inflate( _gridSize ) );
+
+					var selectedSolid = EditorTool.SelectedSolid;
+					selectedSolid.Move( unprojectedMovement );
+
+					_solidPosition = globalSnap;
+					Invalidate();
+				}
 			}
 			else if( _movingEntity )
 			{

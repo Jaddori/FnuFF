@@ -99,6 +99,9 @@ namespace Editor
 			back.Plane.D = max.Dot( back.Plane.Normal );
 
 			_faces.AddRange( new[] { left, right, top, bottom, front, back } );
+
+			foreach( var face in _faces )
+				face.BuildVertices( this );
 		}
 
 		public bool Clip( Plane plane )
@@ -139,10 +142,27 @@ namespace Editor
 				var newFace = new Face( plane.Normal, plane.D );
 				_faces.Add( newFace );
 
+				// rebuild vertices
+				foreach( var face in _faces )
+					face.BuildVertices( this );
+
 				didClip = true;
 			}
 
 			return didClip;
+		}
+
+		public void Move( Triple movement )
+		{
+			foreach( var face in _faces )
+			{
+				for( int i = 0; i < face.Vertices.Count; i++ )
+				{
+					face.Vertices[i] += movement;
+				}
+
+				face.BuildPlane();
+			}
 		}
 
 		public void Paint3D()
@@ -164,11 +184,6 @@ namespace Editor
 				//if( cur != 4 )
 				//	continue;
 
-				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-				var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
-				var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x, face ) ).ToArray();
-				
 				var shade = 1.0f;
 				if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) < 0 ||
 					face.Plane.Normal.Dot( new Triple( 0, 1, 0 ) ) < 0 ||
@@ -200,19 +215,16 @@ namespace Editor
 
 				GL.BeginTriangles();
 
-				var v0 = points[indices[0]];
-				var uv0 = texCoords[indices[0]];
+				var v0 = face.Vertices[0];
+				var uv0 = face.UVs[0];
 
-				for( int j = 1; j < indices.Length - 1; j++ )
+				for( int i = 1; i < face.Vertices.Count - 1; i++ )
 				{
-					var i1 = indices[j];
-					var i2 = indices[j + 1];
+					var v1 = face.Vertices[i];
+					var v2 = face.Vertices[i + 1];
 
-					var v1 = points[i1];
-					var v2 = points[i2];
-
-					var uv1 = texCoords[i1];
-					var uv2 = texCoords[i2];
+					var uv1 = face.UVs[i];
+					var uv2 = face.UVs[i+1];
 
 					var v1v0 = v0 - v1;
 					var v2v0 = v0 - v2;
@@ -231,8 +243,7 @@ namespace Editor
 						uv2 = uv1;
 						uv1 = tempUV;
 					}
-
-					//GL.Color4f( rr, gg, bb, alpha );
+					
 					GL.TexCoord2f( uv0.X, uv0.Y );
 					GL.Vertex3f( v0.X, v0.Y, v0.Z );
 

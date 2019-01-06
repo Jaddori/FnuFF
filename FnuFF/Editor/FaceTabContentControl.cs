@@ -152,6 +152,11 @@ namespace Editor
 			if( _silent )
 				return;
 
+			if( num_rotation.Value < 0 )
+				num_rotation.Value = 360;
+			else if( num_rotation.Value > 360 )
+				num_rotation.Value = 0;
+
 			if( _face != null )
 			{
 				_face.Rotation = GetRotation();
