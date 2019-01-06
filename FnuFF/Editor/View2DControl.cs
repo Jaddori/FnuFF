@@ -75,6 +75,7 @@ namespace Editor
 		private PointF _entityPosition;
 		private PointF _solidPosition;
 		private PointF _solidOffset;
+		private PointF _handlePosition;
 
 		private PointF _previousMousePosition;
 		
@@ -232,11 +233,11 @@ namespace Editor
 		{
 			base.OnCreateControl();
 
-			/*if(_directionType == 1 )
+			if(_directionType == 1 )
 				_camera.Position = new PointF( (int)(Size.Width * -0.25f), (int)(Size.Height * -0.25f) );
 			else
 				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
-				*/
+
 			EditorTool.OnHoveredSolidChanged += (prev, cur) => Invalidate();
 			EditorTool.OnSelectedSolidChanged += ( prev, cur ) => Invalidate();
 			EditorTool.OnSelectedEntityChanged += ( prev, cur ) => Invalidate();
@@ -507,6 +508,8 @@ namespace Editor
 							if( handles[i].Contains( e.Location ) )
 							{
 								_handleIndex = i;
+
+								_handlePosition = SnapToGrid( e.Location );
 							}
 						}
 
@@ -745,76 +748,62 @@ namespace Editor
 				var localSnap = SnapToGrid( e.Location );
 				_hoverPosition = localSnap;
 
-				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ) );
-
-				var localDirection = new PointF( 0, 0 );
-
-				/*if( _handleIndex % 3 == 0 )
-					localDirection.X = -1.0f;
-				else if( ( _handleIndex + 1 ) % 3 == 0 )
-					localDirection.X = 1.0f;
-
-				if( _handleIndex / 3 == 0 )
-					localDirection.Y = -1.0f;
-				else if( _handleIndex / 3 == 2 )
-					localDirection.Y = 1.0f;*/
-
-				var index = _handleIndex;
-				if( index > 3 )
-					index++;
-
-				if( index % 3 == 0 )
-					localDirection.X = -1.0f;
-				else if( ( index + 1 ) % 3 == 0 )
-					localDirection.X = 1.0f;
-
-				if( index / 3 == 0 )
-					localDirection.Y = -1.0f;
-				else if( index / 3 == 2 )
-					localDirection.Y = 1.0f;
-
-				var globalDirection = _camera.Unproject( localDirection );
-
-				var faceChanged = false;
-				var selectedSolid = EditorTool.SelectedSolid;
-				var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
-				for( int i = 0; i < faces.Length; i++ )
+				if( localSnap != _handlePosition )
 				{
-					var d = globalSnap.Dot( faces[i].Plane.Normal );
-					if( faces[i].Plane.D != d )
+					var dif = new PointF( localSnap.X - _handlePosition.X, localSnap.Y - _handlePosition.Y );
+					dif = dif.Deflate( _gridGap ).Inflate( _gridSize );
+
+					if( !dif.IsEmpty )
 					{
-						faces[i].Plane.D = globalSnap.Dot( faces[i].Plane.Normal );
-						faceChanged = true;
-					}
-				}
+						var localDirection = new PointF( 0, 0 );
 
-				if( faceChanged )
-				{
-					Invalidate();
-					OnGlobalInvalidation?.Invoke();
+						var index = _handleIndex;
+						if( index > 3 )
+							index++;
+
+						if( index % 3 == 0 )
+							localDirection.X = -1.0f;
+						else if( ( index + 1 ) % 3 == 0 )
+							localDirection.X = 1.0f;
+
+						if( index / 3 == 0 )
+							localDirection.Y = -1.0f;
+						else if( index / 3 == 2 )
+							localDirection.Y = 1.0f;
+
+						var unprojectedDirection = _camera.Unproject( localDirection );
+						var unprojectedDif = _camera.Unproject( dif ) * unprojectedDirection.Absolute();
+
+						if( !unprojectedDif.IsEmpty )
+						{
+							var selectedSolid = EditorTool.SelectedSolid;
+							var affectedFaces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( unprojectedDirection ) > 0.0f ).ToArray();
+
+							foreach( var face in affectedFaces )
+							{
+								var scale = face.Plane.Normal.Dot( unprojectedDirection );
+
+								for( int i = 0; i < face.Vertices.Count; i++ )
+									face.Vertices[i] += unprojectedDif * scale;
+
+								face.BuildPlane();
+							}
+
+							var allFaces = selectedSolid.Faces;
+							foreach( var face in allFaces )
+							{
+								face.BuildVertices( selectedSolid );
+							}
+
+							_handlePosition = localSnap;
+
+							Invalidate();
+						}
+					}
 				}
 			}
 			else if( _movingSolid )
 			{
-				/*var localSnap = SnapToGrid( e.Location );
-				_hoverPosition = localSnap;
-				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ) );
-				
-				var selectedSolid = EditorTool.SelectedSolid;
-
-				var dir = new PointF( e.X - _solidPosition.X, e.Y - _solidPosition.Y );
-
-				var globalDirection = _camera.Unproject( dir );
-
-				var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
-				for( int i = 0; i < faces.Length; i++ )
-				{
-					var d = globalSnap.Dot( faces[i].Plane.Normal );
-					faces[i].Plane.D = d;
-				}
-
-				Invalidate();*/
-
 				var movePosition = new PointF( e.X - _solidOffset.X, e.Y - _solidOffset.Y );
 				var localSnap = SnapToGrid( movePosition );
 				var globalSnap = _camera.ToGlobal( localSnap );

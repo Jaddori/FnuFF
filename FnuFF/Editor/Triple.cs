@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace Editor
 {
@@ -23,6 +24,9 @@ namespace Editor
 		public float X { get; set; }
 		public float Y { get; set; }
 		public float Z { get; set; }
+
+		[XmlIgnore]
+		public bool IsEmpty { get { return Math.Abs( X ) > EPSILON && Math.Abs( Y ) > EPSILON && Math.Abs( Z ) > EPSILON; } }
 
 		public Triple( float x, float y, float z )
 		{
@@ -175,6 +179,11 @@ namespace Editor
 			X /= value;
 			Y /= value;
 			Z /= value;
+		}
+
+		public Triple Absolute()
+		{
+			return new Triple( Math.Abs( X ), Math.Abs( Y ), Math.Abs( Z ) );
 		}
 
         public override bool Equals( object obj )
