@@ -5,7 +5,7 @@ using namespace Physics;
 #define MAX_COLLISION_PLANES 5
 
 Player::Player()
-	: level( NULL ), fontIndex( -1 ), hasStopped( false ), automove( false )
+	: level( NULL ), fontIndex( -1 )
 {
 	position.y = 0.5f;
 	position.z = 3.0f;
@@ -55,11 +55,6 @@ void Player::move()
 		localMovement.x += 1.0f;
 	if( input.keyDown( SDL_SCANCODE_A ) )
 		localMovement.x -= 1.0f;
-	if( input.keyReleased( SDL_SCANCODE_M ) )
-		automove = !automove;
-
-	if( automove )
-		localMovement.z = 1.0f;
 
 	glm::vec3 direction = camera->getDirection();
 	glm::vec3 globalMovement;
@@ -87,7 +82,8 @@ void Player::move()
 
 	if( input.keyPressed( SDL_SCANCODE_SPACE ) )
 	{
-		globalMovement.y = 0.2f;
+		if( ( flags & PLAYER_FLAG_ON_GROUND ) )
+			globalMovement.y = 0.2f;
 	}
 	else
 	{
@@ -112,18 +108,10 @@ void Player::move()
 	if( ( flags & PLAYER_FLAG_ON_GROUND ) && velocity.y < 0.0f )
 		velocity.y = 0.0f;
 
-	raydir = glm::normalize( velocity );
-
 	trace_t trace = lineTrace( position, position + velocity );
-
-	if( trace.fraction == -0.0f )
-	{
-		hasStopped = true;
-	}
-
 	if( trace.fraction >= 1.0f )
 	{
-		position = trace.position;
+		position = trace.safePosition;
 		return;
 	}
 
@@ -131,8 +119,6 @@ void Player::move()
 	glm::vec3 originalVelocity = velocity;
 
 	slideMove();
-
-	return;
 
 	glm::vec3 down = position;
 	glm::vec3 downVelocity = velocity;
@@ -147,7 +133,7 @@ void Player::move()
 	//if( trace.fraction > 0.0f )
 	if( !trace.startSolid && !trace.allSolid )
 	{
-		position = trace.position;
+		position = trace.safePosition;
 	}
 
 	slideMove();
@@ -166,7 +152,7 @@ void Player::move()
 		//if( trace.fraction > 0.0f )
 		if( !trace.startSolid && !trace.allSolid )
 		{
-			position = trace.position;
+			position = trace.safePosition;
 		}
 
 		glm::vec3 up = position;
@@ -365,12 +351,22 @@ void Player::categorizePosition()
 {
 	flags = 0;
 
-	glm::vec3 below = position - glm::vec3( 0.0f, 0.0125f, 0.0f );
-
-	trace_t trace = lineTrace( position, below );
-	if( trace.startSolid || (trace.fraction < 1.0f && trace.normal.y > PLAYER_FLOOR_MIN_NORMAL) )
+	if( velocity.y > 0.05f )
 	{
-		flags |= PLAYER_FLAG_ON_GROUND;
+		// going up
+	}
+	else
+	{
+		glm::vec3 below = position - glm::vec3( 0.0f, 0.125f, 0.0f );
+
+		trace_t trace = lineTrace( position, below );
+		if( trace.startSolid || (trace.fraction < 1.0f && trace.normal.y > PLAYER_FLOOR_MIN_NORMAL) )
+		{
+			flags |= PLAYER_FLAG_ON_GROUND;
+			groundNormal = trace.normal;
+
+			position = trace.safePosition;
+		}
 	}
 }
 

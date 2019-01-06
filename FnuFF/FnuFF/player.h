@@ -13,7 +13,7 @@
 #define PLAYER_TRACE_MARGIN 0.01f
 
 #define PLAYER_FLOOR_MIN_NORMAL 0.7f
-#define PLAYER_STEP_SIZE 1.5f
+#define PLAYER_STEP_SIZE 0.25f
 
 #define PLAYER_FLAG_ON_GROUND 0x1
 
@@ -51,13 +51,11 @@ private:
 	glm::vec3 velocity;
 	glm::vec3 position;
 	int flags;
+	glm::vec3 groundNormal;
 
 	DebugLine rayLine;
 	DebugSphere rayHit;
 
 	// DEBUG:
 	int fontIndex;
-	bool hasStopped;
-	glm::vec3 raydir;
-	bool automove;
 };
