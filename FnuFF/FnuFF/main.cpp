@@ -96,12 +96,12 @@ int update( void* args )
 	Level& level = *data->coreData->level;
 	//level.load( "./assets/levels/arena.lvl" );
 	//level.load( "./assets/levels/vertical_slope_test.lvl" );
-	//level.load( "./assets/levels/slope_test02.lvl" );
+	level.load( "./assets/levels/slope_test.lvl" );
 	//level.load( "./assets/levels/collision_test.lvl" );
 	//level.load( "./assets/levels/window_test.lvl" );
 	//level.load( "./assets/levels/platform.lvl" );
 	//level.load( "./assets/levels/stepsize_test.lvl" );
-	level.load( "./assets/levels/course.lvl" );
+	//level.load( "./assets/levels/course.lvl" );
 
 	Ray ray;
 	Triangle triangle;

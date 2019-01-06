@@ -113,7 +113,7 @@ namespace Editor
 				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 
 				var allInFront = true;
-				for( int i = 0; i < points.Length && allInFront; i++ )
+				for( int i = 0; i < points.Length; i++ )
 				{
 					if( !plane.InFront( points[i] ) )
 						allInFront = false;
