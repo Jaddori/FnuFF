@@ -5,7 +5,7 @@ using namespace Physics;
 #define MAX_COLLISION_PLANES 5
 
 Player::Player()
-	: level( NULL )
+	: level( NULL ), fontIndex( -1 )
 {
 	position.y = 0.5f;
 	position.z = 3.0f;
@@ -13,6 +13,13 @@ Player::Player()
 
 Player::~Player()
 {
+}
+
+void Player::load()
+{
+	fontIndex = coreData->assets->loadFont( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.tga" );
+
+	LOG_ASSERT( fontIndex >= 0, "Failed to load font for player debug information." );
 }
 
 void Player::update()
@@ -25,9 +32,6 @@ void Player::update()
 	camera->setPosition( position + glm::vec3( 0, 1.0f, 0 ) );
 
 	categorizePosition();
-
-	printf( "Position: (%f, %f, %f)\n", position.x, position.y, position.z );
-	printf( "On ground: %d\n", ( flags & PLAYER_FLAG_ON_GROUND ) );
 }
 
 void Player::move()
@@ -380,6 +384,14 @@ void Player::render()
 {
 	coreData->debugShapes->addLine( rayLine, false );
 	coreData->debugShapes->addSphere( rayHit, false );
+
+	char buffer[1024] = {};
+
+	_snprintf( buffer, 1024, "Position: (%f, %f, %f)\n", position.x, position.y, position.z );
+	coreData->graphics->queueText( fontIndex, buffer, glm::vec3( 32, 32, 0 ), glm::vec4( 1.0f ) );
+
+	_snprintf( buffer, 1024, "On ground: %d\n", ( flags & PLAYER_FLAG_ON_GROUND ) );
+	coreData->graphics->queueText( fontIndex, buffer, glm::vec3( 32, 48, 0 ), glm::vec4( 1.0f ) );
 }
 
 void Player::setLevel( Level* lvl )

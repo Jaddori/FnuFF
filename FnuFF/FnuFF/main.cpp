@@ -108,6 +108,7 @@ int update( void* args )
 	glm::vec3 hitPoint;
 
 	Player player;
+	player.load();
 	player.setLevel( &level );
 	player.setPosition( level.getRandomSpawnPoint().getPosition() );
 

@@ -30,6 +30,8 @@ public:
 	Player();
 	~Player();
 
+	void load();
+
 	void update();
 	void render();
 
@@ -50,4 +52,7 @@ private:
 
 	DebugLine rayLine;
 	DebugSphere rayHit;
+
+	// DEBUG:
+	int fontIndex;
 };
