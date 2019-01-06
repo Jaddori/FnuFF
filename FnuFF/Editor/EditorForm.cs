@@ -71,7 +71,7 @@ namespace Editor
 			view_bottomRight.OnGlobalInvalidation += ViewGlobalInvalidation;
 			view_3d.OnGlobalInvalidation += ViewGlobalInvalidation;
 
-			view_3d.OnFaceSelected += OnFaceSelected;
+			//view_3d.OnFaceSelected += OnFaceSelected;
 
 			tab_face.OnFaceMetricsChanged += OnFaceMetricsChanged;
 		}
@@ -85,6 +85,7 @@ namespace Editor
             button.Selected = true;
 
             EditorTool.Current = (EditorTools)button.Tag;
+			EditorTool.ClearSelection();
 
             Text = "FnuFF Editor - " + EditorTool.Current.ToString();
 

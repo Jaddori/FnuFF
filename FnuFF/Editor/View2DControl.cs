@@ -63,17 +63,13 @@ namespace Editor
 		private PointF _hoverPosition;
 		private PointF _clipStart;
 		private PointF _clipEnd;
-		private bool _hasClipStart;
 		private bool _clipping;
 
 		private PointF _entityPosition;
 
 		private PointF _previousMousePosition;
-
-		//private SizeHandle[] _sizeHandles;
+		
 		private int _handleIndex;
-		private GeometrySolid _selectedSolid;
-		private Entity _selectedEntity;
 		private bool _movingEntity;
 
 		private Level _level;
@@ -211,7 +207,6 @@ namespace Editor
 
 			_handleIndex = -1;
 			_clipping = false;
-			_hasClipStart = false;
         }
 
 		private PointF SnapToGrid( PointF point )
@@ -232,6 +227,10 @@ namespace Editor
 			else
 				_camera.Position = new PointF( (int)( Size.Width * -0.25f ), (int)( Size.Height * -0.75f ) );
 
+			EditorTool.OnHoveredSolidChanged += (prev, cur) => Invalidate();
+			EditorTool.OnSelectedSolidChanged += ( prev, cur ) => Invalidate();
+			EditorTool.OnSelectedEntityChanged += ( prev, cur ) => Invalidate();
+
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
 			Log.AddFunctor( Name, () => "Grid size: " + _gridSize.ToString() );
@@ -251,9 +250,9 @@ namespace Editor
 			Log.AddFunctor( Name, () =>
 				{
 					var result = "No solid selected.";
-					if( _selectedSolid != null )
+					if( EditorTool.SelectedSolid != null )
 					{
-						result = "Selected solid faces: " + _selectedSolid.Faces.Count.ToString();
+						result = "Selected solid faces: " + EditorTool.SelectedSolid.Faces.Count.ToString();
 					}
 
 					return result;
@@ -459,13 +458,16 @@ namespace Editor
 				{
 					_handleIndex = -1;
 
-					if( _selectedSolid != null )
+					var solid = EditorTool.SelectedSolid;
+
+					//if( _selectedSolid != null )
+					if( solid != null )
 					{
 						var facePoints = new List<PointF>();
-						var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
+						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 						foreach( var face in faces )
 						{
-							var otherPlanes = _selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+							var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
 
@@ -487,7 +489,7 @@ namespace Editor
 						{
 							Cursor.Current = HANDLE_CURSORS[_handleIndex];
 
-							_commandSolidChanged = new CommandSolidChanged( _selectedSolid );
+							_commandSolidChanged = new CommandSolidChanged( solid );
 							_commandSolidChanged.Begin();
 						}
 					}
@@ -495,13 +497,14 @@ namespace Editor
 					if( _handleIndex < 0 )
 					{
 						// check if we're trying to move the selected entity
-						if( _selectedEntity != null )
+						var selectedEntity = EditorTool.SelectedEntity;
+						if( selectedEntity != null )
 						{
-							if( _selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
+							if( selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
 							{
 								_movingEntity = true;
 
-								_commandEntityChanged = new CommandEntityChanged( _selectedEntity );
+								_commandEntityChanged = new CommandEntityChanged( selectedEntity );
 								_commandEntityChanged.Begin();
 							}
 						}
@@ -509,29 +512,10 @@ namespace Editor
 						// check if we're trying to select an entity
 						if( !_movingEntity )
 						{
-							var hasPrevSelected = false;
-
-							foreach( var entity in _level.Entities )
-							{
-								if( entity.Selected )
-									hasPrevSelected = true;
-
-								entity.Selected = false;
-							}
-
 							var potentialEntities = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
 							if( potentialEntities.Length > 0 )
 							{
-								_selectedEntity = potentialEntities[0];
-								_selectedEntity.Selected = true;
-
-								Invalidate();
-								OnGlobalInvalidation?.Invoke();
-							}
-							else if( hasPrevSelected )
-							{
-								Invalidate();
-								OnGlobalInvalidation?.Invoke();
+								EditorTool.SelectedEntity = potentialEntities[0];
 							}
 						}
 					}
@@ -635,39 +619,22 @@ namespace Editor
 						_movingEntity = false;
 
 						_commandEntityChanged.End();
-						_commandStack.Do( _commandEntityChanged );
+
+						if( _commandEntityChanged.HasChanges )
+							_commandStack.Do( _commandEntityChanged );
+
+						_commandEntityChanged = null;
 
 						Invalidate();
 						OnGlobalInvalidation?.Invoke();
 					}
 					else
 					{
-						var hadSelection = false;
-						_selectedSolid = null;
-						var minBounds = RectangleF.Empty;
-						foreach( var solid in _level.Solids )
-						{
-							if( solid.Selected )
-								hadSelection = true;
-
-							solid.Selected = false;
-
-							if( solid.Hovered )
-								_selectedSolid = solid;
-						}
-
-						if( _selectedSolid != null )
-						{
-							_selectedSolid.Selected = true;
-
-							Invalidate();
-							OnGlobalInvalidation?.Invoke();
-						}
-						else if( hadSelection )
-						{
-							Invalidate();
-							OnGlobalInvalidation?.Invoke();
-						}
+						var hoveredSolid = _level.Solids.FirstOrDefault( x => x.Hovered );
+						if( hoveredSolid != null )
+							hoveredSolid.Selected = true;
+						
+						EditorTool.SelectedSolid = hoveredSolid;
 					}
 				}
 			}
@@ -745,7 +712,8 @@ namespace Editor
 				var globalDirection = _camera.Unproject( localDirection );
 
 				var faceChanged = false;
-				var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
+				var selectedSolid = EditorTool.SelectedSolid;
+				var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
 				for( int i = 0; i < faces.Length; i++ )
 				{
 					var d = globalSnap.Dot( faces[i].Plane.Normal );
@@ -767,11 +735,12 @@ namespace Editor
 				var localSnap = SnapToGrid( e.Location );
 				_hoverPosition = localSnap;
 
-				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ), _selectedEntity.Position.Dot( _camera.Direction ) );
+				var selectedEntity = EditorTool.SelectedEntity;
+				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ), selectedEntity.Position.Dot( _camera.Direction ) );
 
-				if( globalSnap != _selectedEntity.Position )
+				if( globalSnap != selectedEntity.Position )
 				{
-					_selectedEntity.Position = globalSnap;
+					selectedEntity.Position = globalSnap;
 
 					Invalidate();
 					OnGlobalInvalidation?.Invoke();
@@ -813,20 +782,10 @@ namespace Editor
 				}
 				else if( EditorTool.Current == EditorTools.Select )
 				{
-					var hadHover = false;
 					var minDepth = 99999.0f;
 					GeometrySolid minSolid = null;
-					GeometrySolid prevHover = null;
 					foreach( var solid in _level.Solids )
 					{
-						if( solid.Hovered )
-						{
-							hadHover = true;
-							prevHover = solid;
-						}
-
-						solid.Hovered = false;
-
 						var mpos = new Triple( e.X, e.Y, 0 );
 
 						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
@@ -892,31 +851,18 @@ namespace Editor
 							}
 						}
 					}
-
-					if( minSolid != null )
-					{
-						minSolid.Hovered = true;
-
-						if( minSolid != prevHover )
-						{
-							Invalidate();
-							OnGlobalInvalidation?.Invoke();
-						}
-					}
-					else if( hadHover )
-					{
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
-					}
+					
+					EditorTool.HoveredSolid = minSolid;
 
 					// check interaction with handles
-					if( _selectedSolid != null )
+					var selectedSolid = EditorTool.SelectedSolid;
+					if( selectedSolid != null )
 					{
 						var facePoints = new List<PointF>();
-						var faces = _selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
+						var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 						foreach( var face in faces )
 						{
-							var otherPlanes = _selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+							var otherPlanes = selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
 
@@ -943,9 +889,10 @@ namespace Editor
 
 					// check hover on entities
 					var hoveredSelectedEntity = false;
-					if( _selectedEntity != null )
+					var selectedEntity = EditorTool.SelectedEntity;
+					if( selectedEntity != null )
 					{
-						if( _selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
+						if( selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
 						{
 							Cursor.Current = Cursors.SizeAll;
 							hoveredSelectedEntity = true;
@@ -1083,9 +1030,9 @@ namespace Editor
 				if( EditorTool.Current == EditorTools.Clip )
 				{
 					_clipping = false;
-					_hasClipStart = false;
 
-					if( _selectedSolid != null )
+					var selectedSolid = EditorTool.SelectedSolid;
+					if( selectedSolid != null )
 					{
 						var globalStart = _camera.Unproject( _camera.ToGlobal( _clipStart ).Deflate( _gridGap ).Inflate( _gridSize ) );
 						var globalEnd = _camera.Unproject( _camera.ToGlobal( _clipEnd ).Deflate( _gridGap ).Inflate( _gridSize ) );
@@ -1098,10 +1045,10 @@ namespace Editor
 						var normal = v2v0.Cross( v1v0 );
 						var clipPlane = new Plane( normal, globalStart );
 
-						var command = new CommandSolidChanged( _selectedSolid );
+						var command = new CommandSolidChanged( selectedSolid );
 						command.Begin();
 
-						if( _selectedSolid.Clip( clipPlane ) )
+						if( selectedSolid.Clip( clipPlane ) )
 						{
 							command.End();
 							_commandStack.Do( command );
@@ -1125,19 +1072,26 @@ namespace Editor
 			// solid manipulation
 			if( e.KeyCode == Keys.Delete )
 			{
-				if( _selectedSolid != null )
-				{
-					_level.RemoveSolid( _selectedSolid );
+				var selectedSolid = EditorTool.SelectedSolid;
+				var selectedEntity = EditorTool.SelectedEntity;
 
-					var deleteCommand = new CommandSolidCreated( _level.Solids, _selectedSolid, true );
+				if( selectedSolid != null )
+				{
+					_level.RemoveSolid( selectedSolid );
+
+					var deleteCommand = new CommandSolidCreated( _level.Solids, selectedSolid, true );
 					_commandStack.Do( deleteCommand );
+
+					EditorTool.SelectedSolid = null;
 				}
-				else if( _selectedEntity != null )
+				else if( selectedEntity != null )
 				{
-					_level.RemoveEntity( _selectedEntity );
+					_level.RemoveEntity( selectedEntity );
 
-					var deleteCommand = new CommandEntityCreated( _level.Entities, _selectedEntity, true );
+					var deleteCommand = new CommandEntityCreated( _level.Entities, selectedEntity, true );
 					_commandStack.Do( deleteCommand );
+
+					EditorTool.SelectedEntity = null;
 				}
 			}
         }

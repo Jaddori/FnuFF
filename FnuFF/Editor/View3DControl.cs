@@ -17,8 +17,8 @@ namespace Editor
 		public delegate void GlobalInvalidationHandler();
 		public event GlobalInvalidationHandler OnGlobalInvalidation;
 
-		public delegate void FaceHandler( GeometrySolid solid, Face face );
-		public event FaceHandler OnFaceSelected;
+		//public delegate void FaceHandler( GeometrySolid solid, Face face );
+		//public event FaceHandler OnFaceSelected;
 
 		private const float CAMERA_SCROLL_SPEED = 10.0f;
 		private const float CAMERA_FORWARD_SPEED = 5.0f;
@@ -39,10 +39,10 @@ namespace Editor
 
 		private Level _level;
 		private Camera3D _camera;
-		private GeometrySolid _hoveredSolid;
-		private GeometrySolid _selectedSolid;
-		private Face _hoveredFace;
-		private Face _selectedFace;
+		//private GeometrySolid _hoveredSolid;
+		//private GeometrySolid _selectedSolid;
+		//private Face _hoveredFace;
+		//private Face _selectedFace;
 		private CommandStack _commandStack;
 
 		private bool _mmbDown;
@@ -92,8 +92,11 @@ namespace Editor
 			}
 
 			_camera = new Camera3D { HorizontalSensitivity = 0.05f, VerticalSensitivity = 0.05f };
-
-			EditorTool.OnEditorToolChanged += OnEditorToolChanged;
+			
+			//EditorTool.OnEditorToolChanged += OnEditorToolChanged;
+			EditorTool.OnHoveredSolidChanged += ( prev, cur ) => Invalidate();
+			EditorTool.OnSelectedSolidChanged += ( prev, cur ) => Invalidate();
+			EditorTool.OnHoveredFaceChanged += ( prev, cur ) => Invalidate();
 		}
 
 		protected override void OnPaintBackground( PaintEventArgs pevent )
@@ -171,24 +174,10 @@ namespace Editor
 
 					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
 					{
-						if( _selectedSolid != null )
-							_selectedSolid.Selected = false;
-
 						hitSolid.Selected = true;
-						_selectedSolid = hitSolid;
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
 					}
-					else
-					{
-						if( _selectedSolid != null )
-						{
-							_selectedSolid.Selected = false;
-							_selectedSolid = null;
-							Invalidate();
-							OnGlobalInvalidation?.Invoke();
-						}
-					}
+
+					EditorTool.SelectedSolid = hitSolid;
 				}
 			}
 			else if( EditorTool.Current == EditorTools.Face )
@@ -198,28 +187,8 @@ namespace Editor
 					GeometrySolid hitSolid;
 					Face hitFace;
 
-					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
-					{
-						if( _selectedFace != null )
-							_selectedFace.Selected = false;
-
-						hitFace.Selected = true;
-						_selectedFace = hitFace;
-						Invalidate();
-
-						OnFaceSelected?.Invoke( hitSolid, _selectedFace );
-					}
-					else
-					{
-						if( _selectedFace != null )
-						{
-							_selectedFace.Selected = false;
-							_selectedFace = null;
-							Invalidate();
-
-							OnFaceSelected?.Invoke( null, null );
-						}
-					}
+					IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
+					EditorTool.SelectedFace = hitFace;
 				}
 				else if( e.Button == MouseButtons.Right )
 				{
@@ -228,15 +197,20 @@ namespace Editor
 
 					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
 					{
-						var command = new CommandSolidChanged( hitSolid );
-						command.Begin();
+						var newTexture = ( hitFace.PackName != TextureMap.CurrentPackName || hitFace.TextureName != TextureMap.CurrentTextureName );
 
-						hitFace.PackName = TextureMap.CurrentPackName;
-						hitFace.TextureName = TextureMap.CurrentTextureName;
-						Invalidate();
+						if( newTexture )
+						{
+							var command = new CommandSolidChanged( hitSolid );
+							command.Begin();
 
-						command.End();
-						_commandStack.Do( command );
+							hitFace.PackName = TextureMap.CurrentPackName;
+							hitFace.TextureName = TextureMap.CurrentTextureName;
+							Invalidate();
+
+							command.End();
+							_commandStack.Do( command );
+						}
 					}
 				}
 			}
@@ -280,50 +254,16 @@ namespace Editor
 				GeometrySolid hitSolid;
 				Face hitFace;
 
-				if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
-				{
-					if( _hoveredSolid != null )
-						_hoveredSolid.Hovered = false;
-
-					hitSolid.Hovered = true;
-					_hoveredSolid = hitSolid;
-					Invalidate();
-					OnGlobalInvalidation?.Invoke();
-				}
-				else
-				{
-					if( _hoveredSolid != null )
-					{
-						_hoveredSolid.Hovered = false;
-						_hoveredSolid = null;
-						Invalidate();
-						OnGlobalInvalidation?.Invoke();
-					}
-				}
+				IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
+				EditorTool.HoveredSolid = hitSolid;
 			}
 			else if( EditorTool.Current == EditorTools.Face )
 			{
 				GeometrySolid hitSolid;
 				Face hitFace;
 
-				if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
-				{
-					if( _hoveredFace != null )
-						_hoveredFace.Hovered = false;
-
-					hitFace.Hovered = true;
-					_hoveredFace = hitFace;
-					Invalidate();
-				}
-				else
-				{
-					if( _hoveredFace != null )
-					{
-						_hoveredFace.Hovered = false;
-						_hoveredFace = null;
-						Invalidate();
-					}
-				}
+				IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
+				EditorTool.HoveredFace = hitFace;
 			}
 
 			_previousMousePosition = e.Location;
@@ -420,7 +360,7 @@ namespace Editor
 			return result;
 		}
 
-		private void OnEditorToolChanged( EditorTools previous, EditorTools current )
+		/*private void OnEditorToolChanged( EditorTools previous, EditorTools current )
 		{
 			if( previous == EditorTools.Face )
 			{
@@ -432,6 +372,6 @@ namespace Editor
 					OnFaceSelected?.Invoke( null, null );
 				}
 			}
-		}
+		}*/
 	}
 }

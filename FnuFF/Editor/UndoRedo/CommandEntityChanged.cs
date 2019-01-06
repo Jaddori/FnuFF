@@ -11,22 +11,28 @@ namespace Editor.UndoRedo
 	{
 		private Entity _entity;
 		private Delta<Triple> _position;
+		private bool _hasChanges;
+
+		public bool HasChanges => _hasChanges;
 
 		public CommandEntityChanged()
 		{
 			_position = new Delta<Triple>();
+			_hasChanges = false;
 		}
 
 		public CommandEntityChanged( Entity entity )
 		{
 			_entity = entity;
 			_position = new Delta<Triple>();
+			_hasChanges = false;
 		}
 
 		public CommandEntityChanged( Entity entity, Triple oldPosition )
 		{
 			_entity = entity;
 			_position = new Delta<Triple>( oldPosition, _entity.Position );
+			_hasChanges = false;
 		}
 
 		public void Begin()
@@ -37,6 +43,8 @@ namespace Editor.UndoRedo
 		public void End()
 		{
 			_position.New = _entity.Position;
+
+			_hasChanges = !_position.Old.Equals( _position.New );
 		}
 
 		public void Undo()

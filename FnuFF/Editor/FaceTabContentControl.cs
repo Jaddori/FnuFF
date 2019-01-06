@@ -24,6 +24,14 @@ namespace Editor
 			InitializeComponent();
 		}
 
+		protected override void OnCreateControl()
+		{
+			base.OnCreateControl();
+
+			EditorTool.OnSelectedFaceChanged += ( prev, cur ) => SetFace( cur );
+			SetFace( null );
+		}
+
 		private void btn_browse_Click( object sender, EventArgs e )
 		{
 			var tbf = new TextureBrowserForm();
