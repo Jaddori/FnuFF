@@ -32,13 +32,20 @@ namespace Editor
             Keys.Alt,
         };
 
-		private static Cursor[] HANDLE_CURSORS =
+		/*private static Cursor[] HANDLE_CURSORS =
 		{
 			Cursors.SizeNWSE, Cursors.SizeNS, Cursors.SizeNESW,
 			Cursors.SizeWE, Cursors.SizeAll, Cursors.SizeWE,
 			Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE
+		};*/
+
+		private static Cursor[] HANDLE_CURSORS =
+	{
+			Cursors.SizeNWSE,	Cursors.SizeNS,		Cursors.SizeNESW,
+			Cursors.SizeWE,							Cursors.SizeWE,
+			Cursors.SizeNESW,	Cursors.SizeNS,		Cursors.SizeNWSE
 		};
-		
+
 		private static int[] GRID_SIZES = new int[] { 1, 2, 3, 4, 5, 10 };
 		private const int GRID_MAX_LINES = 100;
 		private const int GRID_GAP_BASE = 64;
@@ -66,11 +73,14 @@ namespace Editor
 		private bool _clipping;
 
 		private PointF _entityPosition;
+		private PointF _solidPosition;
+		private PointF _solidOffset;
 
 		private PointF _previousMousePosition;
 		
 		private int _handleIndex;
 		private bool _movingEntity;
+		private bool _movingSolid;
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
@@ -346,13 +356,28 @@ namespace Editor
 
 					var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
-					if( windingPoints.Length > 0 )
+					var pointCount = windingPoints.Length;
+					if( pointCount > 0 )
 					{
-						for( int i = 0; i < windingPoints.Length - 1; i++ )
+						// draw lines
+						for( int i = 0; i < pointCount - 1; i++ )
 						{
 							g.DrawLine( _solidPen, windingPoints[i], windingPoints[i + 1] );
 						}
-						g.DrawLine( _solidPen, windingPoints[windingPoints.Length - 1], windingPoints[0] );
+						g.DrawLine( _solidPen, windingPoints[pointCount - 1], windingPoints[0] );
+
+						// draw center cross
+						var centerBounds = Extensions.FromPoints( windingPoints );
+						var center = centerBounds.GetCenter();
+						centerBounds = Extensions.FromPoint( center, 8 );
+
+						var prevStyle = _solidPen.DashStyle;
+						_solidPen.DashStyle = DashStyle.Solid;
+
+						g.DrawLine( _solidPen, centerBounds.TopLeft(), centerBounds.BottomRight() );
+						g.DrawLine( _solidPen, centerBounds.BottomLeft(), centerBounds.TopRight() );
+
+						_solidPen.DashStyle = prevStyle;
 					}
 
 					facePoints.AddRange( projectedPoints );
@@ -458,16 +483,16 @@ namespace Editor
 				{
 					_handleIndex = -1;
 
-					var solid = EditorTool.SelectedSolid;
+					var selectedSolid = EditorTool.SelectedSolid;
 
 					//if( _selectedSolid != null )
-					if( solid != null )
+					if( selectedSolid != null )
 					{
 						var facePoints = new List<PointF>();
-						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
+						var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 						foreach( var face in faces )
 						{
-							var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+							var otherPlanes = selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
 
@@ -485,11 +510,24 @@ namespace Editor
 							}
 						}
 
-						if( _handleIndex >= 0 )
+						// check if we're trying to move the selected solid
+						if( _handleIndex < 0 )
+						{
+							if( bounds.Contains( e.X, e.Y ) )
+							{
+								_movingSolid = true;
+								_solidOffset = new PointF( e.X - bounds.Left, e.Y - bounds.Top );
+								_solidPosition = bounds.TopLeft();
+
+								_commandSolidChanged = new CommandSolidChanged( selectedSolid );
+								_commandSolidChanged.Begin();
+							}
+						}
+						else // interaction with handles
 						{
 							Cursor.Current = HANDLE_CURSORS[_handleIndex];
 
-							_commandSolidChanged = new CommandSolidChanged( solid );
+							_commandSolidChanged = new CommandSolidChanged( selectedSolid );
 							_commandSolidChanged.Begin();
 						}
 					}
@@ -614,6 +652,17 @@ namespace Editor
 						Invalidate();
 						OnGlobalInvalidation?.Invoke();
 					}
+					else if( _movingSolid )
+					{
+						_movingSolid = false;
+
+						_commandSolidChanged.End();
+						if( _commandSolidChanged.HasChanges )
+							_commandStack.Do( _commandSolidChanged );
+
+						Invalidate();
+						OnGlobalInvalidation?.Invoke();
+					}
 					else if( _movingEntity )
 					{
 						_movingEntity = false;
@@ -633,7 +682,7 @@ namespace Editor
 						var hoveredSolid = _level.Solids.FirstOrDefault( x => x.Hovered );
 						if( hoveredSolid != null )
 							hoveredSolid.Selected = true;
-						
+
 						EditorTool.SelectedSolid = hoveredSolid;
 					}
 				}
@@ -699,7 +748,7 @@ namespace Editor
 
 				var localDirection = new PointF( 0, 0 );
 
-				if( _handleIndex % 3 == 0 )
+				/*if( _handleIndex % 3 == 0 )
 					localDirection.X = -1.0f;
 				else if( ( _handleIndex + 1 ) % 3 == 0 )
 					localDirection.X = 1.0f;
@@ -707,6 +756,20 @@ namespace Editor
 				if( _handleIndex / 3 == 0 )
 					localDirection.Y = -1.0f;
 				else if( _handleIndex / 3 == 2 )
+					localDirection.Y = 1.0f;*/
+
+				var index = _handleIndex;
+				if( index > 3 )
+					index++;
+
+				if( index % 3 == 0 )
+					localDirection.X = -1.0f;
+				else if( ( index + 1 ) % 3 == 0 )
+					localDirection.X = 1.0f;
+
+				if( index / 3 == 0 )
+					localDirection.Y = -1.0f;
+				else if( index / 3 == 2 )
 					localDirection.Y = 1.0f;
 
 				var globalDirection = _camera.Unproject( localDirection );
@@ -729,6 +792,27 @@ namespace Editor
 					Invalidate();
 					OnGlobalInvalidation?.Invoke();
 				}
+			}
+			else if( _movingSolid )
+			{
+				var localSnap = SnapToGrid( e.Location );
+				_hoverPosition = localSnap;
+				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ) );
+				
+				var selectedSolid = EditorTool.SelectedSolid;
+
+				var dir = new PointF( e.X - _solidPosition.X, e.Y - _solidPosition.Y );
+
+				var globalDirection = _camera.Unproject( dir );
+
+				var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( globalDirection ) > 0 ).ToArray();
+				for( int i = 0; i < faces.Length; i++ )
+				{
+					var d = globalSnap.Dot( faces[i].Plane.Normal );
+					faces[i].Plane.D = d;
+				}
+
+				Invalidate();
 			}
 			else if( _movingEntity )
 			{
@@ -782,12 +866,12 @@ namespace Editor
 				}
 				else if( EditorTool.Current == EditorTools.Select )
 				{
+					var mpos = new Triple( e.X, e.Y, 0 );
+
 					var minDepth = 99999.0f;
 					GeometrySolid minSolid = null;
 					foreach( var solid in _level.Solids )
 					{
-						var mpos = new Triple( e.X, e.Y, 0 );
-
 						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 
 						for( int i = 0; i < faces.Length; i++ )
@@ -799,59 +883,70 @@ namespace Editor
 
 							var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
-							var lineIndices = new Point[windingPoints.Length];
-							if( lineIndices.Length > 0 )
+							var localMinDepth = 9999.0f;
+							foreach( var p in points )
 							{
-								for( int j = 0; j < windingPoints.Length - 1; j++ )
-									lineIndices[j] = new Point( j, j + 1 );
-								lineIndices[lineIndices.Length - 1] = new Point( lineIndices.Length - 1, 0 );
+								var depth = p.Dot( _camera.Direction );
+								if( depth < localMinDepth )
+									localMinDepth = depth;
 							}
 
-							var hovered = false;
-							for( int j = 0; j < lineIndices.Length && !hovered; j++ )
+							if( localMinDepth < minDepth )
 							{
-								var i0 = lineIndices[j].X;
-								var i1 = lineIndices[j].Y;
-
-								var p0 = windingPoints[i0].ToTriple();
-								var p1 = windingPoints[i1].ToTriple();
-								var dir = p1 - p0;
-								dir.Normalize();
-
-								var dif = mpos - p0;
-								var proj = dir * dif.Dot( dir );
-
-								var u = dif - proj;
-								var distance = u.Length();
-
-								if( distance < 8.0f )
+								// check against lines
+								var lineIndices = new Point[windingPoints.Length];
+								if( lineIndices.Length > 0 )
 								{
-									// check if point is within segment
-									var d0 = ( mpos - p0 ).Dot( dir );
-									var d1 = ( mpos - p1 ).Dot( dir );
-									if( ( d0 < 0 && d1 > 0 ) || ( d0 > 0 && d1 < 0 ) )
+									for( int j = 0; j < windingPoints.Length - 1; j++ )
+										lineIndices[j] = new Point( j, j + 1 );
+									lineIndices[lineIndices.Length - 1] = new Point( lineIndices.Length - 1, 0 );
+								}
+
+								var hovered = false;
+								for( int j = 0; j < lineIndices.Length && !hovered; j++ )
+								{
+									var i0 = lineIndices[j].X;
+									var i1 = lineIndices[j].Y;
+
+									var p0 = windingPoints[i0].ToTriple();
+									var p1 = windingPoints[i1].ToTriple();
+									var dir = p1 - p0;
+									dir.Normalize();
+
+									var dif = mpos - p0;
+									var proj = dir * dif.Dot( dir );
+
+									var u = dif - proj;
+									var distance = u.Length();
+
+									if( distance < 8.0f )
 									{
-										hovered = true;
-
-										var localMinDepth = 9999.0f;
-										foreach( var p in points )
+										// check if point is within segment
+										var d0 = ( mpos - p0 ).Dot( dir );
+										var d1 = ( mpos - p1 ).Dot( dir );
+										if( ( d0 < 0 && d1 > 0 ) || ( d0 > 0 && d1 < 0 ) )
 										{
-											var depth = p.Dot( _camera.Direction );
-											if( depth < localMinDepth )
-												localMinDepth = depth;
-										}
-
-										if( localMinDepth < minDepth )
-										{
+											hovered = true;
 											minDepth = localMinDepth;
 											minSolid = solid;
 										}
 									}
 								}
+
+								// check against center
+								var centerBounds = Extensions.FromPoints( windingPoints );
+								var center = centerBounds.GetCenter();
+								centerBounds = Extensions.FromPoint( center, 8 );
+
+								if( centerBounds.Contains( e.X, e.Y ) )
+								{
+									minDepth = localMinDepth;
+									minSolid = solid;
+								}
 							}
 						}
 					}
-					
+
 					EditorTool.HoveredSolid = minSolid;
 
 					// check interaction with handles

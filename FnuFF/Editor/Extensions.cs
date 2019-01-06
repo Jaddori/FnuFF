@@ -91,6 +91,11 @@ namespace Editor
 			return new PointF( r.Left + r.Width / 2, r.Top + r.Height / 2 );
 		}
 
+		public static PointF GetCenter( PointF min, PointF max )
+		{
+			return new PointF( min.X + ( max.X - min.X ) * 0.5f, min.Y + ( max.Y - min.Y ) * 0.5f );
+		}
+
 		public static PointF[] GetHandlePoints( RectangleF r )
 		{
 			var center = GetCenter( r );
@@ -101,7 +106,7 @@ namespace Editor
 				new PointF(center.X, r.Top),
 				new PointF(r.Right, r.Top),
 				new PointF(r.Left, center.Y),
-				new PointF(center.X, center.Y),
+				//new PointF(center.X, center.Y),
 				new PointF(r.Right, center.Y),
 				new PointF(r.Left, r.Bottom),
 				new PointF(center.X, r.Bottom),
@@ -122,9 +127,35 @@ namespace Editor
 			return result;
 		}
 
+		public static PointF TopLeft( this RectangleF r )
+		{
+			return new PointF( r.Left, r.Top );
+		}
+
+		public static PointF TopRight( this RectangleF r )
+		{
+			return new PointF( r.Right, r.Top );
+		}
+
+		public static PointF BottomLeft( this RectangleF r )
+		{
+			return new PointF( r.Left, r.Bottom );
+		}
+
+		public static PointF BottomRight( this RectangleF r )
+		{
+			return new PointF( r.Right, r.Bottom );
+		}
+
 		public static int HandleIndex( int x, int y )
 		{
-			return ( y * 3 + x );
+			//return ( y * 3 + x );
+
+			var index = y * 3 + x;
+			if( x > 0 && y > 0 )
+				index--;
+
+			return index;
 		}
 
 		public static PointF Min( PointF a, PointF b )
