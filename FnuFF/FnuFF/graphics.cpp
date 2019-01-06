@@ -170,6 +170,8 @@ void Graphics::renderSolids()
 	solidShader.setMat4( solidShaderViewLocation, perspectiveCamera.getViewMatrix() );
 
 	const int SOLID_COUNT = solidQueue.getRead().getSize();
+
+	// render opaque faces
 	for( int curSolid = 0; curSolid < SOLID_COUNT; curSolid++ )
 	{
 		const Solid* solid = solidQueue.getRead()[curSolid];
@@ -179,15 +181,45 @@ void Graphics::renderSolids()
 		{
 			int textureIndex = solid->getTextureIndex( curFace );
 			const Texture* texture = assets.getTexture( textureIndex );
-			texture->bind();
+			if( !texture->hasAlpha() )
+			{
+				texture->bind();
 
-			GLuint vao = solid->getVAO( curFace );
-			int vertexCount = solid->getVertexCount( curFace );
+				GLuint vao = solid->getVAO( curFace );
+				int vertexCount = solid->getVertexCount( curFace );
 
-			glBindVertexArray( vao );
-			glDrawArrays( GL_TRIANGLES, 0, vertexCount );
+				glBindVertexArray( vao );
+				glDrawArrays( GL_TRIANGLES, 0, vertexCount );
+			}
 		}
 	}
+
+	// TODO: Fix depth sorting
+	// render transparent faces
+
+	glDepthMask( GL_FALSE );
+	for( int curSolid = 0; curSolid < SOLID_COUNT; curSolid++ )
+	{
+		const Solid* solid = solidQueue.getRead()[curSolid];
+
+		const int FACE_COUNT = solid->getFaceCount();
+		for( int curFace = 0; curFace < FACE_COUNT; curFace++ )
+		{
+			int textureIndex = solid->getTextureIndex( curFace );
+			const Texture* texture = assets.getTexture( textureIndex );
+			if( texture->hasAlpha() )
+			{
+				texture->bind();
+
+				GLuint vao = solid->getVAO( curFace );
+				int vertexCount = solid->getVertexCount( curFace );
+
+				glBindVertexArray( vao );
+				glDrawArrays( GL_TRIANGLES, 0, vertexCount );
+			}
+		}
+	}
+	glDepthMask( GL_TRUE );
 
 	glBindVertexArray( 0 );
 }

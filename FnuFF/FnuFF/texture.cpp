@@ -104,6 +104,11 @@ void Texture::upload()
 	}
 }
 
+bool Texture::hasAlpha() const
+{
+	return ( format == TEXTURE_TRANSPARENT_FORMAT );
+}
+
 GLuint Texture::getID() const
 {
 	return id;
@@ -117,4 +122,9 @@ int Texture::getWidth() const
 int Texture::getHeight() const
 {
 	return height;
+}
+
+GLenum Texture::getFormat() const
+{
+	return format;
 }

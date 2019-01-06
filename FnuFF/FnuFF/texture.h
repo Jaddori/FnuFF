@@ -2,6 +2,8 @@
 
 #include "common.h"
 
+#define TEXTURE_TRANSPARENT_FORMAT GL_BGRA
+
 namespace Rendering
 {
 #pragma pack(push, 1)
@@ -39,9 +41,12 @@ namespace Rendering
 			glBindTexture( GL_TEXTURE_2D, id );
 		}
 
+		bool hasAlpha() const;
+
 		GLuint getID() const;
 		int getWidth() const;
 		int getHeight() const;
+		GLenum getFormat() const;
 
 	private:
 		GLuint id;
