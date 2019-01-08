@@ -330,81 +330,10 @@ namespace Editor
 			// paint solids
 			foreach( var solid in _level.Solids )
 			{
-				var color = Color.FromArgb( EditorColors.FADE, solid.Color );
-				if( solid.Selected )
-					color = Color.White;
-				else if( solid.Hovered )
-					color = solid.Color;
-
-				if( solid.Selected || solid.Hovered )
-					_solidPen.DashStyle = DashStyle.Solid;
-				else
-				{
-					_solidPen.DashStyle = DashStyle.Dash;
-					_solidPen.DashPattern = EditorColors.DASH_PATTERN;
-				}
-
-				_solidPen.Color = color;
-
-				//var faces = solid.Faces.Where( x => Math.Abs(x.Plane.Normal.Dot( _camera.Direction )) > Extensions.EPSILON ).ToArray();
-				var facePoints = new List<PointF>();
-				var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
-				foreach( var face in faces )
-				{
-					var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-					var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-					var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
-
-					var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
-
-					var pointCount = windingPoints.Length;
-					if( pointCount > 0 )
-					{
-						// draw lines
-						for( int i = 0; i < pointCount - 1; i++ )
-						{
-							g.DrawLine( _solidPen, windingPoints[i], windingPoints[i + 1] );
-						}
-						g.DrawLine( _solidPen, windingPoints[pointCount - 1], windingPoints[0] );
-
-						// draw center cross
-						var centerBounds = Extensions.FromPoints( windingPoints );
-						var center = centerBounds.GetCenter();
-						centerBounds = Extensions.FromPoint( center, 8 );
-
-						var prevStyle = _solidPen.DashStyle;
-						_solidPen.DashStyle = DashStyle.Solid;
-
-						g.DrawLine( _solidPen, centerBounds.TopLeft(), centerBounds.BottomRight() );
-						g.DrawLine( _solidPen, centerBounds.BottomLeft(), centerBounds.TopRight() );
-
-						_solidPen.DashStyle = prevStyle;
-					}
-
-					facePoints.AddRange( projectedPoints );
-				}
-
-				if( solid.Selected )
-				{
-					var topleft = new PointF( facePoints.Min( x => x.X ), facePoints.Min( x => x.Y ) );
-					var bottomright = new PointF( facePoints.Max( x => x.X ), facePoints.Max( x => x.Y ) );
-					var bounds = new RectangleF( topleft.X, topleft.Y, bottomright.X - topleft.X, bottomright.Y - topleft.Y );
-
-					var handles = Extensions.GetHandles( bounds, 8 );
-					var drawBounds = bounds.Downcast();
-
-					if( EditorTool.Current == EditorTools.Select )
-					{
-						// draw handle outline
-						g.DrawRectangle( EditorColors.PEN_DASH_FADED_HANDLE_OUTLINE, drawBounds );
-
-						// draw handles
-						foreach( var handle in handles )
-							g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
-					}
-				}
+				solid.Paint2D( g, _camera, _gridGap, _gridSize );
 			}
 
+			// paint clipping handle
 			if( _clipping )
 			{
 				var start = Extensions.FromPoint( _clipStart, 8 );

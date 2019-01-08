@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 using Editor.UndoRedo;
@@ -162,6 +164,80 @@ namespace Editor
 				}
 
 				face.BuildPlane();
+			}
+		}
+
+		public void Paint2D( Graphics g, Camera2D camera, int gridGap, int gridSize )
+		{
+			var color = Color.FromArgb( EditorColors.FADE, _color );
+			if( _selected )
+				color = Color.White;
+			else if( _hovered )
+				color = _color;
+
+			var facePoints = new List<PointF>();
+
+			using( var pen = new Pen( color ) )
+			{
+				if( !_selected && !_hovered )
+				{
+					//pen.DashStyle = DashStyle.Dash;
+					pen.DashPattern = EditorColors.DASH_PATTERN;
+				}
+				
+				var faces = _faces.Where( x => x.Plane.Normal.Dot( camera.Direction ) > 0 ).ToArray();
+				foreach( var face in faces )
+				{
+					var projectedPoints = face.Vertices.Select( x => camera.ToLocal( camera.Project( x ).Inflate( gridGap ).Deflate( gridSize ) ) ).ToArray();
+
+					var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
+
+					var pointCount = windingPoints.Length;
+					if( pointCount > 0 )
+					{
+						// draw lines
+						for( int i = 0; i < pointCount - 1; i++ )
+						{
+							g.DrawLine( pen, windingPoints[i], windingPoints[i + 1] );
+						}
+						g.DrawLine( pen, windingPoints[pointCount - 1], windingPoints[0] );
+
+						// draw center cross
+						var centerBounds = Extensions.FromPoints( windingPoints );
+						var center = centerBounds.GetCenter();
+						centerBounds = Extensions.FromPoint( center, 8 );
+
+						var prevStyle = pen.DashStyle;
+						pen.DashStyle = DashStyle.Solid;
+
+						g.DrawLine( pen, centerBounds.TopLeft(), centerBounds.BottomRight() );
+						g.DrawLine( pen, centerBounds.BottomLeft(), centerBounds.TopRight() );
+
+						pen.DashStyle = prevStyle;
+					}
+
+					facePoints.AddRange( projectedPoints );
+				}
+			}
+
+			if( _selected )
+			{
+				var topleft = new PointF( facePoints.Min( x => x.X ), facePoints.Min( x => x.Y ) );
+				var bottomright = new PointF( facePoints.Max( x => x.X ), facePoints.Max( x => x.Y ) );
+				var bounds = new RectangleF( topleft.X, topleft.Y, bottomright.X - topleft.X, bottomright.Y - topleft.Y );
+
+				var handles = Extensions.GetHandles( bounds, 8 );
+				var drawBounds = bounds.Downcast();
+
+				if( EditorTool.Current == EditorTools.Select )
+				{
+					// draw handle outline
+					g.DrawRectangle( EditorColors.PEN_DASH_FADED_HANDLE_OUTLINE, drawBounds );
+
+					// draw handles
+					foreach( var handle in handles )
+						g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
+				}
 			}
 		}
 
