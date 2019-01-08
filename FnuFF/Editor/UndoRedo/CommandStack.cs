@@ -29,6 +29,14 @@ namespace Editor.UndoRedo
 			_commands.Add( new CommandNewLevel() );
 		}
 
+		public void Reset()
+		{
+			_commands.Clear();
+			_commands.Add( new CommandNewLevel() );
+
+			_index = 0;
+		}
+
 		public void Do( ICommand command )
 		{
 			if( _index >= MAX_COMMANDS-1 )

@@ -16,6 +16,8 @@ namespace Editor
 {
 	public partial class EditorForm : Form
 	{
+		private const string LEVEL_NAME_UNNAMED = "Unnamed";
+
 		private List<FlatButtonControl> _toolbarButtons;
 		private List<FlatTabButtonControl> _tabButtons;
 		private Level _level;
@@ -84,7 +86,7 @@ namespace Editor
 			tab_face.OnFaceMetricsChanged += OnFaceMetricsChanged;
 
 			_lastSaveCommandIndex = _commandStack.Index;
-			_levelName = "Unnamed";
+			_levelName = LEVEL_NAME_UNNAMED;
 
 			UpdateTitle();
 		}
@@ -141,6 +143,13 @@ namespace Editor
 		private void newToolStripMenuItem_Click( object sender, EventArgs e )
 		{
 			_level.Reset();
+			_commandStack.Reset();
+
+			_lastSaveCommandIndex = _commandStack.Index;
+			_levelPath = string.Empty;
+			_levelName = LEVEL_NAME_UNNAMED;
+
+			UpdateTitle();
 		}
 
 		private void ViewGlobalInvalidation()
@@ -421,6 +430,26 @@ namespace Editor
 			Text = _levelName;
 			if( _lastSaveCommandIndex != _commandStack.Index )
 				Text += "*";
+		}
+
+		private void EditorForm_FormClosing( object sender, FormClosingEventArgs e )
+		{
+			if( _lastSaveCommandIndex != _commandStack.Index )
+			{
+				var dialogResult = MessageBox.Show( "There are pending changes. Would you like to save before exiting?", "FnuFF Editor - Unsaved Changes", MessageBoxButtons.YesNoCancel );
+				if( dialogResult == DialogResult.Yes )
+				{
+					var hasPath = !string.IsNullOrEmpty( _levelPath );
+
+					if( !hasPath )
+						hasPath = PromptLevelPath();
+
+					if( hasPath )
+						SaveLevel();
+				}
+				else if( dialogResult == DialogResult.Cancel )
+					e.Cancel = true;
+			}
 		}
 	}
 }
