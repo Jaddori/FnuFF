@@ -1,0 +1,3 @@
+no_draw.tga
+sky.tga
+clip.tga
