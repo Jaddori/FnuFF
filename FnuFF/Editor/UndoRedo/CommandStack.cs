@@ -10,6 +10,11 @@ namespace Editor.UndoRedo
 	{
 		public const int MAX_COMMANDS = 50;
 
+		public delegate void CommandHandler( ICommand command );
+		public event CommandHandler OnDo;
+		public event CommandHandler OnUndo;
+		public event CommandHandler OnRedo;
+
 		private List<ICommand> _commands;
 		private int _index;
 
@@ -39,14 +44,19 @@ namespace Editor.UndoRedo
 
 			_commands.Add( command );
 			_index = _commands.Count - 1;
+
+			OnDo?.Invoke( command );
 		}
 
 		public void Undo()
 		{
 			if( _index > 0 )
 			{
-				_commands[_index].Undo();
+				var command = _commands[_index];
+				command.Undo();
 				_index--;
+
+				OnUndo?.Invoke( command );
 			}
 		}
 
@@ -55,7 +65,10 @@ namespace Editor.UndoRedo
 			if( _index < _commands.Count-1 )
 			{
 				_index++;
-				_commands[_index].Redo();
+				var command = _commands[_index];
+				command.Redo();
+
+				OnRedo?.Invoke( command );
 			}
 		}
 	}

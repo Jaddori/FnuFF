@@ -462,5 +462,32 @@ namespace Editor
 			writer.WriteLine( p.X.ToString() );
 			writer.WriteLine( p.Y.ToString() );
 		}
+
+		public static string NameFromPath( this string path, bool includeExtension = false )
+		{
+			var slashIndex = 0;
+			if( path.Contains( '/' ) )
+				slashIndex = path.LastIndexOf( '/' );
+			if( path.Contains( '\\' ) )
+			{
+				var backslashIndex = path.LastIndexOf( '\\' );
+				if( backslashIndex > slashIndex )
+					slashIndex = backslashIndex;
+			}
+
+			var dotIndex = path.Length;
+			if( path.Contains( '.' ) && !includeExtension )
+			{
+				dotIndex = path.LastIndexOf( '.' );
+			}
+
+			return path.Substring( slashIndex + 1, dotIndex - slashIndex - 1 );
+		}
+
+		public static string ExtensionFromPath( this string path )
+		{
+			var dotIndex = path.LastIndexOf( '.' );
+			return path.Substring( dotIndex + 1 ).Trim();
+		}
 	}
 }

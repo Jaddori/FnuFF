@@ -14,38 +14,46 @@ using Editor.UndoRedo;
 
 namespace Editor
 {
-    public partial class EditorForm : Form
-    {
-        private List<FlatButtonControl> _toolbarButtons;
+	public partial class EditorForm : Form
+	{
+		private List<FlatButtonControl> _toolbarButtons;
 		private List<FlatTabButtonControl> _tabButtons;
 		private Level _level;
 		private CommandStack _commandStack;
-		
+
 		private CommandSolidChanged _solidChangedCommand;
 
-        public EditorForm()
-        {
-            InitializeComponent();
-        }
+		private int _lastSaveCommandIndex;
+		private string _levelPath;
+		private string _levelName;
 
-        private void Form1_Load( object sender, EventArgs e )
-        {
+		public EditorForm()
+		{
+			InitializeComponent();
+		}
+
+		private void Form1_Load( object sender, EventArgs e )
+		{
 			_commandStack = new CommandStack();
 			GeometrySolid.CommandStack = _commandStack;
 
+			_commandStack.OnDo += ( command ) => UpdateTitle();
+			_commandStack.OnUndo += ( command ) => UpdateTitle();
+			_commandStack.OnRedo += ( command ) => UpdateTitle();
+
 			_level = new Level();
 
-            btn_select.Tag = EditorTools.Select;
-            btn_solid.Tag = EditorTools.Solid;
+			btn_select.Tag = EditorTools.Select;
+			btn_solid.Tag = EditorTools.Solid;
 			btn_clip.Tag = EditorTools.Clip;
 			btn_vertex.Tag = EditorTools.Vertex;
 			btn_texture.Tag = EditorTools.Texture;
 			btn_face.Tag = EditorTools.Face;
 			btn_entity.Tag = EditorTools.Entity;
 
-            _toolbarButtons = new List<FlatButtonControl>();
-            _toolbarButtons.Add( btn_select );
-            _toolbarButtons.Add( btn_solid );
+			_toolbarButtons = new List<FlatButtonControl>();
+			_toolbarButtons.Add( btn_select );
+			_toolbarButtons.Add( btn_solid );
 			_toolbarButtons.Add( btn_clip );
 			_toolbarButtons.Add( btn_vertex );
 			_toolbarButtons.Add( btn_texture );
@@ -74,25 +82,30 @@ namespace Editor
 			//view_3d.OnFaceSelected += OnFaceSelected;
 
 			tab_face.OnFaceMetricsChanged += OnFaceMetricsChanged;
+
+			_lastSaveCommandIndex = _commandStack.Index;
+			_levelName = "Unnamed";
+
+			UpdateTitle();
 		}
 
-        private void toolbarButton_Click( object sender, EventArgs e )
-        {
-            foreach( var b in _toolbarButtons )
-                b.Selected = false;
+		private void toolbarButton_Click( object sender, EventArgs e )
+		{
+			foreach( var b in _toolbarButtons )
+				b.Selected = false;
 
-            var button = sender as FlatButtonControl;
-            button.Selected = true;
+			var button = sender as FlatButtonControl;
+			button.Selected = true;
 
-            EditorTool.Current = (EditorTools)button.Tag;
+			EditorTool.Current = (EditorTools)button.Tag;
 
 			if( EditorTool.Current != EditorTools.Clip )
 				EditorTool.ClearSelection();
 
-            Text = "FnuFF Editor - " + EditorTool.Current.ToString();
+			//Text = "FnuFF Editor - " + EditorTool.Current.ToString();
 
 			ViewGlobalInvalidation();
-        }
+		}
 
 		private void tabButton_Click( object sender, EventArgs e )
 		{
@@ -189,6 +202,9 @@ namespace Editor
 
 				if( success )
 				{
+					_levelPath = path;
+					_levelName = _levelPath.NameFromPath();
+
 					view_3d.Level = _level;
 					view_topRight.Level = _level;
 					view_bottomLeft.Level = _level;
@@ -201,36 +217,61 @@ namespace Editor
 			}
 		}
 
-		private void saveToolStripMenuItem_Click( object sender, EventArgs e )
+		private void SaveLevel()
 		{
+			var ser = new XmlSerializer( typeof( Level ) );
+			using( var stream = new FileStream( _levelPath, FileMode.Create, FileAccess.Write ) )
+			{
+				var settings = new XmlWriterSettings();
+				settings.Indent = true;
+				settings.IndentChars = "\t";
+				settings.OmitXmlDeclaration = false;
+
+				using( var writer = XmlWriter.Create( stream, settings ) )
+				{
+					ser.Serialize( writer, _level );
+				}
+			}
+
+			_lastSaveCommandIndex = _commandStack.Index;
+			UpdateTitle();
+
+			MessageBox.Show( "Level saved." );
+		}
+
+		private bool PromptLevelPath()
+		{
+			var result = false;
+
 			saveFileDialog.DefaultExt = ".xml";
 			saveFileDialog.Filter = "XML files|*.xml|All files|*.*";
 
 			if( saveFileDialog.ShowDialog() == DialogResult.OK )
 			{
-				var path = saveFileDialog.FileName;
+				_levelPath = saveFileDialog.FileName;
+				_levelName = _levelPath.NameFromPath();
 
-				var ser = new XmlSerializer( typeof( Level ) );
-				using( var stream = new FileStream( path, FileMode.Create, FileAccess.Write ) )
-				{
-					var settings = new XmlWriterSettings();
-					settings.Indent = true;
-					settings.IndentChars = "\t";
-					settings.OmitXmlDeclaration = false;
-
-					using( var writer = XmlWriter.Create( stream, settings ) )
-					{
-						ser.Serialize( writer, _level );
-					}
-				}
-
-				MessageBox.Show( "Level saved." );
+				result = true;
 			}
+
+			return result;
+		}
+
+		private void saveToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			var hasPath = !string.IsNullOrEmpty( _levelPath );
+
+			if( !hasPath )
+				hasPath = PromptLevelPath();
+
+			if( hasPath )
+				SaveLevel();
 		}
 
 		private void saveAsToolStripMenuItem_Click( object sender, EventArgs e )
 		{
-
+			if( PromptLevelPath() )
+				SaveLevel();
 		}
 
 		private void exportToolStripMenuItem_Click( object sender, EventArgs e )
@@ -373,6 +414,13 @@ namespace Editor
 		private void exitToolStripMenuItem_Click( object sender, EventArgs e )
 		{
 			Close();
+		}
+
+		private void UpdateTitle()
+		{
+			Text = _levelName;
+			if( _lastSaveCommandIndex != _commandStack.Index )
+				Text += "*";
 		}
 	}
 }
