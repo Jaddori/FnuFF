@@ -142,6 +142,8 @@ namespace Editor
 
 				// add new face
 				var newFace = new Face( plane.Normal, plane.D );
+				newFace.PackName = _faces.Last().PackName;
+				newFace.TextureName = _faces.Last().TextureName;
 				_faces.Add( newFace );
 
 				// rebuild vertices

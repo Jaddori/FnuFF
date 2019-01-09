@@ -67,6 +67,7 @@
     <Compile Include="Camera3D.cs" />
     <Compile Include="AssetPack.cs" />
     <Compile Include="EditorColors.cs" />
+    <Compile Include="EditorFlags.cs" />
     <Compile Include="EditorForm.cs">
       <SubType>Form</SubType>
     </Compile>

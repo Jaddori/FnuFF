@@ -139,15 +139,21 @@ namespace Editor
 		{
 			_vertices.Clear();
 
+			if( !EditorFlags.TextureLock )
+				_uvs.Clear();
+
 			var otherPlanes = parent.Faces.Where( x => x != this ).Select( x => x.Plane ).ToArray();
 			var points = Extensions.IntersectPlanes( _plane, otherPlanes );
 			var indices = Extensions.WindingIndex3D( points, _plane.Normal );
 			var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( _plane.Normal, x, this ) ).ToArray();
-
-			foreach( var index in indices )
+			
+			for( int i=0; i<indices.Length; i++ )
 			{
+				var index = indices[i];
 				_vertices.Add( points[index] );
-				_uvs.Add( texCoords[index] );
+				
+				if( i > _uvs.Count-1 )
+					_uvs.Add( texCoords[index] );
 			}
 		}
 
