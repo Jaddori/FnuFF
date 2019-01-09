@@ -580,7 +580,9 @@ namespace Editor
 						_handleIndex = -1;
 
 						_commandSolidChanged.End();
-						_commandStack.Do( _commandSolidChanged );
+
+						if( _commandSolidChanged.HasChanges )
+							_commandStack.Do( _commandSolidChanged );
 
 						Invalidate();
 						OnGlobalInvalidation?.Invoke();
