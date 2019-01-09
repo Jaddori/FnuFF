@@ -243,7 +243,19 @@ namespace Editor
 			}
 		}
 
-		public void Paint3D()
+		public void PaintOpaque3D()
+		{
+			var opaqueFaces = _faces.Where( x => TextureMap.GetBPP( x.PackName, x.TextureName ) <= 3 ).ToArray();
+			Paint3D( opaqueFaces );
+		}
+
+		public void PaintTransparent3D()
+		{
+			var transparentFaces = _faces.Where( x => TextureMap.GetBPP( x.PackName, x.TextureName ) >= 4 ).ToArray();
+			Paint3D( transparentFaces );
+		}
+
+		public void Paint3D( Face[] faces )
 		{
 			float red = _color.R / 255.0f;
 			float green = _color.G / 255.0f;
@@ -256,7 +268,7 @@ namespace Editor
 			}
 
 			var cur = 0;
-			foreach( var face in _faces )
+			foreach( var face in faces )
 			{
 				//cur++;
 				//if( cur != 4 )

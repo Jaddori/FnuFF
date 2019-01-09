@@ -40,7 +40,7 @@ namespace Editor
 		{
 			Targa result = null;
 
-			if( _packs.ContainsKey( packName ) )
+			if( !string.IsNullOrEmpty(packName) && !string.IsNullOrEmpty(textureName) &&  _packs.ContainsKey( packName ) )
 			{
 				var pack = _packs[packName];
 				result = pack.GetTarga( textureName );
@@ -53,11 +53,22 @@ namespace Editor
 		{
 			UInt32 result = 0;
 
-			if( _packs.ContainsKey( packName ) )
+			if( !string.IsNullOrEmpty(packName) && !string.IsNullOrEmpty(textureName) && _packs.ContainsKey( packName ) )
 			{
 				var pack = _packs[packName];
 				result = pack.GetID( textureName );
 			}
+
+			return result;
+		}
+
+		public static int GetBPP( string packName, string textureName )
+		{
+			var result = -1;
+
+			var targa = GetTarga( packName, textureName );
+			if( targa != null )
+				result = targa.Bpp;
 
 			return result;
 		}

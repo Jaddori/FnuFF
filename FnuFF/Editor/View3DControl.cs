@@ -131,11 +131,19 @@ namespace Editor
 
 				GL.End();
 
-				// draw solids
+				// draw opaque solids
 				foreach( var solid in _level.Solids )
 				{
-					solid.Paint3D();
+					solid.PaintOpaque3D();
 				}
+
+				// draw transparent solids
+				GL.EnableDepthMask( false );
+				foreach( var solid in _level.Solids )
+				{
+					solid.PaintTransparent3D();
+				}
+				GL.EnableDepthMask( true );
 
 				// draw entities
 				foreach( var entity in _level.Entities )
