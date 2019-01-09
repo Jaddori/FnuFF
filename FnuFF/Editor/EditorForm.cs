@@ -204,6 +204,11 @@ namespace Editor
 						if( ser.CanDeserialize( reader ) )
 						{
 							_level = (Level)ser.Deserialize( reader );
+
+							foreach( var solid in _level.Solids )
+								foreach( var face in solid.Faces )
+									face.BuildVertices( solid );
+
 							success = true;
 						}
 					}
@@ -211,6 +216,8 @@ namespace Editor
 
 				if( success )
 				{
+					EditorTool.Current = EditorTools.Select;
+
 					_levelPath = path;
 					_levelName = _levelPath.NameFromPath();
 
