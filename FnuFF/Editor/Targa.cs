@@ -147,7 +147,8 @@ namespace Editor
 				var ptr = data.Scan0;
 				for( int y = 0; y < _height; y++ )
 				{
-					Marshal.Copy( _pixels, ( _height - y - 1 ) * lineWidth, ptr, lineWidth );
+					//Marshal.Copy( _pixels, ( _height - y - 1 ) * lineWidth, ptr, lineWidth );
+					Marshal.Copy( _pixels, y * lineWidth, ptr, lineWidth );
 					ptr += data.Stride;
 				}
 
