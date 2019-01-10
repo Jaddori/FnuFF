@@ -26,7 +26,7 @@ namespace Editor
 		public float Z { get; set; }
 
 		[XmlIgnore]
-		public bool IsEmpty { get { return Math.Abs( X ) > EPSILON && Math.Abs( Y ) > EPSILON && Math.Abs( Z ) > EPSILON; } }
+		public bool IsEmpty { get { return Math.Abs( X ) < EPSILON && Math.Abs( Y ) < EPSILON && Math.Abs( Z ) < EPSILON; } }
 
 		public Triple( float x, float y, float z )
 		{

@@ -179,7 +179,10 @@ namespace Editor
 			var d = _vertices[0].Dot( normal );
 
 			if( _plane.Normal.Dot( normal ) < 0 )
+			{
 				normal *= -1;
+				d = -d;
+			}
 
 			_plane.Normal = normal;
 			_plane.D = d;
