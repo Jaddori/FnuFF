@@ -53,31 +53,58 @@ namespace Editor
 			stream.ReadByte(); // skip colormap type
 
 			var imageType = stream.ReadByte();
-			if( imageType == 2 ) // can only handle unmapped RGB(A)
+
+			byte[] buffer = new byte[16];
+			stream.Read( buffer, 0, 9 ); // skip colormap and origin info
+
+			stream.Read( buffer, 0, 5 );
+			_width = BitConverter.ToInt16( buffer, 0 );
+			_height = BitConverter.ToInt16( buffer, 2 );
+			_bpp = buffer[4];
+			_bpp /= 8;
+
+			stream.ReadByte(); // skip image descriptor
+
+			if( _width > 0 && _height > 0 && ( _bpp == 3 || _bpp == 4 ) )
 			{
-				byte[] buffer = new byte[16];
-				stream.Read( buffer, 0, 9 ); // skip colormap and origin info
+				int pixelCount = _width * _height * _bpp;
+				_pixels = new byte[pixelCount];
 
-				stream.Read( buffer, 0, 5 );
-				_width = BitConverter.ToInt16( buffer, 0 );
-				_height = BitConverter.ToInt16( buffer, 2 );
-				_bpp = buffer[4];
-				_bpp /= 8;
-
-				stream.ReadByte(); // skip image descriptor
-
-				if( _width > 0 && _height > 0 && ( _bpp == 3 || _bpp == 4 ) )
+				if( imageType == 2 ) // unmapped RGB(A)
 				{
-					int pixelCount = _width * _height * _bpp;
-					_pixels = new byte[pixelCount];
 					stream.Read( _pixels, 0, pixelCount );
 
-					// convert from GBR(A) to RGB(A)
-					for( int i = 0; i < pixelCount; i += _bpp )
+					_imageDirty = true;
+					result = true;
+				}
+				else if( imageType == 10 ) // RLE RGB(A)
+				{
+					var pixelOffset = 0;
+					while( pixelOffset < pixelCount )
 					{
-						var temp = _pixels[i];
-						_pixels[i] = _pixels[i + 2];
-						_pixels[i + 2] = temp;
+						var packet = new byte[1];
+						stream.Read( packet, 0, 1 );
+
+						if( ( packet[0] & 0x80 ) > 0 ) // RLE header
+						{
+							int count = ( packet[0] ^ 0x80 ) + 1;
+
+							var pixel = new byte[_bpp];
+							stream.Read( pixel, 0, _bpp );
+
+							for( int i = 0; i < count; i++ )
+							{
+								Array.Copy( pixel, 0, _pixels, pixelOffset, _bpp );
+								pixelOffset += _bpp;
+							}
+						}
+						else // raw pixel
+						{
+							int count = packet[0] + 1;
+
+							stream.Read( _pixels, pixelOffset, count * _bpp );
+							pixelOffset += count * _bpp;
+						}
 					}
 
 					_imageDirty = true;
@@ -96,31 +123,59 @@ namespace Editor
 			reader.ReadByte(); // skip colormap type
 
 			var imageType = reader.ReadByte();
-			if( imageType == 2 ) // can only handle unmapped RGB(A)
+
+			byte[] buffer = new byte[16];
+			reader.Read( buffer, 0, 9 ); // skip colormap and origin info
+
+			reader.Read( buffer, 0, 5 );
+			_width = BitConverter.ToInt16( buffer, 0 );
+			_height = BitConverter.ToInt16( buffer, 2 );
+			_bpp = buffer[4];
+			_bpp /= 8;
+
+			reader.ReadByte(); // skip image descriptor
+
+			if( _width > 0 && _height > 0 && ( _bpp == 3 || _bpp == 4 ) )
 			{
-				byte[] buffer = new byte[16];
-				reader.Read( buffer, 0, 9 ); // skip colormap and origin info
+				int pixelCount = _width * _height * _bpp;
+				_pixels = new byte[pixelCount];
 
-				_width = reader.ReadInt16();
-				_height = reader.ReadInt16();
-				_bpp = reader.ReadByte();
-				_bpp /= 8;
-
-				reader.ReadByte(); // skip image descriptor
-
-				if( _width > 0 && _height > 0 && ( _bpp == 3 || _bpp == 4 ) )
+				if( imageType == 2 ) // unmapped RGB(A)
 				{
-					int pixelCount = _width * _height * _bpp;
-					_pixels = new byte[pixelCount];
 					reader.Read( _pixels, 0, pixelCount );
 
-					// convert from GBR(A) to RGB(A)
-					/*for( int i = 0; i < pixelCount; i += _bpp )
+					_imageDirty = true;
+					result = true;
+				}
+				else if( imageType == 10 ) // RLE RGB(A)
+				{
+					var pixelOffset = 0;
+					while( pixelOffset < pixelCount )
 					{
-						var temp = _pixels[i];
-						_pixels[i] = _pixels[i + 2];
-						_pixels[i + 2] = temp;
-					}*/
+						var packet = new byte[1];
+						reader.Read( packet, 0, 1 );
+
+						if( ( packet[0] & 0x80 ) > 0 ) // RLE header
+						{
+							int count = (packet[0] ^ 0x80) + 1;
+
+							var pixel = new byte[_bpp];
+							reader.Read( pixel, 0, _bpp );
+
+							for( int i = 0; i < count; i++ )
+							{
+								Array.Copy( pixel, 0, _pixels, pixelOffset, _bpp );
+								pixelOffset += _bpp;
+							}
+						}
+						else // raw pixel
+						{
+							int count = packet[0] + 1;
+
+							reader.Read( _pixels, pixelOffset, count * _bpp );
+							pixelOffset += count * _bpp;
+						}
+					}
 
 					_imageDirty = true;
 					result = true;
@@ -147,7 +202,6 @@ namespace Editor
 				var ptr = data.Scan0;
 				for( int y = 0; y < _height; y++ )
 				{
-					//Marshal.Copy( _pixels, ( _height - y - 1 ) * lineWidth, ptr, lineWidth );
 					Marshal.Copy( _pixels, y * lineWidth, ptr, lineWidth );
 					ptr += data.Stride;
 				}
