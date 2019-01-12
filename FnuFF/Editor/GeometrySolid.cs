@@ -395,5 +395,15 @@ namespace Editor
 
 			GL.SetTexture( 0 );
 		}
+
+		public GeometrySolid Copy()
+		{
+			var result = new GeometrySolid();
+
+			foreach( var face in _faces )
+				result.Faces.Add( face.Copy() );
+
+			return result;
+		}
     }
 }

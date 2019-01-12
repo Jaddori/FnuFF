@@ -31,6 +31,7 @@ namespace Editor
             Keys.Space,
             Keys.Escape,
             Keys.Alt,
+			Keys.ShiftKey | Keys.Shift,
         };
 
 		private static Cursor[] HANDLE_CURSORS =
@@ -51,6 +52,7 @@ namespace Editor
         private bool _lmbDown;
 		private bool _mmbDown;
 		private bool _spaceDown;
+		private bool _shiftDown;
         private int _directionType;
 		private PointF _hoverPosition;
 		private PointF _clipStart;
@@ -67,6 +69,7 @@ namespace Editor
 		private int _handleIndex;
 		private bool _movingEntity;
 		private bool _movingSolid;
+		private bool _duplicatingSolid;
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
@@ -421,8 +424,19 @@ namespace Editor
 								_solidPosition = _camera.ToGlobal( bounds.TopLeft() );
 								_solidOffset = new PointF( e.X - bounds.Left, e.Y - bounds.Top );
 
-								_commandSolidChanged = new CommandSolidChanged( selectedSolid );
-								_commandSolidChanged.Begin();
+								if( _shiftDown ) // check if we're duplicating solid
+								{
+									var duplicate = selectedSolid.Copy();
+									_level.AddSolid( duplicate );
+									EditorTool.SelectedSolid = duplicate;
+
+									_duplicatingSolid = true;
+								}
+								else
+								{
+									_commandSolidChanged = new CommandSolidChanged( selectedSolid );
+									_commandSolidChanged.Begin();
+								}
 							}
 						}
 						else // interaction with handles
@@ -560,9 +574,19 @@ namespace Editor
 					{
 						_movingSolid = false;
 
-						_commandSolidChanged.End();
-						if( _commandSolidChanged.HasChanges )
-							_commandStack.Do( _commandSolidChanged );
+						if( _duplicatingSolid )
+						{
+							var command = new CommandSolidCreated( _level.Solids, EditorTool.SelectedSolid );
+							_commandStack.Do( command );
+						}
+						else
+						{
+							_commandSolidChanged.End();
+							if( _commandSolidChanged.HasChanges )
+								_commandStack.Do( _commandSolidChanged );
+						}
+
+						_duplicatingSolid = false;
 
 						Invalidate();
 						OnGlobalInvalidation?.Invoke();
@@ -964,6 +988,8 @@ namespace Editor
 
 			if( e.KeyCode == Keys.Space )
 				_spaceDown = true;
+			else if( e.KeyCode == Keys.ShiftKey )
+				_shiftDown = true;
 
 			// camera input
 			var movement = new PointF();
@@ -1062,6 +1088,8 @@ namespace Editor
 
 			if( e.KeyCode == Keys.Space )
 				_spaceDown = false;
+			else if( e.KeyCode == Keys.ShiftKey )
+				_shiftDown = true;
 
 			// solid manipulation
 			if( e.KeyCode == Keys.Delete )
