@@ -163,5 +163,14 @@ namespace Editor
 				OnFaceMetricsChanged?.Invoke();
 			}
 		}
+
+		public void SetDefaultTexture()
+		{
+			txt_textureName.Text = TextureMap.CurrentPackName + "/" + TextureMap.CurrentTextureName;
+
+			var targa = TextureMap.GetCurrentTarga();
+			if( targa != null )
+				pb_texture.Image = targa.ToImage();
+		}
 	}
 }

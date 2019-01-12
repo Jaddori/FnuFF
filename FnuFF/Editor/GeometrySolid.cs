@@ -103,7 +103,12 @@ namespace Editor
 			_faces.AddRange( new[] { left, right, top, bottom, front, back } );
 
 			foreach( var face in _faces )
+			{
+				face.PackName = TextureMap.CurrentPackName;
+				face.TextureName = TextureMap.CurrentTextureName;
+
 				face.BuildVertices( this );
+			}
 		}
 
 		public bool Clip( Plane plane )

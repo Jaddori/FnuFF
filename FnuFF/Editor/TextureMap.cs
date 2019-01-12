@@ -27,11 +27,20 @@ namespace Editor
 				var pack = new AssetPack();
 				if( pack.Load( filename ) )
 				{
-					var name = pack.Name;
+					if( pack.Targas.Length > 0 )
+					{
+						var name = pack.Name;
 
-					_names.Add( filename, name );
-					_paths.Add( name, filename );
-					_packs.Add( name, pack );
+						_names.Add( filename, name );
+						_paths.Add( name, filename );
+						_packs.Add( name, pack );
+
+						if( string.IsNullOrEmpty( _currentPackName ) || string.IsNullOrEmpty( _currentTextureName ) )
+						{
+							_currentPackName = pack.Name;
+							_currentTextureName = pack.Names[0];
+						}
+					}
 				}
 			}
 		}

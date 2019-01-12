@@ -84,6 +84,7 @@ namespace Editor
 			//view_3d.OnFaceSelected += OnFaceSelected;
 
 			tab_face.OnFaceMetricsChanged += OnFaceMetricsChanged;
+			tab_face.SetDefaultTexture();
 
 			_lastSaveCommandIndex = _commandStack.Index;
 			_levelName = LEVEL_NAME_UNNAMED;
