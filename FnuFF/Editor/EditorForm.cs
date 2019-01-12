@@ -441,6 +441,7 @@ namespace Editor
 
 		private void EditorForm_FormClosing( object sender, FormClosingEventArgs e )
 		{
+#if false
 			if( _lastSaveCommandIndex != _commandStack.Index )
 			{
 				var dialogResult = MessageBox.Show( "There are pending changes. Would you like to save before exiting?", "FnuFF Editor - Unsaved Changes", MessageBoxButtons.YesNoCancel );
@@ -457,6 +458,7 @@ namespace Editor
 				else if( dialogResult == DialogResult.Cancel )
 					e.Cancel = true;
 			}
+#endif
 		}
 	}
 }

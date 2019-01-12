@@ -32,32 +32,16 @@ namespace Editor
             Keys.Alt,
         };
 
-		/*private static Cursor[] HANDLE_CURSORS =
-		{
-			Cursors.SizeNWSE, Cursors.SizeNS, Cursors.SizeNESW,
-			Cursors.SizeWE, Cursors.SizeAll, Cursors.SizeWE,
-			Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE
-		};*/
-
 		private static Cursor[] HANDLE_CURSORS =
-	{
+		{
 			Cursors.SizeNWSE,	Cursors.SizeNS,		Cursors.SizeNESW,
 			Cursors.SizeWE,							Cursors.SizeWE,
 			Cursors.SizeNESW,	Cursors.SizeNS,		Cursors.SizeNWSE
 		};
 
-		private static int[] GRID_SIZES = new int[] { 1, 2, 3, 4, 5, 10 };
-		private const int GRID_MAX_LINES = 100;
-		private const int GRID_GAP_BASE = 64;
-
         private Camera2D _camera;
 
         private Brush _backgroundBrush;
-        private Pen _gridPen;
-		private Pen _gridHighlightPen;
-        private int _gridSize;
-        private int _gridGap;
-        private int _gridSizeIndex;
 
         private Pen _solidPen;
         private PointF _startPosition;
@@ -194,13 +178,9 @@ namespace Editor
             DoubleBuffered = true;
 
             _camera = new Camera2D();
+			_camera.Zoom = 5;
 
             _backgroundBrush = new SolidBrush( EditorColors.BACKGROUND_LOW );
-            _gridPen = new Pen( EditorColors.GRID );
-			_gridHighlightPen = new Pen( EditorColors.GRID_HIGHLIGHT );
-            _gridSizeIndex = 0;
-            _gridSize = GRID_SIZES[_gridSizeIndex];
-            _gridGap = 64;
 			
             _solidPen = new Pen( Color.White );
 			_solidPen.DashPattern = EditorColors.DASH_PATTERN;
@@ -223,7 +203,7 @@ namespace Editor
 		private PointF SnapToGrid( PointF point )
 		{
 			var result = _camera.ToGlobal( point );
-			result = _camera.Snap( _gridGap, result );
+			result = _camera.Snap( Grid.Gap, result );
 			result = _camera.ToLocal( result );
 
 			return result;
@@ -243,9 +223,10 @@ namespace Editor
 			EditorTool.OnSelectedEntityChanged += ( prev, cur ) => Invalidate();
 
 			Log.AddFunctor( Name, () => "Camera: " + _camera.Position.ToString() );
+			Log.AddFunctor( Name, () => "Zoom: " + _camera.Zoom.ToString() );
 			Log.AddFunctor( Name, () => "Hover: " + _hoverPosition.ToString() );
-			Log.AddFunctor( Name, () => "Grid size: " + _gridSize.ToString() );
-			Log.AddFunctor( Name, () => "Grid gap: " + _gridGap.ToString() );
+			Log.AddFunctor( Name, () => "Grid size: " + Grid.Size.ToString() );
+			Log.AddFunctor( Name, () => "Grid gap: " + Grid.Gap.ToString() );
 			Log.AddFunctor( Name, () => "Clip end: " + _clipEnd.ToString() );
 			Log.AddFunctor( Name, () =>
 				{
@@ -283,32 +264,10 @@ namespace Editor
 				return;
 
 			// paint grid
-			for( int x = -GRID_MAX_LINES; x <= GRID_MAX_LINES; x++ )
-			{
-				var p1 = new PointF( x * _gridGap, -GRID_MAX_LINES*_gridGap );
-				var p2 = new PointF( p1.X, GRID_MAX_LINES * _gridGap );
-
-				var g1 = _camera.ToLocal( p1 );
-				var g2 = _camera.ToLocal( p2 );
-
-				if( g1.X > 0 && g1.X < Size.Width )
-					g.DrawLine( _gridPen, g1, g2 );
-			}
-			
-			for( int y = -GRID_MAX_LINES; y <= GRID_MAX_LINES; y++ )
-			{
-				var p1 = new PointF( -GRID_MAX_LINES * _gridGap, y*_gridGap );
-				var p2 = new PointF( GRID_MAX_LINES * _gridGap, p1.Y );
-
-				var g1 = _camera.ToLocal( p1 );
-				var g2 = _camera.ToLocal( p2 );
-
-				if( g1.Y > 0 && g1.Y < Size.Height )
-					g.DrawLine( _gridPen, g1, g2 );
-			}
+			Grid.Paint2D( g, _camera, Size );
 
 			// paint axis gizmo
-			var gizmoExtent = _gridGap * 3;
+			var gizmoExtent = Grid.Gap * 3;
 			var origo = _camera.ToLocal( _camera.Project( new Triple(0,0,0) ) );
 			var xproj = _camera.ToLocal( _camera.Project( new Triple( gizmoExtent, 0, 0 ) ) );
 			var yproj = _camera.ToLocal( _camera.Project( new Triple( 0, gizmoExtent, 0 ) ) );
@@ -330,7 +289,7 @@ namespace Editor
 			// paint solids
 			foreach( var solid in _level.Solids )
 			{
-				solid.Paint2D( g, _camera, _gridGap, _gridSize );
+				solid.Paint2D( g, _camera );
 			}
 
 			// paint clipping handle
@@ -353,7 +312,7 @@ namespace Editor
 			// draw entities
 			foreach( var entity in _level.Entities )
 			{
-				entity.Paint2D( g, _camera, _gridSize, _gridGap );
+				entity.Paint2D( g, _camera );
 			}
 
 			if( !DesignMode )
@@ -414,8 +373,7 @@ namespace Editor
 					_handleIndex = -1;
 
 					var selectedSolid = EditorTool.SelectedSolid;
-
-					//if( _selectedSolid != null )
+					
 					if( selectedSolid != null )
 					{
 						var facePoints = new List<PointF>();
@@ -424,7 +382,7 @@ namespace Editor
 						{
 							var otherPlanes = selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
+							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
 
 							facePoints.AddRange( projectedPoints );
 						}
@@ -438,7 +396,7 @@ namespace Editor
 							{
 								_handleIndex = i;
 
-								_handlePosition = SnapToGrid( e.Location );
+								_handlePosition = SnapToGrid( e.Location ).Inflate( _camera.Zoom );
 							}
 						}
 
@@ -471,7 +429,7 @@ namespace Editor
 						var selectedEntity = EditorTool.SelectedEntity;
 						if( selectedEntity != null )
 						{
-							if( selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
+							if( selectedEntity.Contains2D( e.Location, _camera ) )
 							{
 								_movingEntity = true;
 
@@ -483,7 +441,7 @@ namespace Editor
 						// check if we're trying to select an entity
 						if( !_movingEntity )
 						{
-							var potentialEntities = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
+							var potentialEntities = _level.Entities.Where( x => x.Contains2D( e.Location, _camera ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
 							if( potentialEntities.Length > 0 )
 							{
 								EditorTool.SelectedEntity = potentialEntities[0];
@@ -550,15 +508,15 @@ namespace Editor
 						var gmax = _camera.ToGlobal( max );
 
 						var minTriple = _camera.Unproject( gmin, 0 );
-						var maxTriple = _camera.Unproject( gmax, _gridGap );
+						var maxTriple = _camera.Unproject( gmax, Grid.Gap );
 
 						Extensions.MinMax( ref minTriple, ref maxTriple );
 
-						minTriple /= _gridGap;
-						minTriple *= _gridSize;
+						minTriple /= Grid.Gap;
+						minTriple *= Grid.Size;
 
-						maxTriple /= _gridGap;
-						maxTriple *= _gridSize;
+						maxTriple /= Grid.Gap;
+						maxTriple *= Grid.Size;
 
 						var solid = new GeometrySolid( minTriple, maxTriple );
 						_level.AddSolid( solid );
@@ -637,7 +595,7 @@ namespace Editor
 					if( _snapToGrid )
 						_entityPosition = SnapToGrid( _entityPosition );
 
-					var position = _camera.Unproject( _camera.ToGlobal( _entityPosition ).Deflate( _gridGap ).Inflate( _gridSize ) );
+					var position = _camera.Unproject( _camera.ToGlobal( _entityPosition ).Deflate( Grid.Gap ).Inflate( Grid.Size ) );
 					var entity = new Entity( position );
 					entity.Data = new PlayerSpawn();
 					_level.AddEntity( entity );
@@ -676,13 +634,13 @@ namespace Editor
 
 			if( _handleIndex >= 0 )
 			{
-				var localSnap = SnapToGrid( e.Location );
-				_hoverPosition = localSnap;
+				var localSnap = SnapToGrid( e.Location ).Inflate( _camera.Zoom );
+				_hoverPosition = localSnap.Deflate( _camera.Zoom );
 
 				if( localSnap != _handlePosition )
 				{
 					var dif = new PointF( localSnap.X - _handlePosition.X, localSnap.Y - _handlePosition.Y );
-					dif = dif.Deflate( _gridGap ).Inflate( _gridSize );
+					dif = dif.Deflate( Grid.Gap ).Inflate( Grid.Size );
 
 					if( !dif.IsEmpty )
 					{
@@ -742,7 +700,7 @@ namespace Editor
 				if( globalSnap != _solidPosition )
 				{
 					var localMovement = new PointF( globalSnap.X - _solidPosition.X, globalSnap.Y - _solidPosition.Y );
-					var unprojectedMovement = _camera.Unproject( localMovement.Deflate( _gridGap ).Inflate( _gridSize ) );
+					var unprojectedMovement = _camera.Unproject( localMovement.Deflate( Grid.Gap ).Inflate( Grid.Size ) );
 
 					var selectedSolid = EditorTool.SelectedSolid;
 					selectedSolid.Move( unprojectedMovement );
@@ -757,7 +715,7 @@ namespace Editor
 				_hoverPosition = localSnap;
 
 				var selectedEntity = EditorTool.SelectedEntity;
-				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( _gridGap ).Inflate( _gridSize ), selectedEntity.Position.Dot( _camera.Direction ) );
+				var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( Grid.Gap ).Inflate( Grid.Size ), selectedEntity.Position.Dot( _camera.Direction ) );
 
 				if( globalSnap != selectedEntity.Position )
 				{
@@ -794,9 +752,7 @@ namespace Editor
 
 					if( _snapToGrid )
 					{
-						_hoverPosition = _camera.ToGlobal( _hoverPosition );
-						_hoverPosition = _camera.Snap( _gridGap, _hoverPosition );
-						_hoverPosition = _camera.ToLocal( _hoverPosition );
+						_hoverPosition = SnapToGrid( _hoverPosition );
 					}
 
 					Invalidate();
@@ -816,7 +772,7 @@ namespace Editor
 							var face = faces[i];
 							var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
+							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
 
 							var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
@@ -896,7 +852,7 @@ namespace Editor
 						{
 							var otherPlanes = selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( _gridGap ).Deflate( _gridSize ) ) ).ToArray();
+							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
 
 							facePoints.AddRange( projectedPoints );
 						}
@@ -924,7 +880,7 @@ namespace Editor
 					var selectedEntity = EditorTool.SelectedEntity;
 					if( selectedEntity != null )
 					{
-						if( selectedEntity.Contains2D( e.Location, _camera, _gridSize, _gridGap ) )
+						if( selectedEntity.Contains2D( e.Location, _camera ) )
 						{
 							Cursor.Current = Cursors.SizeAll;
 							hoveredSelectedEntity = true;
@@ -943,7 +899,7 @@ namespace Editor
 							entity.Hovered = false;
 						}
 
-						var potentialEntites = _level.Entities.Where( x => x.Contains2D( e.Location, _camera, _gridSize, _gridGap ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
+						var potentialEntites = _level.Entities.Where( x => x.Contains2D( e.Location, _camera ) ).OrderBy( x => x.Position.Dot( _camera.Direction ) ).ToArray();
 						if( potentialEntites.Length > 0 )
 						{
 							potentialEntites[0].Hovered = true;
@@ -1022,18 +978,16 @@ namespace Editor
             // grid manipulation
             if( e.Alt )
             {
-                if( e.KeyCode == Keys.D8 )
-                    _gridSizeIndex--;
-                else if( e.KeyCode == Keys.D9 )
-                    _gridSizeIndex++;
-
-                if( _gridSizeIndex < 0 )
-                    _gridSizeIndex = 0;
-                else if( _gridSizeIndex >= GRID_SIZES.Length )
-                    _gridSizeIndex = GRID_SIZES.Length-1;
-
-                _gridSize = GRID_SIZES[_gridSizeIndex];
-				_gridGap = (int)(GRID_GAP_BASE * _gridSize);
+				if( e.KeyCode == Keys.D8 )
+				{
+					Grid.Decrease();
+					_camera.Zoom = 5;
+				}
+				else if( e.KeyCode == Keys.D9 )
+				{
+					Grid.Increase();
+					_camera.Zoom = 5;
+				}
 
                 Invalidate();
 
@@ -1057,6 +1011,7 @@ namespace Editor
 				}
 			}
 
+			// clipping
 			if( e.KeyCode == Keys.Enter )
 			{
 				if( EditorTool.Current == EditorTools.Clip )
@@ -1066,8 +1021,8 @@ namespace Editor
 					var selectedSolid = EditorTool.SelectedSolid;
 					if( selectedSolid != null )
 					{
-						var globalStart = _camera.Unproject( _camera.ToGlobal( _clipStart ).Deflate( _gridGap ).Inflate( _gridSize ) );
-						var globalEnd = _camera.Unproject( _camera.ToGlobal( _clipEnd ).Deflate( _gridGap ).Inflate( _gridSize ) );
+						var globalStart = _camera.Unproject( _camera.ToGlobal( _clipStart ).Deflate( Grid.Gap ).Inflate( Grid.Size ) );
+						var globalEnd = _camera.Unproject( _camera.ToGlobal( _clipEnd ).Deflate( Grid.Gap ).Inflate( Grid.Size ) );
 
 						var compliment = globalEnd - _camera.Direction;
 

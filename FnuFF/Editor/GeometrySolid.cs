@@ -169,7 +169,7 @@ namespace Editor
 			}
 		}
 
-		public void Paint2D( Graphics g, Camera2D camera, int gridGap, int gridSize )
+		public void Paint2D( Graphics g, Camera2D camera )
 		{
 			var color = Color.FromArgb( EditorColors.FADE, _color );
 			if( _selected )
@@ -183,14 +183,13 @@ namespace Editor
 			{
 				if( !_selected && !_hovered )
 				{
-					//pen.DashStyle = DashStyle.Dash;
 					pen.DashPattern = EditorColors.DASH_PATTERN;
 				}
 				
 				var faces = _faces.Where( x => x.Plane.Normal.Dot( camera.Direction ) > 0 ).ToArray();
 				foreach( var face in faces )
 				{
-					var projectedPoints = face.Vertices.Select( x => camera.ToLocal( camera.Project( x ).Inflate( gridGap ).Deflate( gridSize ) ) ).ToArray();
+					var projectedPoints = face.Vertices.Select( x => camera.ToLocal( camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
 
 					var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
@@ -304,14 +303,14 @@ namespace Editor
 				}
 
 				GL.BeginTriangles();
-
-				var v0 = face.Vertices[0];
+				
+				var v0 = face.Vertices[0] / Grid.SIZE_BASE;
 				var uv0 = face.UVs[0];
 
 				for( int i = 1; i < face.Vertices.Count - 1; i++ )
 				{
-					var v1 = face.Vertices[i];
-					var v2 = face.Vertices[i + 1];
+					var v1 = face.Vertices[i] / Grid.SIZE_BASE;
+					var v2 = face.Vertices[i + 1] / Grid.SIZE_BASE;
 
 					var uv1 = face.UVs[i];
 					var uv2 = face.UVs[i+1];

@@ -44,10 +44,10 @@ namespace Editor.Entities
 			_selected = false;
 		}
 
-		public bool Contains2D( Point point, Camera2D camera, float gridSize, float gridGap )
+		public bool Contains2D( Point point, Camera2D camera )
 		{
 			var gpos = camera.Project( _position );
-			var lpos = camera.ToLocal( gpos.Deflate( gridSize ).Inflate( gridGap ) );
+			var lpos = camera.ToLocal( gpos.Deflate( Grid.Size ).Inflate( Grid.Gap ) );
 
 			var bounds = Extensions.FromPoint( lpos, 32 );
 			var result = bounds.Contains( point );
@@ -55,9 +55,9 @@ namespace Editor.Entities
 			return result;
 		}
 
-		public virtual void Paint2D( Graphics g, Camera2D camera, float gridSize, float gridGap )
+		public virtual void Paint2D( Graphics g, Camera2D camera )
 		{
-			var localPosition = camera.ToLocal( camera.Project( _position ).Deflate( gridSize ).Inflate( gridGap ) );
+			var localPosition = camera.ToLocal( camera.Project( _position ).Deflate( Grid.Size ).Inflate( Grid.Gap ) );
 
 			var icon = _data.GetIcon2D(_hovered, _selected);
 			var iconBounds = Extensions.FromPoint( localPosition, icon.Width );
@@ -66,6 +66,8 @@ namespace Editor.Entities
 
 		public virtual void Paint3D()
 		{
+			var position = _position / Grid.SIZE_BASE;
+
 			GL.EnablePointSprite( true );
 			GL.EnableDepthMask( false );
 			GL.SetTexture( _data.GetIcon3D() );
@@ -74,7 +76,7 @@ namespace Editor.Entities
 			GL.BeginPoints();
 			GL.TexCoord2f( 1.0f, 1.0f );
 			GL.Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-			GL.Vertex3f( _position.X, _position.Y, _position.Z );
+			GL.Vertex3f( position.X, position.Y, position.Z );
 			GL.End();
 
 			GL.SetTexture( 0 );
@@ -84,16 +86,16 @@ namespace Editor.Entities
 			GL.BeginLines();
 
 			GL.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
-			GL.Vertex3f( _position.X, _position.Y, _position.Z );
-			GL.Vertex3f( _position.X + 0.25f, _position.Y, _position.Z );
+			GL.Vertex3f( position.X, position.Y, position.Z );
+			GL.Vertex3f( position.X + 0.25f, position.Y, position.Z );
 
 			GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
-			GL.Vertex3f( _position.X, _position.Y, _position.Z );
-			GL.Vertex3f( _position.X, _position.Y+ 0.25f, _position.Z );
+			GL.Vertex3f( position.X, position.Y, position.Z );
+			GL.Vertex3f( position.X, position.Y+ 0.25f, position.Z );
 
 			GL.Color4f( 0.0f, 0.0f, 1.0f, 1.0f );
-			GL.Vertex3f( _position.X, _position.Y, _position.Z );
-			GL.Vertex3f( _position.X, _position.Y, _position.Z + 0.25f );
+			GL.Vertex3f( position.X, position.Y, position.Z );
+			GL.Vertex3f( position.X, position.Y, position.Z + 0.25f );
 
 			GL.End();
 		}

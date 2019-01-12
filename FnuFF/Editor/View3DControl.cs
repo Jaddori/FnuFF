@@ -17,9 +17,6 @@ namespace Editor
 		public delegate void GlobalInvalidationHandler();
 		public event GlobalInvalidationHandler OnGlobalInvalidation;
 
-		//public delegate void FaceHandler( GeometrySolid solid, Face face );
-		//public event FaceHandler OnFaceSelected;
-
 		private const float CAMERA_SCROLL_SPEED = 10.0f;
 		private const float CAMERA_FORWARD_SPEED = 5.0f;
 		private const float CAMERA_STRAFE_SPEED = 5.0f;
@@ -39,10 +36,6 @@ namespace Editor
 
 		private Level _level;
 		private Camera3D _camera;
-		//private GeometrySolid _hoveredSolid;
-		//private GeometrySolid _selectedSolid;
-		//private Face _hoveredFace;
-		//private Face _selectedFace;
 		private CommandStack _commandStack;
 
 		private bool _mmbDown;
@@ -325,6 +318,9 @@ namespace Editor
 			var start = GL.Unproject( x, Size.Height - y, 0 );
 			var end = GL.Unproject( x, Size.Height - y, 1 );
 
+			start *= Grid.SIZE_BASE;
+			end *= Grid.SIZE_BASE;
+
 			var ray = new Ray( start, end );
 
 			var minLength = float.MaxValue;
@@ -368,19 +364,5 @@ namespace Editor
 
 			return result;
 		}
-
-		/*private void OnEditorToolChanged( EditorTools previous, EditorTools current )
-		{
-			if( previous == EditorTools.Face )
-			{
-				if( _selectedFace != null )
-				{
-					_selectedFace.Selected = false;
-					_selectedFace = null;
-
-					OnFaceSelected?.Invoke( null, null );
-				}
-			}
-		}*/
 	}
 }

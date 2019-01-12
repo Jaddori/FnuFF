@@ -329,6 +329,8 @@ namespace Editor
 
 		public static PointF EmitTextureCoordinates( Triple normal, Triple point, Face face )
 		{
+			point /= Grid.SIZE_BASE;
+
 			Triple xaxis = new Triple();
 			Triple yaxis = new Triple();
 			TextureAxisFromPlane( normal, ref xaxis, ref yaxis );
