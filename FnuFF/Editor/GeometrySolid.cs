@@ -8,6 +8,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Globalization;
 using Editor.UndoRedo;
 
 namespace Editor
@@ -15,6 +16,7 @@ namespace Editor
 	public class GeometrySolid
 	{
 		private const float CLIP_MARGIN = 0.01f;
+		public const int DIMENSION_TEXT_OFFSET = 12;
 		private static Random random = new Random();
 
 		[XmlIgnore]
@@ -184,6 +186,9 @@ namespace Editor
 
 			var facePoints = new List<PointF>();
 
+			var minPoint = new PointF( 99999, 99999 );
+			var maxPoint = new PointF( -99999, -99999 );
+
 			using( var pen = new Pen( color ) )
 			{
 				if( !_selected && !_hovered )
@@ -223,6 +228,19 @@ namespace Editor
 					}
 
 					facePoints.AddRange( projectedPoints );
+
+					foreach( var v in face.Vertices )
+					{
+						var point = camera.Project( v );
+						if( point.X < minPoint.X )
+							minPoint.X = point.X;
+						if( point.Y < minPoint.Y )
+							minPoint.Y = point.Y;
+						if( point.X > maxPoint.X )
+							maxPoint.X = point.X;
+						if( point.Y > maxPoint.Y )
+							maxPoint.Y = point.Y;
+					}
 				}
 			}
 
@@ -244,6 +262,23 @@ namespace Editor
 					foreach( var handle in handles )
 						g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
 				}
+
+				// draw dimensions text
+				var size = new PointF( maxPoint.X - minPoint.X, maxPoint.Y - minPoint.Y );
+
+				var numberFormat = new NumberFormatInfo() { NumberDecimalSeparator = "." };
+				var leftText = size.Y.ToString( "0.0", numberFormat );
+				var topText = size.X.ToString( "0.0", numberFormat );
+				
+				var leftTextSize = g.MeasureString( leftText, EditorColors.SOLID_DIMENSIONS_FONT );
+				var topTextSize = g.MeasureString( topText, EditorColors.SOLID_DIMENSIONS_FONT );
+
+				var center = bounds.GetCenter();
+				var leftPosition = new PointF( bounds.Left - leftTextSize.Width - DIMENSION_TEXT_OFFSET, center.Y - leftTextSize.Height/2 );
+				var topPosition = new PointF( center.X - topTextSize.Width / 2, bounds.Top - DIMENSION_TEXT_OFFSET - topTextSize.Height );
+				
+				g.DrawString( leftText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, leftPosition );
+				g.DrawString( topText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, topPosition );
 			}
 		}
 

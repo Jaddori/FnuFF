@@ -9,6 +9,7 @@ using System.Windows.Forms.ComponentModel;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using Editor.UndoRedo;
 using Editor.Entities;
 
@@ -284,6 +285,25 @@ namespace Editor
                 var maxPoint = new PointF( Math.Max( _startPosition.X, _endPosition.X ), Math.Max( _startPosition.Y, _endPosition.Y ) );
                 var solidRect = new RectangleF( minPoint, new SizeF( maxPoint.X - minPoint.X, maxPoint.Y - minPoint.Y ) );
 				g.DrawRectangle( EditorColors.PEN_WHITE, solidRect.X, solidRect.Y, solidRect.Width, solidRect.Height );
+
+				// paint dimensions text
+				var globalMin = _camera.ToGlobal( minPoint ).Deflate( Grid.Gap ).Inflate( Grid.Size );
+				var globalMax = _camera.ToGlobal( maxPoint ).Deflate( Grid.Gap ).Inflate( Grid.Size );
+				var size = new PointF( globalMax.X - globalMin.X, globalMax.Y - globalMin.Y );
+
+				var numberFormat = new NumberFormatInfo() { NumberDecimalSeparator = "." };
+				var leftText = size.Y.ToString( "0.0", numberFormat );
+				var topText = size.X.ToString( "0.0", numberFormat );
+
+				var leftTextSize = g.MeasureString( leftText, EditorColors.SOLID_DIMENSIONS_FONT );
+				var topTextSize = g.MeasureString( topText, EditorColors.SOLID_DIMENSIONS_FONT );
+
+				var center = solidRect.GetCenter();
+				var leftPosition = new PointF( solidRect.Left - leftTextSize.Width - GeometrySolid.DIMENSION_TEXT_OFFSET, center.Y - leftTextSize.Height/2 );
+				var topPosition = new PointF( center.X - topTextSize.Width / 2, solidRect.Top - topTextSize.Height - GeometrySolid.DIMENSION_TEXT_OFFSET );
+
+				g.DrawString( leftText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, leftPosition );
+				g.DrawString( topText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, topPosition );
             }
 
 			// paint solids

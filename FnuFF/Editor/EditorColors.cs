@@ -51,6 +51,9 @@ namespace Editor
 
 		public static Pen PEN_DASH_FADED_CLIP_LINE = new Pen( Color.FromArgb( 128, Color.DarkGray ) ) { DashPattern = new[] { 4.0f, 4.0f } };
 
+		// fonts
+		public static Font SOLID_DIMENSIONS_FONT = new Font( FontFamily.GenericMonospace, 8.0f );
+
 		// values
 		public static int FADE = 64;
 		public static float[] DASH_PATTERN = { 4.0f, 4.0f };
