@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <Windows.h>
 
 #define MAX_INPUT_FILES 1024
 #define MAX_TEXTURE_NAME_LEN 64
@@ -19,19 +20,27 @@ enum
 	MODE_FOLDER,
 };
 
+enum
+{
+	COLOR_NONE = FOREGROUND_INTENSITY,
+	COLOR_ERROR = FOREGROUND_RED,
+	COLOR_SUCCESS = FOREGROUND_GREEN
+};
+
 bool strcnt( char* str, char c );
 bool strncnt( char* str, char c, int n );
 void parseSettings( char* rootFolder, char* outputName, int* contentMode, char* fileContent );
 int parseInputFiles( char** inputFiles, char* rootFolder, char* fileContent );
-int packContent( char** inputFiles, int inputFileCount, char* outputName, int contentMode );
-int packTextures( char** inputFiles, int inputFileCount, char* outputName );
+int packContent( char** inputFiles, int inputFileCount, char* outputName, int contentMode, HANDLE handle );
+int packTextures( char** inputFiles, int inputFileCount, char* outputName, HANDLE handle );
+void consoleColor( HANDLE handle, int color = COLOR_NONE );
 
 int main( int argc, char* argv[] )
 {
+	HANDLE consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE );
+
 	int contentMode = MODE_NONE;
 	int inputMode = MODE_ARGS;
-	//char* outputName = NULL;
-	//char* rootFolder = NULL;
 
 	char* outputName = new char[MAX_PATH_LEN]{0};
 	char* rootFolder = new char[MAX_PATH_LEN]{0};
@@ -94,6 +103,7 @@ int main( int argc, char* argv[] )
 
 		if( inputFileCount < 1 )
 		{
+			consoleColor( consoleHandle, COLOR_ERROR );
 			printf( "No input files provided. Aborting.\n" );
 			return 1;
 		}
@@ -126,19 +136,23 @@ int main( int argc, char* argv[] )
 			inputFileCount = parseInputFiles( inputFiles, rootFolder, fileContent );
 			if( inputFileCount < 0 )
 			{
+				consoleColor( consoleHandle, COLOR_ERROR );
 				printf( "Too many files in input file list. Max is %d.\n", MAX_INPUT_FILES );
+				consoleColor( consoleHandle );
 				return 1;
 			}
 		}
 		else
 		{
+			consoleColor( consoleHandle, COLOR_ERROR );
 			printf( "Failed to open file: %s\n", inputFile );
+			consoleColor( consoleHandle );
 			return 1;
 		}
 	}
 
 	// pack content
-	return packContent( inputFiles, inputFileCount, outputName, contentMode );
+	return packContent( inputFiles, inputFileCount, outputName, contentMode, consoleHandle );
 }
 
 bool strcnt( char* str, char c )
@@ -246,16 +260,18 @@ int parseInputFiles( char** inputFiles, char* rootFolder, char* fileContent )
 	return index;
 }
 
-int packContent( char** inputFiles, int inputFileCount, char* outputName, int contentMode )
+int packContent( char** inputFiles, int inputFileCount, char* outputName, int contentMode, HANDLE consoleHandle )
 {
 	if( contentMode == MODE_TEXTURES )
-		return packTextures( inputFiles, inputFileCount, outputName );
+		return packTextures( inputFiles, inputFileCount, outputName, consoleHandle );
 
+	consoleColor( consoleHandle, COLOR_ERROR );
 	printf( "Invalid content mode. Aborting." );
+	consoleColor( consoleHandle );
 	return 1;
 }
 
-int packTextures( char** inputFiles, int inputFileCount, char* outputName )
+int packTextures( char** inputFiles, int inputFileCount, char* outputName, HANDLE consoleHandle )
 {
 	int result = 0;
 
@@ -283,7 +299,9 @@ int packTextures( char** inputFiles, int inputFileCount, char* outputName )
 
 			if( dotIndex < 0 )
 			{
+				consoleColor( consoleHandle, COLOR_ERROR );
 				printf( "No extension found for file: %s\n", inputFile );
+				consoleColor( consoleHandle );
 				result = 1;
 			}
 			else 
@@ -294,7 +312,10 @@ int packTextures( char** inputFiles, int inputFileCount, char* outputName )
 				int nameLen = dotIndex - slashIndex;
 				if( nameLen >= MAX_TEXTURE_NAME_LEN )
 				{
+					consoleColor( consoleHandle, COLOR_ERROR );
 					printf( "Filename is too long: %s\n", inputFile );
+					consoleColor( consoleHandle );
+					result = 1;
 				}
 				else
 				{
@@ -326,7 +347,9 @@ int packTextures( char** inputFiles, int inputFileCount, char* outputName )
 			}
 			else
 			{
+				consoleColor( consoleHandle, COLOR_ERROR );
 				printf( "Failed to open file: %s\n", inputFile );
+				consoleColor( consoleHandle );
 				result = 1;
 			}
 		}
@@ -335,14 +358,23 @@ int packTextures( char** inputFiles, int inputFileCount, char* outputName )
 	}
 	else
 	{
+		consoleColor( consoleHandle, COLOR_ERROR );
 		printf( "Failed to create output file: %s\n", outputName );
+		consoleColor( consoleHandle );
 		result = 1;
 	}
 
 	if( result == 0 )
 	{
+		consoleColor( consoleHandle, COLOR_SUCCESS );
 		printf( "Asset Pack created: %s\n", outputName );
+		consoleColor( consoleHandle );
 	}
 
 	return result;
+}
+
+void consoleColor( HANDLE handle, int color )
+{
+	SetConsoleTextAttribute( handle, color );
 }
