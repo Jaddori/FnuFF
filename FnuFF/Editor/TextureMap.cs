@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Editor
 {
@@ -11,6 +12,7 @@ namespace Editor
 		private static Dictionary<string, string> _names = new Dictionary<string, string>();
 		private static Dictionary<string, string> _paths = new Dictionary<string, string>();
 		private static Dictionary<string, AssetPack> _packs = new Dictionary<string, AssetPack>();
+		private static Dictionary<string, DateTime> _lastWrite = new Dictionary<string, DateTime>();
 
 		private static string _currentPackName;
 		private static string _currentTextureName;
@@ -22,7 +24,17 @@ namespace Editor
 
 		public static void LoadPack( string filename )
 		{
-			if( !_packs.ContainsKey( filename ) )
+			if( _names.ContainsKey( filename ) ) // update existing
+			{
+				var name = _names[filename];
+				var pack = _packs[name];
+				
+				pack.Load( filename );
+
+				var writeTime = File.GetLastWriteTime( filename );
+				_lastWrite[name] = writeTime;
+			}
+			else // load new
 			{
 				var pack = new AssetPack();
 				if( pack.Load( filename ) )
@@ -34,6 +46,9 @@ namespace Editor
 						_names.Add( filename, name );
 						_paths.Add( name, filename );
 						_packs.Add( name, pack );
+
+						var writeTime = File.GetLastWriteTime( filename );
+						_lastWrite.Add( name, writeTime );
 
 						if( string.IsNullOrEmpty( _currentPackName ) || string.IsNullOrEmpty( _currentTextureName ) )
 						{
@@ -94,6 +109,26 @@ namespace Editor
 			if( !string.IsNullOrEmpty( _currentPackName ) && !string.IsNullOrEmpty( _currentTextureName ) )
 				return _packs[_currentPackName].GetTarga( _currentTextureName );
 			return null;
+		}
+
+		public static bool CheckHotload()
+		{
+			var result = false;
+
+			foreach( var pair in _lastWrite )
+			{
+				var path = _paths[pair.Key];
+				var writeTime = File.GetLastWriteTime( path );
+
+				if( writeTime != pair.Value )
+				{
+					LoadPack( path );
+					result = true;
+					break;
+				}
+			}
+
+			return result;
 		}
 	}
 }

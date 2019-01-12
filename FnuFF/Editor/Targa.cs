@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace Editor
 {
-	public class Targa
+	public class Targa : IDisposable
 	{
 		private int _width;
 		private int _height;
@@ -213,6 +213,15 @@ namespace Editor
 			}
 
 			return _image;
+		}
+
+		public void Dispose()
+		{
+			if( _image != null )
+			{
+				_image.Dispose();
+				_image = null;
+			}
 		}
 	}
 }

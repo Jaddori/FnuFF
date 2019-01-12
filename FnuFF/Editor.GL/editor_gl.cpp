@@ -212,6 +212,11 @@ EXPORT uint32_t loadTexture( const char* path )
 	return result;
 }
 
+EXPORT void unloadTexture( uint32_t id )
+{
+	glDeleteTextures( 1, &id );
+}
+
 EXPORT uint32_t uploadTexture( int width, int height, int bpp, char* pixels, bool flipVertically )
 {
 	uint32_t result = 0;

@@ -491,5 +491,14 @@ namespace Editor
 			}
 #endif
 		}
+
+		private void timer_hotload_Tick( object sender, EventArgs e )
+		{
+			var didHotload = TextureMap.CheckHotload();
+			if( didHotload )
+			{
+				ViewGlobalInvalidation();
+			}
+		}
 	}
 }

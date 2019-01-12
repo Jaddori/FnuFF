@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+			this.components = new System.ComponentModel.Container();
 			this.status_editor = new System.Windows.Forms.StatusStrip();
 			this.stlbl_status = new System.Windows.Forms.ToolStripStatusLabel();
 			this.menu_editor = new System.Windows.Forms.MenuStrip();
@@ -44,6 +45,7 @@
 			this.pnl_tabPanel = new System.Windows.Forms.Panel();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.timer_hotload = new System.Windows.Forms.Timer(this.components);
 			this.ws_viewports = new Editor.WorkspaceControl();
 			this.view_bottomLeft = new Editor.View2DControl();
 			this.view_bottomRight = new Editor.View2DControl();
@@ -202,6 +204,12 @@
 			// openFileDialog
 			// 
 			this.openFileDialog.FileName = "openFileDialog";
+			// 
+			// timer_hotload
+			// 
+			this.timer_hotload.Enabled = true;
+			this.timer_hotload.Interval = 1000;
+			this.timer_hotload.Tick += new System.EventHandler(this.timer_hotload_Tick);
 			// 
 			// ws_viewports
 			// 
@@ -505,6 +513,7 @@
 		private FlatTabButtonControl btn_tab_face;
 		private FlatTabButtonControl btn_tab_entity;
 		private FaceTabContentControl tab_face;
+		private System.Windows.Forms.Timer timer_hotload;
 	}
 }
 

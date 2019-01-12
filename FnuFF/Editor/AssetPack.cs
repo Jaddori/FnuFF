@@ -29,6 +29,18 @@ namespace Editor
 		{
 			var result = true;
 
+			// unload if we already have targas
+			if( _targas != null )
+			{
+				int COUNT = _targas.Length;
+				for( int i = 0; i < COUNT; i++ )
+				{
+					_targas[i].Dispose();
+					GL.UnloadTexture( _ids[i] );
+				}
+			}
+
+			// load new stuff
 			var slashIndex = filename.LastIndexOf( '\\' );
 			if( slashIndex < 0 )
 				slashIndex = filename.LastIndexOf( '/' );

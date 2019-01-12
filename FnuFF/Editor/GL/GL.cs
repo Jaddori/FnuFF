@@ -57,6 +57,9 @@ namespace Editor
 		private extern static UInt32 loadTexture( string path );
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
+		private extern static void unloadTexture( UInt32 id );
+
+		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
 		private extern static UInt32 uploadTexture( int width, int height, int bpp, byte[] pixels, bool flipVertically );
 
 		[DllImport( DLL_PATH, CallingConvention = CallingConvention.Cdecl )]
@@ -156,6 +159,11 @@ namespace Editor
 		{
 			var id = loadTexture( path );
 			return id;
+		}
+
+		public static void UnloadTexture( UInt32 id )
+		{
+			unloadTexture( id );
 		}
 
 		public static UInt32 UploadTexture( int width, int height, int bpp, byte[] pixels, bool flipVertically = true )
