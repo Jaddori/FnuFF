@@ -190,13 +190,6 @@ namespace Editor
 
 			_invalidateAction = new Level.ChangeHandler( () => Invalidate() );
 
-			var handleCursors = new[]
-			{
-				Cursors.SizeNWSE, Cursors.SizeNS, Cursors.SizeNESW,
-				Cursors.SizeWE, Cursors.SizeAll, Cursors.SizeWE,
-				Cursors.SizeNESW, Cursors.SizeNS, Cursors.SizeNWSE
-			};
-
 			_handleIndex = -1;
 			_clipping = false;
         }
@@ -400,9 +393,7 @@ namespace Editor
 						var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 						foreach( var face in faces )
 						{
-							var otherPlanes = selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
+							var projectedPoints = face.Vertices.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
 
 							facePoints.AddRange( projectedPoints );
 						}
@@ -790,16 +781,14 @@ namespace Editor
 						for( int i = 0; i < faces.Length; i++ )
 						{
 							var face = faces[i];
-							var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
+							var projectedPoints = face.Vertices.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
 
 							var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
 							var localMinDepth = 9999.0f;
-							foreach( var p in points )
+							foreach( var v in face.Vertices )
 							{
-								var depth = p.Dot( _camera.Direction );
+								var depth = v.Dot( _camera.Direction );
 								if( depth < localMinDepth )
 									localMinDepth = depth;
 							}
@@ -870,9 +859,7 @@ namespace Editor
 						var faces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();
 						foreach( var face in faces )
 						{
-							var otherPlanes = selectedSolid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-							var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-							var projectedPoints = points.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
+							var projectedPoints = face.Vertices.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
 
 							facePoints.AddRange( projectedPoints );
 						}

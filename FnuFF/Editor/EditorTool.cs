@@ -11,17 +11,6 @@ namespace Editor
 	{
 		public delegate void ChangeHandler<T>( T prev, T current );
 
-		/*public delegate void EditorToolChangedHandler( EditorTools prev, EditorTools current );
-		public static event EditorToolChangedHandler OnEditorToolChanged;
-
-		public delegate void SolidChangedHandler( GeometrySolid prev, GeometrySolid current );
-		public static event SolidChangedHandler OnHoveredSolidChanged;
-		public static event SolidChangedHandler OnSelectedSolidChanged;
-
-		public delegate void FaceChangedHandler( Face prev, Face current );
-		public static event FaceChangedHandler OnHoveredFaceChanged;
-		public static event FaceChangedHandler OnSelectedFaceChanged;*/
-
 		public static event ChangeHandler<EditorTools> OnEditorToolChanged;
 
 		public static event ChangeHandler<GeometrySolid> OnHoveredSolidChanged;

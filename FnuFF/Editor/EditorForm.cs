@@ -103,10 +103,14 @@ namespace Editor
 			var button = sender as FlatButtonControl;
 			button.Selected = true;
 
+			var prevTool = EditorTool.Current;
 			EditorTool.Current = (EditorTools)button.Tag;
 
 			if( EditorTool.Current != EditorTools.Clip )
-				EditorTool.ClearSelection();
+			{
+				if( !(prevTool == EditorTools.Clip && EditorTool.Current == EditorTools.Select) )
+					EditorTool.ClearSelection();
+			}
 
 			//Text = "FnuFF Editor - " + EditorTool.Current.ToString();
 
