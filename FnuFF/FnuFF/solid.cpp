@@ -14,15 +14,18 @@ Solid::~Solid()
 
 void Solid::read( Assets* assets, const name_t* textureNames, FILE* file, void* transientMemory )
 {
-	faceCount = 0;
-	fread( &faceCount, sizeof(faceCount), 1, file );
+	planeCount = 0;
+	fread( &planeCount, sizeof(planeCount), 1, file );
 
-	planes = new Plane[faceCount];
+	planes = new Plane[planeCount];
 
-	for( int i=0; i<faceCount; i++ )
+	for( int i=0; i<planeCount; i++ )
 	{
 		fread( &planes[i], sizeof(planes[i]), 1, file );
 	}
+
+	faceCount = 0;
+	fread( &faceCount, sizeof(faceCount), 1, file );
 
 	faces = new SolidFace[faceCount];
 	vaos = new GLuint[faceCount];
@@ -89,6 +92,11 @@ int Solid::getTextureIndex( int faceIndex ) const
 const Physics::Plane* Solid::getPlanes() const
 {
 	return planes;
+}
+
+int Solid::getPlaneCount() const
+{
+	return planeCount;
 }
 
 int Solid::getFaceCount() const

@@ -20,6 +20,7 @@ void Graphics::load()
 	perspectiveCamera.setPosition( glm::vec3( 0, 0, -10 ) );
 
 	assets.loadPack( "./assets/textures/pack01.bin" );
+	assets.loadPack( "./assets/textures/tools.bin" );
 	
 	textShader.load( "./assets/shaders/font.vs", "./assets/shaders/font.gs", "./assets/shaders/font.fs" );
 	textProjectionLocation = textShader.getLocation( "projectionMatrix" );

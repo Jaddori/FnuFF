@@ -350,11 +350,17 @@ namespace Editor
 					writer.Write( solid.Faces.Count );
 					foreach( var face in solid.Faces )
 					{
-						writer.Write( face.Plane );
+						writer.Write( face.Plane, Grid.SIZE_BASE );
 					}
-					
+
+					var visibleFaceCount = solid.Faces.Count( x => x.PackName != "tools" );
+					writer.Write( visibleFaceCount );
+
 					foreach( var face in solid.Faces )
 					{
+						if( face.PackName == "tools" )
+							continue;
+
 						// write texture information
 						var textureIndex = -1;
 						if( !string.IsNullOrEmpty( face.TextureName ) )
@@ -366,7 +372,8 @@ namespace Editor
 
 						// write vertex information
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-						var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+						//var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+						var points = face.Vertices.ToArray();
 						var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
 						var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x, face ) ).ToArray();
 
@@ -404,13 +411,13 @@ namespace Editor
 								uv1 = tempUV;
 							}
 
-							writer.Write( v0 );
+							writer.Write( v0, Grid.SIZE_BASE );
 							writer.Write( uv0 );
 
-							writer.Write( v1 );
+							writer.Write( v1, Grid.SIZE_BASE );
 							writer.Write( uv1 );
 
-							writer.Write( v2 );
+							writer.Write( v2, Grid.SIZE_BASE );
 							writer.Write( uv2 );
 						}
 					}
@@ -418,7 +425,7 @@ namespace Editor
 
 				foreach( var entity in entities )
 				{
-					writer.Write( entity.Position );
+					writer.Write( entity.Position, Grid.SIZE_BASE );
 				}
 
 				writer.Close();

@@ -31,10 +31,12 @@ public:
 	int getVertexCount( int faceIndex ) const;
 	int getTextureIndex( int faceIndex ) const;
 	const Physics::Plane* getPlanes() const;
+	int getPlaneCount() const;
 	int getFaceCount() const;
 
 private:
 	Physics::Plane* planes;
+	int planeCount;
 	int faceCount;
 	GLuint* vaos;
 	GLuint* vbos;

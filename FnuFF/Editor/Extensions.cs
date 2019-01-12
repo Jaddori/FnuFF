@@ -417,52 +417,52 @@ namespace Editor
 			return points.ToArray();
 		}
 
-		public static void Write( this BinaryWriter writer, Face f )
+		public static void Write( this BinaryWriter writer, Face f, float divider = 1.0f )
 		{
-			writer.Write( f.Plane );
+			writer.Write( f.Plane, divider );
 		}
 
-		public static void Write( this BinaryWriter writer, Plane p )
+		public static void Write( this BinaryWriter writer, Plane p, float divider = 1.0f )
 		{
 			writer.Write( p.Normal );
-			writer.Write( p.D );
+			writer.Write( p.D / divider );
 		}
 
-		public static void Write( this BinaryWriter writer, Triple t )
+		public static void Write( this BinaryWriter writer, Triple t, float divider = 1.0f )
 		{
-			writer.Write( t.X );
-			writer.Write( t.Y );
-			writer.Write( t.Z );
+			writer.Write( t.X / divider );
+			writer.Write( t.Y / divider );
+			writer.Write( t.Z / divider );
 		}
 
-		public static void Write( this BinaryWriter writer, PointF p )
+		public static void Write( this BinaryWriter writer, PointF p, float divider = 1.0f )
 		{
-			writer.Write( p.X );
-			writer.Write( p.Y );
+			writer.Write( p.X / divider );
+			writer.Write( p.Y / divider );
 		}
 
-		public static void Write( this StreamWriter writer, Face f )
+		public static void Write( this StreamWriter writer, Face f, float divider = 1.0f )
 		{
-			writer.Write( f.Plane );
+			writer.Write( f.Plane, divider );
 		}
 
-		public static void Write( this StreamWriter writer, Plane p )
+		public static void Write( this StreamWriter writer, Plane p, float divider = 1.0f )
 		{
 			writer.Write( p.Normal );
-			writer.WriteLine( p.D.ToString() );
+			writer.WriteLine( ( p.D / divider ).ToString() );
 		}
 
-		public static void Write( this StreamWriter writer, Triple t )
+		public static void Write( this StreamWriter writer, Triple t, float divider = 1.0f )
 		{
-			writer.WriteLine( t.X.ToString() );
-			writer.WriteLine( t.Y.ToString() );
-			writer.WriteLine( t.Z.ToString() );
+			writer.WriteLine( ( t.X / divider ).ToString() );
+			writer.WriteLine( ( t.Y / divider ).ToString() );
+			writer.WriteLine( ( t.Z / divider ).ToString() );
 		}
 
-		public static void Write( this StreamWriter writer, PointF p )
+		public static void Write( this StreamWriter writer, PointF p, float divider = 1.0f )
 		{
-			writer.WriteLine( p.X.ToString() );
-			writer.WriteLine( p.Y.ToString() );
+			writer.WriteLine( ( p.X / divider ).ToString() );
+			writer.WriteLine( ( p.Y / divider ).ToString() );
 		}
 
 		public static string NameFromPath( this string path, bool includeExtension = false )
