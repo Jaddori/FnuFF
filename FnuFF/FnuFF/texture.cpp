@@ -2,7 +2,7 @@
 using namespace Rendering;
 
 Texture::Texture()
-	: id( 0 ), width( 0 ), height( 0 ), format( GL_COMPRESSED_RGBA_S3TC_DXT1_EXT ), pixels( NULL ), uploaded( false )
+	: id( 0 ), width( 0 ), height( 0 ), format( GL_RGB ), pixels( NULL ), uploaded( false )
 {
 }
 
@@ -44,7 +44,42 @@ bool Texture::read( FILE* file )
 		format = GL_BGRA;
 
 	pixels = new GLbyte[size];
-	fread( pixels, sizeof(GLbyte), size, file );
+
+	if( header.imageType == 2 ) // uncompressed RGB(A)
+	{
+		fread( pixels, sizeof(GLbyte), size, file );
+	}
+	else // RLE compressed RGB(A)
+	{
+		char* pixelBuffer[4] = {};
+
+		int offset = 0;
+		while( offset < size )
+		{
+			char packet = 0;
+			fread( &packet, sizeof(packet), 1, file );
+
+			if( (packet & 0x80) ) // RLE
+			{
+				packet ^= 0x80;
+				int count = packet + 1;
+				fread( pixelBuffer, 1, bpp, file );
+
+				for( int i=0; i<count; i++ )
+				{
+					memcpy( pixels + offset, pixelBuffer, bpp );
+					offset += bpp;
+				}
+			}
+			else // raw pixels
+			{
+				int count = packet + 1;
+				fread( pixels + offset, 1, count*bpp, file );
+
+				offset += count*bpp;
+			}
+		}
+	}
 
 	// need to flip the image data vertically
 	if( header.yorigin == 0 )

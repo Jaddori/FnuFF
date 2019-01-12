@@ -5,11 +5,5 @@ output:./assets/textures/pack01.bin
 bricks.tga
 bricks02.tga
 bricks03.tga
-cloud02.tga
 concrete01.tga
 concrete02.tga
-test.tga
-test02.tga
-orientation.tga
-billboard_mask_opaque.tga
-billboard_mask_transparent.tga

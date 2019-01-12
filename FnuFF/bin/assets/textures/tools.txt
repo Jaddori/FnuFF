@@ -1,3 +1,7 @@
+mode:textures
+root:./assets/textures/
+output:./assets/textures/tools.bin
+
 no_draw.tga
 sky.tga
 clip.tga
