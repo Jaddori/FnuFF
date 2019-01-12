@@ -1,3 +1,7 @@
+mode:textures
+root:./assets/textures/
+output:./assets/textures/pack01.bin
+
 bricks.tga
 bricks02.tga
 bricks03.tga

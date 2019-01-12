@@ -4,6 +4,10 @@
 #define MAX_INPUT_FILES 1024
 #define MAX_TEXTURE_NAME_LEN 64
 #define BUFFER_SIZE 1024
+#define MAX_PATH_LEN 2048
+
+#define min(a,b) (a < b ? a : b)
+#define max(a,b) (a > b ? a : b)
 
 enum
 {
@@ -15,6 +19,9 @@ enum
 	MODE_FOLDER,
 };
 
+bool strcnt( char* str, char c );
+bool strncnt( char* str, char c, int n );
+void parseSettings( char* rootFolder, char* outputName, int* contentMode, char* fileContent );
 int parseInputFiles( char** inputFiles, char* rootFolder, char* fileContent );
 int packContent( char** inputFiles, int inputFileCount, char* outputName, int contentMode );
 int packTextures( char** inputFiles, int inputFileCount, char* outputName );
@@ -23,8 +30,11 @@ int main( int argc, char* argv[] )
 {
 	int contentMode = MODE_NONE;
 	int inputMode = MODE_ARGS;
-	char* outputName = NULL;
-	char* rootFolder = NULL;
+	//char* outputName = NULL;
+	//char* rootFolder = NULL;
+
+	char* outputName = new char[MAX_PATH_LEN]{0};
+	char* rootFolder = new char[MAX_PATH_LEN]{0};
 	
 	// parse arguments
 	for( int i=1; i<argc; i++ )
@@ -41,7 +51,7 @@ int main( int argc, char* argv[] )
 		else if( strcmp( argv[i], "-output" ) == 0 )
 		{
 			int len = strlen( argv[i+1] );
-			outputName = new char[len+1];
+
 			strcpy( outputName, argv[i+1] );
 			outputName[len] = 0;
 
@@ -52,7 +62,7 @@ int main( int argc, char* argv[] )
 		else if( strcmp( argv[i], "-root" ) == 0 )
 		{
 			int len = strlen( argv[i+1] );
-			rootFolder = new char[len+1];
+
 			strcpy( rootFolder, argv[i+1] );
 			rootFolder[len] = 0;
 
@@ -111,6 +121,8 @@ int main( int argc, char* argv[] )
 
 			fclose( f );
 
+			parseSettings( rootFolder, outputName, &contentMode, fileContent );
+
 			inputFileCount = parseInputFiles( inputFiles, rootFolder, fileContent );
 			if( inputFileCount < 0 )
 			{
@@ -129,6 +141,68 @@ int main( int argc, char* argv[] )
 	return packContent( inputFiles, inputFileCount, outputName, contentMode );
 }
 
+bool strcnt( char* str, char c )
+{
+	return strncnt( str, c, strlen( str ) );
+}
+
+bool strncnt( char* str, char c, int n )
+{
+	bool result = false;
+
+	for( int i=0; i<n && !result; i++ )
+		if( str[i] == c )
+			result = true;
+
+	return result;
+}
+
+void parseSettings( char* rootFolder, char* outputName, int* contentMode, char* fileContent )
+{
+	bool hasMode = (*contentMode != MODE_NONE);
+	bool hasRoot = (*rootFolder);
+	bool hasOutput = (*outputName);
+
+	char* cur = fileContent;
+	while( *cur && (!hasRoot || !hasOutput || !hasMode) )
+	{
+		while( *cur == '\r' || *cur == '\n' || *cur == ' ' || *cur == '\t' )
+			cur++;
+
+		char* start = cur;
+		while( *cur != '\r' && *cur != '\n' && *cur )
+			cur++;
+
+		int len = cur - start;
+
+		if( !hasMode && strncmp( start, "mode:", min( len, 5 ) ) == 0 )
+		{
+			len -= 5;
+			start += 5;
+
+			if( strncmp( start, "textures", min( len, 8 ) ) == 0 )
+			{
+				*contentMode = MODE_TEXTURES;
+				hasMode = true;
+			}
+		}
+		else if( !hasRoot && strncmp( start, "root:", min( len, 5 ) ) == 0 )
+		{
+			strncpy( rootFolder, start+5, len-5 ); // +5 = skip "root:"
+			rootFolder[len-5] = 0;
+
+			hasRoot = true;
+		}
+		else if( !hasOutput && strncmp( start, "output:", min( len, 7 ) ) == 0 )
+		{
+			strncpy( outputName, start+7, len-7 ); // +7 = skip "output:"
+			rootFolder[len-7] = 0;
+
+			hasOutput = true;
+		}
+	}
+}
+
 int parseInputFiles( char** inputFiles, char* rootFolder, char* fileContent )
 {
 	int index = 0;
@@ -143,7 +217,7 @@ int parseInputFiles( char** inputFiles, char* rootFolder, char* fileContent )
 		if( index >= MAX_INPUT_FILES )
 			return -1;
 
-		while( *cur == '\r' || *cur == '\n' )
+		while( *cur == '\r' || *cur == '\n' || *cur == ' ' || *cur == '\t' )
 			cur++;
 
 		char* start = cur;
@@ -151,18 +225,22 @@ int parseInputFiles( char** inputFiles, char* rootFolder, char* fileContent )
 			cur++;
 
 		int len = cur - start;
-		inputFiles[index] = new char[len+rootLen+1];
 
-		int offset = 0;
-		if( rootFolder )
+		if( !strncnt( start, ':', len ) )
 		{
-			strncpy( inputFiles[index], rootFolder, rootLen );
-			offset = rootLen;
-		}
+			inputFiles[index] = new char[len+rootLen+1];
 
-		strncpy( inputFiles[index]+offset, start, len );
-		inputFiles[index][rootLen+len] = 0;
-		index++;
+			int offset = 0;
+			if( rootFolder )
+			{
+				strncpy( inputFiles[index], rootFolder, rootLen );
+				offset = rootLen;
+			}
+
+			strncpy( inputFiles[index]+offset, start, len );
+			inputFiles[index][rootLen+len] = 0;
+			index++;
+		}
 	}
 
 	return index;
@@ -259,6 +337,11 @@ int packTextures( char** inputFiles, int inputFileCount, char* outputName )
 	{
 		printf( "Failed to create output file: %s\n", outputName );
 		result = 1;
+	}
+
+	if( result == 0 )
+	{
+		printf( "Asset Pack created: %s\n", outputName );
 	}
 
 	return result;
