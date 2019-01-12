@@ -62,6 +62,9 @@ namespace Editor
 			_toolbarButtons.Add( btn_face );
 			_toolbarButtons.Add( btn_entity );
 
+			btn_tab_entity.Tag = null;
+			btn_tab_face.Tag = tab_face;
+
 			_tabButtons = new List<FlatTabButtonControl>();
 			_tabButtons.Add( btn_tab_entity );
 			_tabButtons.Add( btn_tab_face );
@@ -113,10 +116,26 @@ namespace Editor
 		private void tabButton_Click( object sender, EventArgs e )
 		{
 			foreach( var b in _tabButtons )
+			{
 				b.Selected = false;
+				b.BackColor = EditorColors.BACKGROUND_HIGH;
+
+				if( b.Tag != null )
+				{
+					var c = b.Tag as UserControl;
+					c.Visible = false;
+				}
+			}
 
 			var button = sender as FlatTabButtonControl;
 			button.Selected = true;
+			button.BackColor = EditorColors.BACKGROUND_LOW;
+
+			if( button.Tag != null )
+			{
+				var tabControl = button.Tag as UserControl;
+				tabControl.Visible = true;
+			}
 		}
 
 		private void btn_texture_Click( object sender, EventArgs e )

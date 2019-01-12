@@ -40,18 +40,8 @@
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnl_left = new System.Windows.Forms.Panel();
-			this.btn_entity = new Editor.FlatButtonControl();
-			this.btn_face = new Editor.FlatButtonControl();
-			this.btn_texture = new Editor.FlatButtonControl();
-			this.btn_clip = new Editor.FlatButtonControl();
-			this.btn_vertex = new Editor.FlatButtonControl();
-			this.btn_solid = new Editor.FlatButtonControl();
-			this.btn_select = new Editor.FlatButtonControl();
 			this.pnl_right = new System.Windows.Forms.Panel();
-			this.tab_face = new Editor.FaceTabContentControl();
 			this.pnl_tabPanel = new System.Windows.Forms.Panel();
-			this.btn_tab_face = new Editor.FlatTabButtonControl();
-			this.btn_tab_entity = new Editor.FlatTabButtonControl();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.ws_viewports = new Editor.WorkspaceControl();
@@ -59,6 +49,16 @@
 			this.view_bottomRight = new Editor.View2DControl();
 			this.view_3d = new Editor.View3DControl();
 			this.view_topRight = new Editor.View2DControl();
+			this.tab_face = new Editor.FaceTabContentControl();
+			this.btn_tab_face = new Editor.FlatTabButtonControl();
+			this.btn_tab_entity = new Editor.FlatTabButtonControl();
+			this.btn_entity = new Editor.FlatButtonControl();
+			this.btn_face = new Editor.FlatButtonControl();
+			this.btn_texture = new Editor.FlatButtonControl();
+			this.btn_clip = new Editor.FlatButtonControl();
+			this.btn_vertex = new Editor.FlatButtonControl();
+			this.btn_solid = new Editor.FlatButtonControl();
+			this.btn_select = new Editor.FlatButtonControl();
 			this.status_editor.SuspendLayout();
 			this.menu_editor.SuspendLayout();
 			this.pnl_left.SuspendLayout();
@@ -176,6 +176,156 @@
 			this.pnl_left.Size = new System.Drawing.Size(58, 702);
 			this.pnl_left.TabIndex = 3;
 			// 
+			// pnl_right
+			// 
+			this.pnl_right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_right.Controls.Add(this.tab_face);
+			this.pnl_right.Controls.Add(this.pnl_tabPanel);
+			this.pnl_right.Dock = System.Windows.Forms.DockStyle.Right;
+			this.pnl_right.Location = new System.Drawing.Point(1039, 24);
+			this.pnl_right.Name = "pnl_right";
+			this.pnl_right.Size = new System.Drawing.Size(200, 702);
+			this.pnl_right.TabIndex = 4;
+			// 
+			// pnl_tabPanel
+			// 
+			this.pnl_tabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.pnl_tabPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_tabPanel.Controls.Add(this.btn_tab_face);
+			this.pnl_tabPanel.Controls.Add(this.btn_tab_entity);
+			this.pnl_tabPanel.Location = new System.Drawing.Point(0, 0);
+			this.pnl_tabPanel.Name = "pnl_tabPanel";
+			this.pnl_tabPanel.Size = new System.Drawing.Size(200, 30);
+			this.pnl_tabPanel.TabIndex = 0;
+			// 
+			// openFileDialog
+			// 
+			this.openFileDialog.FileName = "openFileDialog";
+			// 
+			// ws_viewports
+			// 
+			this.ws_viewports.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.ws_viewports.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ws_viewports.Location = new System.Drawing.Point(58, 24);
+			this.ws_viewports.Name = "ws_viewports";
+			// 
+			// ws_viewports.Bottom Left
+			// 
+			this.ws_viewports.PanelBottomLeft.Controls.Add(this.view_bottomLeft);
+			this.ws_viewports.PanelBottomLeft.Location = new System.Drawing.Point(1, 353);
+			this.ws_viewports.PanelBottomLeft.Name = "Bottom Left";
+			this.ws_viewports.PanelBottomLeft.Size = new System.Drawing.Size(488, 349);
+			this.ws_viewports.PanelBottomLeft.TabIndex = 2;
+			// 
+			// ws_viewports.Bottom Right
+			// 
+			this.ws_viewports.PanelBottomRight.Controls.Add(this.view_bottomRight);
+			this.ws_viewports.PanelBottomRight.Location = new System.Drawing.Point(492, 353);
+			this.ws_viewports.PanelBottomRight.Name = "Bottom Right";
+			this.ws_viewports.PanelBottomRight.Size = new System.Drawing.Size(488, 349);
+			this.ws_viewports.PanelBottomRight.TabIndex = 3;
+			// 
+			// ws_viewports.Top Left
+			// 
+			this.ws_viewports.PanelTopLeft.Controls.Add(this.view_3d);
+			this.ws_viewports.PanelTopLeft.Location = new System.Drawing.Point(1, 1);
+			this.ws_viewports.PanelTopLeft.Name = "Top Left";
+			this.ws_viewports.PanelTopLeft.Size = new System.Drawing.Size(488, 349);
+			this.ws_viewports.PanelTopLeft.TabIndex = 0;
+			// 
+			// ws_viewports.Top Right
+			// 
+			this.ws_viewports.PanelTopRight.Controls.Add(this.view_topRight);
+			this.ws_viewports.PanelTopRight.Location = new System.Drawing.Point(492, 1);
+			this.ws_viewports.PanelTopRight.Name = "Top Right";
+			this.ws_viewports.PanelTopRight.Size = new System.Drawing.Size(488, 349);
+			this.ws_viewports.PanelTopRight.TabIndex = 1;
+			this.ws_viewports.Size = new System.Drawing.Size(981, 702);
+			this.ws_viewports.TabIndex = 5;
+			this.ws_viewports.Text = "workspaceControl1";
+			// 
+			// view_bottomLeft
+			// 
+			this.view_bottomLeft.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+			this.view_bottomLeft.Direction = 0;
+			this.view_bottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.view_bottomLeft.Location = new System.Drawing.Point(0, 0);
+			this.view_bottomLeft.Name = "view_bottomLeft";
+			this.view_bottomLeft.Size = new System.Drawing.Size(488, 349);
+			this.view_bottomLeft.TabIndex = 0;
+			// 
+			// view_bottomRight
+			// 
+			this.view_bottomRight.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+			this.view_bottomRight.Direction = 2;
+			this.view_bottomRight.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.view_bottomRight.Location = new System.Drawing.Point(0, 0);
+			this.view_bottomRight.Name = "view_bottomRight";
+			this.view_bottomRight.Size = new System.Drawing.Size(488, 349);
+			this.view_bottomRight.TabIndex = 0;
+			// 
+			// view_3d
+			// 
+			this.view_3d.BackColor = System.Drawing.Color.Black;
+			this.view_3d.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.view_3d.Location = new System.Drawing.Point(0, 0);
+			this.view_3d.Name = "view_3d";
+			this.view_3d.Size = new System.Drawing.Size(488, 349);
+			this.view_3d.TabIndex = 0;
+			this.view_3d.Text = "view3DControl1";
+			// 
+			// view_topRight
+			// 
+			this.view_topRight.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+			this.view_topRight.Direction = 1;
+			this.view_topRight.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.view_topRight.Location = new System.Drawing.Point(0, 0);
+			this.view_topRight.Name = "view_topRight";
+			this.view_topRight.Size = new System.Drawing.Size(488, 349);
+			this.view_topRight.TabIndex = 0;
+			// 
+			// tab_face
+			// 
+			this.tab_face.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tab_face.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+			this.tab_face.Location = new System.Drawing.Point(3, 30);
+			this.tab_face.Name = "tab_face";
+			this.tab_face.Size = new System.Drawing.Size(194, 251);
+			this.tab_face.TabIndex = 1;
+			this.tab_face.Visible = false;
+			// 
+			// btn_tab_face
+			// 
+			this.btn_tab_face.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.btn_tab_face.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.btn_tab_face.Hovered = false;
+			this.btn_tab_face.Location = new System.Drawing.Point(84, 3);
+			this.btn_tab_face.Name = "btn_tab_face";
+			this.btn_tab_face.Pressed = false;
+			this.btn_tab_face.Selected = false;
+			this.btn_tab_face.Size = new System.Drawing.Size(75, 27);
+			this.btn_tab_face.TabIndex = 1;
+			this.btn_tab_face.Text = "Face";
+			this.btn_tab_face.UseVisualStyleBackColor = false;
+			this.btn_tab_face.Click += new System.EventHandler(this.tabButton_Click);
+			// 
+			// btn_tab_entity
+			// 
+			this.btn_tab_entity.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.btn_tab_entity.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+			this.btn_tab_entity.Hovered = false;
+			this.btn_tab_entity.Location = new System.Drawing.Point(3, 3);
+			this.btn_tab_entity.Name = "btn_tab_entity";
+			this.btn_tab_entity.Pressed = false;
+			this.btn_tab_entity.Selected = true;
+			this.btn_tab_entity.Size = new System.Drawing.Size(75, 27);
+			this.btn_tab_entity.TabIndex = 0;
+			this.btn_tab_entity.Text = "Entity";
+			this.btn_tab_entity.UseVisualStyleBackColor = false;
+			this.btn_tab_entity.Click += new System.EventHandler(this.tabButton_Click);
+			// 
 			// btn_entity
 			// 
 			this.btn_entity.Hovered = false;
@@ -287,146 +437,6 @@
 			this.btn_select.Tag = "";
 			this.btn_select.UseVisualStyleBackColor = true;
 			this.btn_select.Click += new System.EventHandler(this.toolbarButton_Click);
-			// 
-			// pnl_right
-			// 
-			this.pnl_right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-			this.pnl_right.Controls.Add(this.tab_face);
-			this.pnl_right.Controls.Add(this.pnl_tabPanel);
-			this.pnl_right.Dock = System.Windows.Forms.DockStyle.Right;
-			this.pnl_right.Location = new System.Drawing.Point(1039, 24);
-			this.pnl_right.Name = "pnl_right";
-			this.pnl_right.Size = new System.Drawing.Size(200, 702);
-			this.pnl_right.TabIndex = 4;
-			// 
-			// tab_face
-			// 
-			this.tab_face.Location = new System.Drawing.Point(3, 36);
-			this.tab_face.Name = "tab_face";
-			this.tab_face.Size = new System.Drawing.Size(194, 269);
-			this.tab_face.TabIndex = 1;
-			// 
-			// pnl_tabPanel
-			// 
-			this.pnl_tabPanel.Controls.Add(this.btn_tab_face);
-			this.pnl_tabPanel.Controls.Add(this.btn_tab_entity);
-			this.pnl_tabPanel.Dock = System.Windows.Forms.DockStyle.Top;
-			this.pnl_tabPanel.Location = new System.Drawing.Point(0, 0);
-			this.pnl_tabPanel.Name = "pnl_tabPanel";
-			this.pnl_tabPanel.Size = new System.Drawing.Size(200, 30);
-			this.pnl_tabPanel.TabIndex = 0;
-			// 
-			// btn_tab_face
-			// 
-			this.btn_tab_face.Hovered = false;
-			this.btn_tab_face.Location = new System.Drawing.Point(84, 3);
-			this.btn_tab_face.Name = "btn_tab_face";
-			this.btn_tab_face.Pressed = false;
-			this.btn_tab_face.Selected = false;
-			this.btn_tab_face.Size = new System.Drawing.Size(75, 23);
-			this.btn_tab_face.TabIndex = 1;
-			this.btn_tab_face.Text = "Face";
-			this.btn_tab_face.UseVisualStyleBackColor = true;
-			this.btn_tab_face.Click += new System.EventHandler(this.tabButton_Click);
-			// 
-			// btn_tab_entity
-			// 
-			this.btn_tab_entity.Hovered = false;
-			this.btn_tab_entity.Location = new System.Drawing.Point(3, 3);
-			this.btn_tab_entity.Name = "btn_tab_entity";
-			this.btn_tab_entity.Pressed = false;
-			this.btn_tab_entity.Selected = true;
-			this.btn_tab_entity.Size = new System.Drawing.Size(75, 23);
-			this.btn_tab_entity.TabIndex = 0;
-			this.btn_tab_entity.Text = "Entity";
-			this.btn_tab_entity.UseVisualStyleBackColor = true;
-			this.btn_tab_entity.Click += new System.EventHandler(this.tabButton_Click);
-			// 
-			// openFileDialog
-			// 
-			this.openFileDialog.FileName = "openFileDialog";
-			// 
-			// ws_viewports
-			// 
-			this.ws_viewports.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
-			this.ws_viewports.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.ws_viewports.Location = new System.Drawing.Point(58, 24);
-			this.ws_viewports.Name = "ws_viewports";
-			// 
-			// ws_viewports.Bottom Left
-			// 
-			this.ws_viewports.PanelBottomLeft.Controls.Add(this.view_bottomLeft);
-			this.ws_viewports.PanelBottomLeft.Location = new System.Drawing.Point(1, 353);
-			this.ws_viewports.PanelBottomLeft.Name = "Bottom Left";
-			this.ws_viewports.PanelBottomLeft.Size = new System.Drawing.Size(488, 349);
-			this.ws_viewports.PanelBottomLeft.TabIndex = 2;
-			// 
-			// ws_viewports.Bottom Right
-			// 
-			this.ws_viewports.PanelBottomRight.Controls.Add(this.view_bottomRight);
-			this.ws_viewports.PanelBottomRight.Location = new System.Drawing.Point(492, 353);
-			this.ws_viewports.PanelBottomRight.Name = "Bottom Right";
-			this.ws_viewports.PanelBottomRight.Size = new System.Drawing.Size(488, 349);
-			this.ws_viewports.PanelBottomRight.TabIndex = 3;
-			// 
-			// ws_viewports.Top Left
-			// 
-			this.ws_viewports.PanelTopLeft.Controls.Add(this.view_3d);
-			this.ws_viewports.PanelTopLeft.Location = new System.Drawing.Point(1, 1);
-			this.ws_viewports.PanelTopLeft.Name = "Top Left";
-			this.ws_viewports.PanelTopLeft.Size = new System.Drawing.Size(488, 349);
-			this.ws_viewports.PanelTopLeft.TabIndex = 0;
-			// 
-			// ws_viewports.Top Right
-			// 
-			this.ws_viewports.PanelTopRight.Controls.Add(this.view_topRight);
-			this.ws_viewports.PanelTopRight.Location = new System.Drawing.Point(492, 1);
-			this.ws_viewports.PanelTopRight.Name = "Top Right";
-			this.ws_viewports.PanelTopRight.Size = new System.Drawing.Size(488, 349);
-			this.ws_viewports.PanelTopRight.TabIndex = 1;
-			this.ws_viewports.Size = new System.Drawing.Size(981, 702);
-			this.ws_viewports.TabIndex = 5;
-			this.ws_viewports.Text = "workspaceControl1";
-			// 
-			// view_bottomLeft
-			// 
-			this.view_bottomLeft.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
-			this.view_bottomLeft.Direction = 0;
-			this.view_bottomLeft.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.view_bottomLeft.Location = new System.Drawing.Point(0, 0);
-			this.view_bottomLeft.Name = "view_bottomLeft";
-			this.view_bottomLeft.Size = new System.Drawing.Size(488, 349);
-			this.view_bottomLeft.TabIndex = 0;
-			// 
-			// view_bottomRight
-			// 
-			this.view_bottomRight.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
-			this.view_bottomRight.Direction = 2;
-			this.view_bottomRight.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.view_bottomRight.Location = new System.Drawing.Point(0, 0);
-			this.view_bottomRight.Name = "view_bottomRight";
-			this.view_bottomRight.Size = new System.Drawing.Size(488, 349);
-			this.view_bottomRight.TabIndex = 0;
-			// 
-			// view_3d
-			// 
-			this.view_3d.BackColor = System.Drawing.Color.Black;
-			this.view_3d.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.view_3d.Location = new System.Drawing.Point(0, 0);
-			this.view_3d.Name = "view_3d";
-			this.view_3d.Size = new System.Drawing.Size(488, 349);
-			this.view_3d.TabIndex = 0;
-			this.view_3d.Text = "view3DControl1";
-			// 
-			// view_topRight
-			// 
-			this.view_topRight.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
-			this.view_topRight.Direction = 1;
-			this.view_topRight.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.view_topRight.Location = new System.Drawing.Point(0, 0);
-			this.view_topRight.Name = "view_topRight";
-			this.view_topRight.Size = new System.Drawing.Size(488, 349);
-			this.view_topRight.TabIndex = 0;
 			// 
 			// EditorForm
 			// 

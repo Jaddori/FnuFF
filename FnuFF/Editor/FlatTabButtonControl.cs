@@ -63,17 +63,17 @@ namespace Editor
 			e.Graphics.DrawString( Text, Font, _textBrush, rect, format );
 
 			// draw selection/hover indicator
-			if( _pressed || _hovered || _selected )
+			if( _pressed || _hovered  )
 			{
 				var brush = _selectedBrush;
-				if( _selected )
+				/*if( _selected )
 				{
 					if( _pressed )
 						brush = _selectedPressedBrush;
 					else if( _hovered )
 						brush = _selectedHoveredBrush;
 				}
-				else
+				else*/
 				{
 					if( _pressed )
 						brush = _pressedBrush;
