@@ -214,17 +214,24 @@ namespace Editor
 						g.DrawLine( pen, windingPoints[pointCount - 1], windingPoints[0] );
 
 						// draw center cross
+						var topleft = new PointF( projectedPoints.Min( x => x.X ), projectedPoints.Min( x => x.Y ) );
+						var bottomright = new PointF( projectedPoints.Max( x => x.X ), projectedPoints.Max( x => x.Y ) );
+						var bounds = new RectangleF( topleft.X, topleft.Y, bottomright.X - topleft.X, bottomright.Y - topleft.Y );
+
 						var centerBounds = Extensions.FromPoints( windingPoints );
 						var center = centerBounds.GetCenter();
 						centerBounds = Extensions.FromPoint( center, 8 );
 
-						var prevStyle = pen.DashStyle;
-						pen.DashStyle = DashStyle.Solid;
+						if( centerBounds.Width < bounds.Width && centerBounds.Height < bounds.Height )
+						{
+							var prevStyle = pen.DashStyle;
+							pen.DashStyle = DashStyle.Solid;
 
-						g.DrawLine( pen, centerBounds.TopLeft(), centerBounds.BottomRight() );
-						g.DrawLine( pen, centerBounds.BottomLeft(), centerBounds.TopRight() );
+							g.DrawLine( pen, centerBounds.TopLeft(), centerBounds.BottomRight() );
+							g.DrawLine( pen, centerBounds.BottomLeft(), centerBounds.TopRight() );
 
-						pen.DashStyle = prevStyle;
+							pen.DashStyle = prevStyle;
+						}
 					}
 
 					facePoints.AddRange( projectedPoints );
