@@ -16,7 +16,8 @@ namespace Editor
         public static Color SELECTED = Color.FromArgb( 174, 45, 48 );
         public static Color HOVERED = Color.FromArgb( 208, 208, 216 );
         public static Color PRESSED = Color.FromArgb( 71, 71, 76 );
-        public static Color SELECTED_HOVERED = Color.FromArgb( 255, 66, 72 );
+		public static Color PRESSED_DARK = Color.FromArgb( 21, 21, 21 );
+		public static Color SELECTED_HOVERED = Color.FromArgb( 255, 66, 72 );
         public static Color SELECTED_PRESSED = Color.FromArgb( 96, 25, 27 );
         public static Color GRID = Color.FromArgb( 34, 34, 34 );
 		public static Color GRID_HIGHLIGHT = Color.FromArgb( 60, 60, 60 );

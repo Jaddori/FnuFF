@@ -47,11 +47,13 @@
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timer_hotload = new System.Windows.Forms.Timer(this.components);
 			this.pnl_flags = new System.Windows.Forms.Panel();
+			this.lbl_commandHistory = new System.Windows.Forms.Label();
 			this.ws_viewports = new Editor.WorkspaceControl();
 			this.view_bottomLeft = new Editor.View2DControl();
 			this.view_bottomRight = new Editor.View2DControl();
 			this.view_3d = new Editor.View3DControl();
 			this.view_topRight = new Editor.View2DControl();
+			this.cntl_commandHistory = new Editor.CommandHistoryControl();
 			this.tab_face = new Editor.FaceTabContentControl();
 			this.btn_tab_face = new Editor.FlatTabButtonControl();
 			this.btn_tab_entity = new Editor.FlatTabButtonControl();
@@ -185,6 +187,8 @@
 			// pnl_right
 			// 
 			this.pnl_right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_right.Controls.Add(this.lbl_commandHistory);
+			this.pnl_right.Controls.Add(this.cntl_commandHistory);
 			this.pnl_right.Controls.Add(this.tab_face);
 			this.pnl_right.Controls.Add(this.pnl_tabPanel);
 			this.pnl_right.Dock = System.Windows.Forms.DockStyle.Right;
@@ -225,6 +229,18 @@
 			this.pnl_flags.Name = "pnl_flags";
 			this.pnl_flags.Size = new System.Drawing.Size(1239, 24);
 			this.pnl_flags.TabIndex = 6;
+			// 
+			// lbl_commandHistory
+			// 
+			this.lbl_commandHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.lbl_commandHistory.AutoSize = true;
+			this.lbl_commandHistory.ForeColor = System.Drawing.Color.White;
+			this.lbl_commandHistory.Location = new System.Drawing.Point(6, 325);
+			this.lbl_commandHistory.Name = "lbl_commandHistory";
+			this.lbl_commandHistory.Size = new System.Drawing.Size(92, 13);
+			this.lbl_commandHistory.TabIndex = 3;
+			this.lbl_commandHistory.Text = "Command History:";
 			// 
 			// ws_viewports
 			// 
@@ -307,6 +323,22 @@
 			this.view_topRight.Name = "view_topRight";
 			this.view_topRight.Size = new System.Drawing.Size(488, 337);
 			this.view_topRight.TabIndex = 0;
+			// 
+			// cntl_commandHistory
+			// 
+			this.cntl_commandHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.cntl_commandHistory.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+			this.cntl_commandHistory.CurrentColor = System.Drawing.Color.FromArgb(((int)(((byte)(174)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.cntl_commandHistory.ForeColor = System.Drawing.Color.DarkGray;
+			this.cntl_commandHistory.Location = new System.Drawing.Point(3, 341);
+			this.cntl_commandHistory.Name = "cntl_commandHistory";
+			this.cntl_commandHistory.Padding = new System.Windows.Forms.Padding(3, 1, 3, 1);
+			this.cntl_commandHistory.RedoColor = System.Drawing.Color.DimGray;
+			this.cntl_commandHistory.Size = new System.Drawing.Size(194, 337);
+			this.cntl_commandHistory.TabIndex = 2;
+			this.cntl_commandHistory.Text = "commandHistoryControl1";
+			this.cntl_commandHistory.UndoColor = System.Drawing.Color.LightGray;
 			// 
 			// tab_face
 			// 
@@ -512,6 +544,7 @@
 			this.menu_editor.PerformLayout();
 			this.pnl_left.ResumeLayout(false);
 			this.pnl_right.ResumeLayout(false);
+			this.pnl_right.PerformLayout();
 			this.pnl_tabPanel.ResumeLayout(false);
 			this.pnl_flags.ResumeLayout(false);
 			this.ws_viewports.PanelBottomLeft.ResumeLayout(false);
@@ -561,6 +594,8 @@
 		private System.Windows.Forms.Panel pnl_flags;
 		private FlatToggleButtonControl btn_textureLock;
 		private FlatToggleButtonControl btn_snapToGrid;
+		private CommandHistoryControl cntl_commandHistory;
+		private System.Windows.Forms.Label lbl_commandHistory;
 	}
 }
 

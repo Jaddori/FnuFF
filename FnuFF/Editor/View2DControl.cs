@@ -178,7 +178,13 @@ namespace Editor
 		public CommandStack CommandStack
 		{
 			get { return _commandStack; }
-			set { _commandStack = value; }
+			set
+			{
+				_commandStack = value;
+				_commandStack.OnDo += ( command ) => Invalidate();
+				_commandStack.OnUndo += ( command ) => Invalidate();
+				_commandStack.OnRedo += ( command ) => Invalidate();
+			}
 		}
 
 		public View2DControl()

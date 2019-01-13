@@ -89,6 +89,8 @@ namespace Editor
 			tab_face.OnFaceMetricsChanged += OnFaceMetricsChanged;
 			tab_face.SetDefaultTexture();
 
+			cntl_commandHistory.CommandStack = _commandStack;
+
 			_lastSaveCommandIndex = _commandStack.Index;
 			_levelName = LEVEL_NAME_UNNAMED;
 

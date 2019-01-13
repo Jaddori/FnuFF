@@ -79,5 +79,17 @@ namespace Editor.UndoRedo
 				OnRedo?.Invoke( command );
 			}
 		}
+
+		public void SetIndex( int index )
+		{
+			if( index >= 0 && index < _commands.Count )
+			{
+				while( index < _index )
+					Undo();
+
+				while( index > _index )
+					Redo();
+			}
+		}
 	}
 }
