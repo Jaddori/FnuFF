@@ -47,6 +47,12 @@ void Solid::read( Assets* assets, const name_t* textureNames, FILE* file, void* 
 	}
 }
 
+void Solid::unload()
+{
+	glDeleteVertexArrays( faceCount, vaos );
+	glDeleteBuffers( faceCount, vbos );
+}
+
 void Solid::upload()
 {
 	glGenVertexArrays( faceCount, vaos );

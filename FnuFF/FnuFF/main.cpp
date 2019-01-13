@@ -122,7 +122,17 @@ int update( void* args )
 			data->coreData->systemInfo->startUpdate();
 
 			if( input.keyDown( SDL_SCANCODE_ESCAPE ) )
+			{
 				*data->coreData->running = false;
+			}
+			else if( input.keyPressed( SDL_SCANCODE_R ) )
+			{
+				player.setPosition( level.getRandomSpawnPoint().getPosition() );
+			}
+
+#ifdef _DEBUG
+			level.hotload();
+#endif
 
 			uint64_t curTick = SDL_GetTicks();
 			float deltaTime = ( curTick - lastTick ) * 0.001f;

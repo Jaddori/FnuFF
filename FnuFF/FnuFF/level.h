@@ -21,11 +21,17 @@ public:
 	const Solid* getSolids() const;
 	int getSolidCount() const;
 
+#ifdef _DEBUG
+	bool hotload();
+#endif
+
 private:
-	//Transform transform;
-	//int meshIndex;
-	//Physics::Triangle* triangles;
-	//int triangleCount;
+#ifdef _DEBUG
+	uint64_t getTimestamp( const char* path );
+
+	uint64_t timestamp;
+	char path[1024];
+#endif
 
 	bool uploaded;
 

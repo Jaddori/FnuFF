@@ -23,6 +23,7 @@ public:
 	Solid();
 	~Solid();
 
+	void unload();
 	void upload();
 
 	void read( Rendering::Assets* assets, const name_t* textureNames, FILE* file, void* transientMemory );

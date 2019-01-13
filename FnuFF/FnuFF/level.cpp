@@ -51,6 +51,13 @@ bool Level::load( const char* filepath )
 		fclose( file );
 
 		delete[] textureNames;
+		uploaded = false;
+
+#ifdef _DEBUG
+		timestamp = getTimestamp( filepath );
+		strcpy( path, filepath );
+		path[strlen(filepath)] = 0;
+#endif
 	}
 
 	return result;
@@ -58,6 +65,11 @@ bool Level::load( const char* filepath )
 
 void Level::unload()
 {
+	for( int i=0; i<solidCount; i++ )
+	{
+		solids[i].unload();
+	}
+
 	delete[] solids;
 }
 
@@ -97,3 +109,40 @@ int Level::getSolidCount() const
 {
 	return solidCount;
 }
+
+#ifdef _DEBUG
+bool Level::hotload()
+{
+	bool result = false;
+
+	uint64_t curTimestamp = getTimestamp( path );
+	if( curTimestamp != timestamp )
+	{
+		unload();
+		load( path );
+
+		result = true;
+	}
+
+	return result;
+}
+
+uint64_t Level::getTimestamp( const char* path )
+{
+	uint64_t result = 0;
+
+	HANDLE file = CreateFile( path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	if( file )
+	{
+		FILETIME writeTime;
+		if( GetFileTime( file, NULL, NULL, &writeTime ) )
+		{
+			result = ((uint64_t)writeTime.dwHighDateTime << 32) | (uint64_t)writeTime.dwLowDateTime;
+		}
+
+		CloseHandle( file );
+	}
+
+	return result;
+}
+#endif
