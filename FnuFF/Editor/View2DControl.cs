@@ -50,7 +50,6 @@ namespace Editor
         private Pen _solidPen;
         private PointF _startPosition;
         private PointF _endPosition;
-        private bool _snapToGrid;
         private bool _lmbDown;
 		private bool _mmbDown;
 		private bool _spaceDown;
@@ -198,8 +197,6 @@ namespace Editor
 			
             _solidPen = new Pen( Color.White );
 			_solidPen.DashPattern = EditorColors.DASH_PATTERN;
-
-            _snapToGrid = true;
 
 			_invalidateAction = new Level.ChangeHandler( () => Invalidate() );
 
@@ -386,7 +383,7 @@ namespace Editor
 				{
 					_startPosition = e.Location;
 
-					if( _snapToGrid )
+					if( EditorFlags.SnapToGrid )
 					{
 						_startPosition = SnapToGrid( _startPosition );
 					}
@@ -496,7 +493,7 @@ namespace Editor
 				if( e.Button == MouseButtons.Left )
 				{
 					_clipStart = e.Location;
-					if( _snapToGrid )
+					if( EditorFlags.SnapToGrid )
 						_clipStart = SnapToGrid( _clipStart );
 
 					_clipping = true;
@@ -534,7 +531,7 @@ namespace Editor
 				if( e.Button == MouseButtons.Left )
 				{
 					_entityPosition = e.Location;
-					if( _snapToGrid )
+					if( EditorFlags.SnapToGrid )
 						_entityPosition = SnapToGrid( _entityPosition );
 				}
 			}
@@ -553,7 +550,7 @@ namespace Editor
 				{
 					_endPosition = e.Location;
 
-					if( _snapToGrid )
+					if( EditorFlags.SnapToGrid )
 					{
 						_endPosition = SnapToGrid( _endPosition );
 					}
@@ -672,7 +669,7 @@ namespace Editor
 				if( e.Button == MouseButtons.Left )
 				{
 					_entityPosition = e.Location;
-					if( _snapToGrid )
+					if( EditorFlags.SnapToGrid )
 						_entityPosition = SnapToGrid( _entityPosition );
 
 					var position = _camera.Unproject( _camera.ToGlobal( _entityPosition ).Deflate( Grid.Gap ).Inflate( Grid.Size ) );
@@ -859,7 +856,7 @@ namespace Editor
 					{
 						_endPosition = e.Location;
 
-						if( _snapToGrid )
+						if( EditorFlags.SnapToGrid )
 						{
 							_endPosition = SnapToGrid( _endPosition );
 						}
@@ -869,7 +866,7 @@ namespace Editor
 
 					_hoverPosition = e.Location;
 
-					if( _snapToGrid )
+					if( EditorFlags.SnapToGrid )
 					{
 						_hoverPosition = SnapToGrid( _hoverPosition );
 					}
@@ -1033,7 +1030,7 @@ namespace Editor
 					if( _clipping )
 					{
 						_clipEnd = e.Location;
-						if( _snapToGrid )
+						if( EditorFlags.SnapToGrid )
 							_clipEnd = SnapToGrid( _clipEnd );
 
 						Invalidate();
@@ -1042,13 +1039,13 @@ namespace Editor
 				else if( EditorTool.Current == EditorTools.Entity )
 				{
 					_hoverPosition = e.Location;
-					if( _snapToGrid )
+					if( EditorFlags.SnapToGrid )
 						_hoverPosition = SnapToGrid( _hoverPosition );
 
 					if( _lmbDown )
 					{
 						_entityPosition = e.Location;
-						if( _snapToGrid )
+						if( EditorFlags.SnapToGrid )
 							_entityPosition = SnapToGrid( _entityPosition );
 					}
 
