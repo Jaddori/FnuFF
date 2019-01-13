@@ -11,7 +11,7 @@ using Editor.UndoRedo;
 
 namespace Editor
 {
-	public class CommandHistoryControl : Control
+	public class CommandHistoryControl : UserControl
 	{
 		private CommandStack _commandStack;
 		private Color _undoColor;
@@ -28,9 +28,9 @@ namespace Editor
 			set
 			{
 				_commandStack = value;
-				_commandStack.OnDo += ( command ) => Invalidate();
-				_commandStack.OnRedo += (command) => Invalidate();
-				_commandStack.OnUndo += ( command ) => Invalidate();
+				_commandStack.OnDo += ( command ) => { UpdateScrollbars(true); Invalidate(); };
+				_commandStack.OnRedo += (command) => { UpdateScrollbars(); Invalidate(); };
+				_commandStack.OnUndo += ( command ) => { UpdateScrollbars(); Invalidate(); };
 			}
 		}
 
@@ -67,6 +67,7 @@ namespace Editor
 		public CommandHistoryControl()
 		{
 			DoubleBuffered = true;
+			AutoScroll = true;
 
 			_commandStack = null;
 			_undoColor = Color.White;
@@ -117,6 +118,8 @@ namespace Editor
 
 			if( _commandStack == null )
 				return;
+
+			g.TranslateTransform( 0, AutoScrollPosition.Y );
 
 			using( var undoBrush = new SolidBrush( UndoColor ) )
 			using( var redoBrush = new SolidBrush( RedoColor ) )
@@ -197,6 +200,28 @@ namespace Editor
 				if( _hoverIndex < _commandStack.Commands.Count || prevIndex < _commandStack.Commands.Count )
 				{
 					Invalidate();
+				}
+			}
+		}
+
+		protected override void OnResize( EventArgs e )
+		{
+			base.OnResize( e );
+
+			UpdateScrollbars();
+			Invalidate();
+		}
+
+		public void UpdateScrollbars( bool updatePosition = false )
+		{
+			if( _commandStack != null )
+			{
+				var lineHeight = Font.Height + Padding.Vertical;
+				AutoScrollMinSize = new Size( 0, _commandStack.Commands.Count * lineHeight );
+
+				if( updatePosition )
+				{
+					AutoScrollPosition = new Point( 0, _commandStack.Commands.Count * lineHeight );
 				}
 			}
 		}
