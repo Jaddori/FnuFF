@@ -17,6 +17,8 @@ namespace Editor
 {
     public class View2DControl : Control
     {
+		private const int HANDLE_SIZE = 8;
+
 		public delegate void GlobalInvalidationHandler();
 		public event GlobalInvalidationHandler OnGlobalInvalidation;
 
@@ -70,6 +72,8 @@ namespace Editor
 		private bool _movingEntity;
 		private bool _movingSolid;
 		private bool _duplicatingSolid;
+		private bool _movingVertex;
+		private List<Tuple<int, int>> _selectedVertices;
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
@@ -195,6 +199,12 @@ namespace Editor
 
 			_handleIndex = -1;
 			_clipping = false;
+
+			_movingEntity = false;
+			_movingSolid = false;
+			_duplicatingSolid = false;
+			_movingVertex = false;
+			_selectedVertices = new List<Tuple<int, int>>();
         }
 
 		private PointF SnapToGrid( PointF point )
@@ -490,6 +500,27 @@ namespace Editor
 			{
 				if( e.Button == MouseButtons.Left )
 				{
+					_selectedVertices.Clear();
+
+					var selectedSolid = EditorTool.SelectedSolid;
+					if( selectedSolid != null )
+					{
+						for( int curFace = 0; curFace < selectedSolid.Faces.Count; curFace++ )
+						{
+							var face = selectedSolid.Faces[curFace];
+							var projectedVertices = face.Vertices.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
+
+							for( int curVertex = 0; curVertex < projectedVertices.Length; curVertex++ )
+							{
+								var bounds = Extensions.FromPoint( projectedVertices[curVertex], 8 );
+
+								if( bounds.Contains( e.Location ) )
+									_selectedVertices.Add( new Tuple<int, int>( curFace, curVertex ) );
+							}
+						}
+
+						_movingVertex = (_selectedVertices.Count > 0);
+					}
 				}
 			}
 			else if( EditorTool.Current == EditorTools.Entity )
@@ -620,6 +651,14 @@ namespace Editor
 				if( e.Button == MouseButtons.Left )
 				{
 					_clipping = false;
+				}
+			}
+			else if( EditorTool.Current == EditorTools.Vertex )
+			{
+				if( e.Button == MouseButtons.Left )
+				{
+					_movingVertex = false;
+					_selectedVertices.Clear();
 				}
 			}
 			else if( EditorTool.Current == EditorTools.Entity )
@@ -755,6 +794,45 @@ namespace Editor
 				if( globalSnap != selectedEntity.Position )
 				{
 					selectedEntity.Position = globalSnap;
+
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
+			}
+			else if( _movingVertex )
+			{
+				var localSnap = SnapToGrid( e.Location );
+				_hoverPosition = localSnap;
+
+				var movedVertices = true;
+				var selectedSolid = EditorTool.SelectedSolid;
+				foreach( var pair in _selectedVertices )
+				{
+					var face = pair.Item1;
+					var vertex = pair.Item2;
+
+					var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( Grid.Gap ).Inflate( Grid.Size ), selectedSolid.Faces[face].Vertices[vertex].Dot( _camera.Direction ) );
+
+					if( globalSnap != selectedSolid.Faces[face].Vertices[vertex] )
+					{
+						selectedSolid.Faces[face].Vertices[vertex] = globalSnap;
+					}
+					else
+					{
+						movedVertices = false;
+						break; // if one of the vertices didn't move, then none of them did
+					}
+				}
+
+				if( movedVertices )
+				{
+					foreach( var face in selectedSolid.Faces )
+					{
+						face.BuildPlane();
+
+						if( !EditorFlags.TextureLock )
+							face.UpdateUVs();
+					}
 
 					Invalidate();
 					OnGlobalInvalidation?.Invoke();

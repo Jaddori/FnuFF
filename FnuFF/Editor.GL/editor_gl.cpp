@@ -280,6 +280,14 @@ EXPORT void enableDepthMask( bool enabled )
 	glDepthMask( enabled ? GL_TRUE : GL_FALSE );
 }
 
+EXPORT void enableDepthTest( bool enabled )
+{
+	if( enabled )
+		glEnable( GL_DEPTH_TEST );
+	else
+		glDisable( GL_DEPTH_TEST );
+}
+
 EXPORT void unproject( int x, int y, int z, float* outx, float* outy, float* outz )
 {
 	GLdouble viewMatrix[16];

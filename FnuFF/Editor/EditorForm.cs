@@ -106,9 +106,10 @@ namespace Editor
 			var prevTool = EditorTool.Current;
 			EditorTool.Current = (EditorTools)button.Tag;
 
-			if( EditorTool.Current != EditorTools.Clip )
+			if( EditorTool.Current != EditorTools.Clip && EditorTool.Current != EditorTools.Vertex )
 			{
-				if( !(prevTool == EditorTools.Clip && EditorTool.Current == EditorTools.Select) )
+				if( !(prevTool == EditorTools.Clip && EditorTool.Current == EditorTools.Select) &&
+					!(prevTool == EditorTools.Vertex && EditorTool.Current == EditorTools.Select) )
 					EditorTool.ClearSelection();
 			}
 
@@ -465,7 +466,7 @@ namespace Editor
 
 		private void UpdateTitle()
 		{
-			Text = _levelName;
+			Text = "FnuFF Editor - " + _levelName;
 			if( _lastSaveCommandIndex != _commandStack.Index )
 				Text += "*";
 		}

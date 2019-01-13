@@ -199,7 +199,7 @@ namespace Editor
 				var faces = _faces.Where( x => x.Plane.Normal.Dot( camera.Direction ) > 0 ).ToArray();
 				foreach( var face in faces )
 				{
-					var projectedPoints = face.Vertices.Select( x => camera.ToLocal( camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).ToArray();
+					var projectedPoints = face.Vertices.Select( x => camera.ToLocal( camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).Distinct().ToArray();
 
 					var windingPoints = Extensions.WindingSort2D( projectedPoints.ToArray() );
 
@@ -231,6 +231,15 @@ namespace Editor
 							g.DrawLine( pen, centerBounds.BottomLeft(), centerBounds.TopRight() );
 
 							pen.DashStyle = prevStyle;
+						}
+
+						if( _selected && EditorTool.Current == EditorTools.Vertex )
+						{
+							foreach( var vertex in projectedPoints )
+							{
+								var handle = Extensions.FromPoint( vertex, 8 );
+								g.FillRectangle( EditorColors.BRUSH_HANDLE, handle );
+							}
 						}
 					}
 
@@ -391,6 +400,26 @@ namespace Editor
 				}
 
 				GL.End();
+
+				// draw vertex handles
+				if( _selected && EditorTool.Current == EditorTools.Vertex )
+				{
+					GL.EnablePointSprite( true );
+					GL.EnableDepthMask( false );
+					GL.SetTexture( 0 );
+					GL.PointSize( 8 );
+
+					GL.BeginPoints();
+
+					GL.Color4f( 1.0f );
+					foreach( var v in face.Vertices )
+						GL.Vertex3f( v.X / Grid.SIZE_BASE, v.Y / Grid.SIZE_BASE, v.Z / Grid.SIZE_BASE );
+
+					GL.End();
+					
+					GL.EnableDepthMask( true );
+					GL.EnablePointSprite( false );
+				}
 			}
 
 			GL.SetTexture( 0 );
