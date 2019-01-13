@@ -501,5 +501,15 @@ namespace Editor
 				ViewGlobalInvalidation();
 			}
 		}
+
+		private void btn_textureLock_Click( object sender, EventArgs e )
+		{
+			EditorFlags.TextureLock = btn_textureLock.Selected;
+		}
+
+		private void btn_snapToGrid_Click( object sender, EventArgs e )
+		{
+			EditorFlags.SnapToGrid = btn_snapToGrid.Selected;
+		}
 	}
 }

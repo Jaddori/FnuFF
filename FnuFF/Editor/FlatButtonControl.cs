@@ -88,27 +88,27 @@ namespace Editor
 					e.Graphics.FillRectangle( Brushes.White, rect );
 			}
 
-            // draw selection/hover indicator
-            if( _pressed || _hovered || _selected )
-            {
-                var brush = _selectedBrush;
-                if( _selected )
-                {
-                    if( _pressed )
-                        brush = _selectedPressedBrush;
-                    else if( _hovered )
-                        brush = _selectedHoveredBrush;
-                }
-                else
-                {
-                    if( _pressed )
-                        brush = _pressedBrush;
-                    else if( _hovered )
-                        brush = _hoveredBrush;
-                }
+			// draw selection/hover indicator
+			if( _pressed || _hovered || _selected )
+			{
+				var brush = _selectedBrush;
+				if( _selected )
+				{
+					if( _pressed )
+						brush = _selectedPressedBrush;
+					else if( _hovered )
+						brush = _selectedHoveredBrush;
+				}
+				else
+				{
+					if( _pressed )
+						brush = _pressedBrush;
+					else if( _hovered )
+						brush = _hoveredBrush;
+				}
 
-                e.Graphics.FillRectangle( brush, new Rectangle( 0, 0, INDICATOR_WIDTH, Size.Height ) );
-            }
+				e.Graphics.FillRectangle( brush, new Rectangle( 0, 0, INDICATOR_WIDTH, Size.Height ) );
+			}
 
             if( DesignMode )
             {

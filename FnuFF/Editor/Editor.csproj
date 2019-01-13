@@ -98,6 +98,9 @@
     <Compile Include="FlatTabButtonControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="FlatToggleButtonControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GeometrySolid.cs" />
     <Compile Include="GL\GL.cs" />
     <Compile Include="Grid.cs" />
@@ -232,6 +235,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icon_entity_player_spawn_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_texture_lock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_texture_lock_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_snap_to_grid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_snap_to_grid_selected.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

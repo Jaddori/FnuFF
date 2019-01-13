@@ -163,6 +163,26 @@ namespace Editor.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icon_snap_to_grid {
+            get {
+                object obj = ResourceManager.GetObject("icon_snap_to_grid", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icon_snap_to_grid_selected {
+            get {
+                object obj = ResourceManager.GetObject("icon_snap_to_grid_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icon_solid {
             get {
                 object obj = ResourceManager.GetObject("icon_solid", resourceCulture);
@@ -186,6 +206,26 @@ namespace Editor.Properties {
         internal static System.Drawing.Bitmap icon_texture {
             get {
                 object obj = ResourceManager.GetObject("icon_texture", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icon_texture_lock {
+            get {
+                object obj = ResourceManager.GetObject("icon_texture_lock", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icon_texture_lock_selected {
+            get {
+                object obj = ResourceManager.GetObject("icon_texture_lock_selected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
