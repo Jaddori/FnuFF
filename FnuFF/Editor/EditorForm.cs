@@ -328,6 +328,8 @@ namespace Editor
 			{
 				var path = saveFileDialog.FileName;
 
+				generateLightmap( path + "_light.tga" );
+
 				var solids = _level.Solids;
 				var entities = _level.Entities;
 				
@@ -400,26 +402,35 @@ namespace Editor
 
 						// write vertex information
 						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-						//var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
-						var points = face.Vertices.ToArray();
-						var indices = Extensions.WindingIndex3D( points, face.Plane.Normal );
-						var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( face.Plane.Normal, x, face ) ).ToArray();
 
-						int indexCount = ( indices.Length - 2 ) * 3;
+						var vertices = face.Vertices;
+						var uvs = face.UVs;
+						var lms = face.LightmapUVs;
+
+						var indexCount = ( vertices.Count - 2 ) * 3;
 						writer.Write( indexCount );
 
-						var v0 = points[indices[0]];
-						var uv0 = texCoords[indices[0]];
-						for( int i = 1; i < indices.Length-1; i++ )
+						var v0 = vertices[0];
+						var uv0 = uvs[0];
+						var lm0 = new PointF( LIGHTMAP_SIZE * 0.5f, LIGHTMAP_SIZE * 0.5f );
+						if( lms.Count > 0 )
+							lm0 = lms[0];
+
+						for( int i = 1; i < vertices.Count - 1; i++ )
 						{
-							var i1 = indices[i];
-							var i2 = indices[i + 1];
+							var v1 = vertices[i];
+							var v2 = vertices[i+1];
 
-							var v1 = points[i1];
-							var v2 = points[i2];
+							var uv1 = uvs[i];
+							var uv2 = uvs[i+1];
 
-							var uv1 = texCoords[i1];
-							var uv2 = texCoords[i2];
+							var lm1 = new PointF( LIGHTMAP_SIZE*0.5f, LIGHTMAP_SIZE * 0.5f );
+							var lm2 = new PointF( LIGHTMAP_SIZE * 0.5f, LIGHTMAP_SIZE * 0.5f );
+
+							if( lms.Count > i )
+								lm1 = lms[i];
+							if( lms.Count > i + 1 )
+								lm2 = lms[i + 1];
 
 							var v1v0 = v0 - v1;
 							var v2v0 = v0 - v2;
@@ -441,12 +452,15 @@ namespace Editor
 
 							writer.Write( v0, Grid.SIZE_BASE );
 							writer.Write( uv0 );
+							writer.Write( lm0.Div( LIGHTMAP_SIZE ) );
 
 							writer.Write( v1, Grid.SIZE_BASE );
 							writer.Write( uv1 );
+							writer.Write( lm1.Div( LIGHTMAP_SIZE ) );
 
 							writer.Write( v2, Grid.SIZE_BASE );
 							writer.Write( uv2 );
+							writer.Write( lm2.Div( LIGHTMAP_SIZE ) );
 						}
 					}
 				}
@@ -458,8 +472,6 @@ namespace Editor
 
 				writer.Close();
 				stream.Close();
-
-				generateLightmap( path + "_light.tga" );
 			}
 		}
 
@@ -497,6 +509,8 @@ namespace Editor
 						var allocated = allocLightmap( rover, 4, 4, out mapIndex );
 						if( allocated )
 						{
+							face.BuildLightmapUVs( mapIndex.X, mapIndex.Y, 4, 4 );
+
 							for( int curLumel = 0; curLumel < face.Lumels.Count; curLumel++ )
 							{
 								var a = face.Lumels[curLumel];
@@ -587,10 +601,9 @@ namespace Editor
 					if( radiance > 255.0f )
 						radiance = 255.0f;
 					byte r = (byte)radiance;
-					byte g = 0, b = 0;
 
-					writer.Write( b );
-					writer.Write( g );
+					writer.Write( r );
+					writer.Write( r );
 					writer.Write( r );
 
 					if( radiance > 0 )

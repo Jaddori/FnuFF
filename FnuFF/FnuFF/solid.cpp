@@ -66,12 +66,14 @@ void Solid::upload()
 
 		glEnableVertexAttribArray( 0 );
 		glEnableVertexAttribArray( 1 );
+		glEnableVertexAttribArray( 2 );
 
 		glBindBuffer( GL_ARRAY_BUFFER, vbos[i] );
 		glBufferData( GL_ARRAY_BUFFER, sizeof(SolidVertex)*face.vertexCount, face.vertices, GL_STATIC_DRAW );
 
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), 0 );
 		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)) );
+		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof(SolidVertex), (void*)(sizeof(glm::vec3)+sizeof(glm::vec2)) );
 
 		delete[] face.vertices;
 		face.vertices = NULL;

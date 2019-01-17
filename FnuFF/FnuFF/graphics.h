@@ -81,7 +81,10 @@ namespace Rendering
 		Shader solidShader;
 		GLuint solidShaderProjectionLocation;
 		GLuint solidShaderViewLocation;
+		GLuint solidShaderDiffuseLocation;
 		SwapArray<const Solid*> solidQueue;
+		Texture lightmap;
+		GLuint lightmapLocation;
 
 		Shader textShader;
 		GLuint textProjectionLocation;

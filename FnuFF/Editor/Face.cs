@@ -26,6 +26,9 @@ namespace Editor
 
 		//private List<Triple> _lumels;
 		private List<Lumel> _lumels;
+		private List<PointF> _lightmapUVs;
+		private Triple _tangent;
+		private Triple _bitangent;
 
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public string PackName { get { return _packName; } set { _packName = value; } }
@@ -74,8 +77,10 @@ namespace Editor
 		public bool Selected { get { return _selected; } set { _selected = value; } }
 
 		[XmlIgnore]
-		//public List<Triple> Lumels => _lumels;
 		public List<Lumel> Lumels => _lumels;
+
+		[XmlIgnore]
+		public List<PointF> LightmapUVs => _lightmapUVs;
 
 		public Face()
 		{
@@ -88,6 +93,7 @@ namespace Editor
 			_hovered = false;
 			//_lumels = new List<Triple>();
 			_lumels = new List<Lumel>();
+			_lightmapUVs = new List<PointF>();
 		}
 
 		public Face( Triple normal, float d )
@@ -106,6 +112,7 @@ namespace Editor
 			_hovered = false;
 			//_lumels = new List<Triple>();
 			_lumels = new List<Lumel>();
+			_lightmapUVs = new List<PointF>();
 		}
 
 		public Face Copy()
@@ -223,13 +230,13 @@ namespace Editor
 			var deltaUV2 = uv2.Sub( uv0 );
 
 			var r = 1.0f / ( deltaUV1.X * deltaUV2.Y - deltaUV1.Y * deltaUV2.X + 0.0001f );
-			var tangent = ( deltaPos1 * deltaUV2.Y - deltaPos2 * deltaUV1.Y ) * r;
-			var bitangent = ( deltaPos2 * deltaUV1.X - deltaPos1 * deltaUV2.X ) * r;
+			_tangent = ( deltaPos1 * deltaUV2.Y - deltaPos2 * deltaUV1.Y ) * r;
+			_bitangent = ( deltaPos2 * deltaUV1.X - deltaPos1 * deltaUV2.X ) * r;
 
-			var xaxis = tangent;
+			var xaxis = _tangent;
 			xaxis.Normalize();
 
-			var yaxis = bitangent;
+			var yaxis = _bitangent;
 			yaxis.Normalize();
 
 			var minx = _vertices.Min( x => x.Dot( xaxis ) );// / Grid.SIZE_BASE;
@@ -265,6 +272,43 @@ namespace Editor
 						_lumels.Add( new Lumel( p0 ) );
 					}
 				}
+			}
+		}
+
+		public void BuildLightmapUVs( int x, int y, int w, int h )
+		{
+			_lightmapUVs.Clear();
+
+			if( _vertices.Count <= 0 )
+				return;
+
+			var xaxis = _tangent;
+			xaxis.Normalize();
+
+			var yaxis = _bitangent;
+			yaxis.Normalize();
+
+			var minx = _vertices.Min( a => a.Dot( xaxis ) );
+			var miny = _vertices.Min( a => a.Dot( yaxis ) );
+			var maxx = _vertices.Max( a => a.Dot( xaxis ) );
+			var maxy = _vertices.Max( a => a.Dot( yaxis ) );
+
+			var width = ( maxx - minx );
+			var height = ( maxy - miny );
+
+			for( int i = 0; i < _vertices.Count; i++ )
+			{
+				var v = _vertices[i];
+				var curx = v.Dot( xaxis );
+				var cury = v.Dot( yaxis );
+
+				curx = ( curx - minx ) / width;
+				cury = ( cury - miny ) / height;
+
+				var finalx = x + curx * w;
+				var finaly = y + cury * h;
+
+				_lightmapUVs.Add( new PointF( finalx, finaly ) );
 			}
 		}
 	}

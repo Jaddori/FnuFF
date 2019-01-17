@@ -15,12 +15,16 @@ void Graphics::load()
 	solidShader.load( "./assets/shaders/solid.vs", NULL, "./assets/shaders/solid.fs" );
 	solidShaderProjectionLocation = solidShader.getLocation( "projectionMatrix" );
 	solidShaderViewLocation = solidShader.getLocation( "viewMatrix" );
+	solidShaderDiffuseLocation = solidShader.getLocation( "fragDiffuse" );
+	lightmapLocation = solidShader.getLocation( "fragLightmap" );
 
 	perspectiveCamera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
 	perspectiveCamera.setPosition( glm::vec3( 0, 0, -10 ) );
 
 	assets.loadPack( "./assets/textures/pack01.bin" );
 	assets.loadPack( "./assets/textures/tools.bin" );
+	lightmap.load( "./assets/levels/lightmap_test01.lvl_light.tga" );
+	lightmap.upload();
 	
 	textShader.load( "./assets/shaders/font.vs", "./assets/shaders/font.gs", "./assets/shaders/font.fs" );
 	textProjectionLocation = textShader.getLocation( "projectionMatrix" );
@@ -169,6 +173,8 @@ void Graphics::renderSolids()
 	solidShader.bind();
 	solidShader.setMat4( solidShaderProjectionLocation, perspectiveCamera.getProjectionMatrix() );
 	solidShader.setMat4( solidShaderViewLocation, perspectiveCamera.getViewMatrix() );
+	solidShader.setInt( solidShaderDiffuseLocation, 0 );
+	solidShader.setInt( lightmapLocation, 1 );
 
 	const int SOLID_COUNT = solidQueue.getRead().getSize();
 
@@ -184,7 +190,8 @@ void Graphics::renderSolids()
 			const Texture* texture = assets.getTexture( textureIndex );
 			if( !texture->hasAlpha() )
 			{
-				texture->bind();
+				texture->bind( GL_TEXTURE0 );
+				lightmap.bind( GL_TEXTURE1 );
 
 				GLuint vao = solid->getVAO( curFace );
 				int vertexCount = solid->getVertexCount( curFace );

@@ -8,6 +8,7 @@ struct SolidVertex
 {
 	glm::vec3 position;
 	glm::vec2 uv;
+	glm::vec2 lm;
 };
 
 struct SolidFace

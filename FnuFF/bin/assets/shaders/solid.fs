@@ -1,14 +1,18 @@
 #version 420
 
 in vec2 fragUV;
+in vec2 fragLM;
 
 out vec4 finalColor;
 
 uniform sampler2D fragDiffuse;
+uniform sampler2D fragLightmap;
 
 void main()
 {
-	//finalColor = vec4( fragColor, 1.0 );
-	finalColor = texture( fragDiffuse, fragUV );
-	//finalColor = vec4( fragUV, 1.0, 1.0 );
+	//float brightness = texture( fragLightmap, fragLM ).r;
+	//finalColor = texture( fragDiffuse, fragUV ) * brightness;
+	
+	//finalColor = texture( fragDiffuse, fragUV );
+	finalColor = texture( fragLightmap, fragLM );
 }

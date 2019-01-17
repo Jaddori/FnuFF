@@ -182,7 +182,7 @@
 							<Y>1</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>128</D>
+						<D>320</D>
 					</Plane>
 					<PackName>tools</PackName>
 					<TextureName>no_draw</TextureName>
@@ -312,7 +312,7 @@
 							<Y>1</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>128</D>
+						<D>320</D>
 					</Plane>
 					<PackName>tools</PackName>
 					<TextureName>no_draw</TextureName>
@@ -442,7 +442,7 @@
 							<Y>1</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>128</D>
+						<D>320</D>
 					</Plane>
 					<PackName>tools</PackName>
 					<TextureName>no_draw</TextureName>
@@ -572,7 +572,7 @@
 							<Y>1</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>128</D>
+						<D>320</D>
 					</Plane>
 					<PackName>tools</PackName>
 					<TextureName>no_draw</TextureName>
@@ -702,7 +702,7 @@
 							<Y>1</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>192</D>
+						<D>384</D>
 					</Plane>
 					<PackName>tools</PackName>
 					<TextureName>no_draw</TextureName>
@@ -723,7 +723,7 @@
 							<Y>-1</Y>
 							<Z>-0</Z>
 						</Normal>
-						<D>-128</D>
+						<D>-320</D>
 					</Plane>
 					<PackName>tools</PackName>
 					<TextureName>sky</TextureName>
@@ -912,5 +912,18 @@
 			</Faces>
 		</GeometrySolid>
 	</Solids>
-	<Entities />
+	<Entities>
+		<Entity>
+			<Position>
+				<X>128.000031</X>
+				<Y>128.000031</Y>
+				<Z>127.999992</Z>
+			</Position>
+			<Active>true</Active>
+			<Data xsi:type="PlayerSpawn">
+				<Name />
+				<Angle>0</Angle>
+			</Data>
+		</Entity>
+	</Entities>
 </Level>
