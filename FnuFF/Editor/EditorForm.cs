@@ -17,7 +17,6 @@ namespace Editor
 	public partial class EditorForm : Form
 	{
 		private const string LEVEL_NAME_UNNAMED = "Unnamed";
-		private const int LIGHTMAP_SIZE = 128;
 
 		private List<FlatButtonControl> _toolbarButtons;
 		private List<FlatTabButtonControl> _tabButtons;
@@ -238,7 +237,6 @@ namespace Editor
 								foreach( var face in solid.Faces )
 								{
 									face.BuildVertices( solid );
-									face.BuildLumels( solid );
 								}
 							}
 
@@ -328,7 +326,7 @@ namespace Editor
 			{
 				var path = saveFileDialog.FileName;
 
-				generateLightmap( path + "_light.tga" );
+				GenerateLightmap( path + "_light.tga" );
 
 				var solids = _level.Solids;
 				var entities = _level.Entities;
@@ -412,7 +410,7 @@ namespace Editor
 
 						var v0 = vertices[0];
 						var uv0 = uvs[0];
-						var lm0 = new PointF( LIGHTMAP_SIZE * 0.5f, LIGHTMAP_SIZE * 0.5f );
+						var lm0 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
 						if( lms.Count > 0 )
 							lm0 = lms[0];
 
@@ -424,8 +422,8 @@ namespace Editor
 							var uv1 = uvs[i];
 							var uv2 = uvs[i+1];
 
-							var lm1 = new PointF( LIGHTMAP_SIZE*0.5f, LIGHTMAP_SIZE * 0.5f );
-							var lm2 = new PointF( LIGHTMAP_SIZE * 0.5f, LIGHTMAP_SIZE * 0.5f );
+							var lm1 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
+							var lm2 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
 
 							if( lms.Count > i )
 								lm1 = lms[i];
@@ -448,19 +446,23 @@ namespace Editor
 								var tempUV = uv2;
 								uv2 = uv1;
 								uv1 = tempUV;
+
+								var tempLM = lm2;
+								lm2 = lm1;
+								lm1 = tempLM;
 							}
 
 							writer.Write( v0, Grid.SIZE_BASE );
 							writer.Write( uv0 );
-							writer.Write( lm0.Div( LIGHTMAP_SIZE ) );
+							writer.Write( lm0, Lightmap.SIZE );
 
 							writer.Write( v1, Grid.SIZE_BASE );
 							writer.Write( uv1 );
-							writer.Write( lm1.Div( LIGHTMAP_SIZE ) );
+							writer.Write( lm1, Lightmap.SIZE );
 
 							writer.Write( v2, Grid.SIZE_BASE );
 							writer.Write( uv2 );
-							writer.Write( lm2.Div( LIGHTMAP_SIZE ) );
+							writer.Write( lm2, Lightmap.SIZE );
 						}
 					}
 				}
@@ -474,180 +476,12 @@ namespace Editor
 				stream.Close();
 			}
 		}
-
-		private void generateLightmap( string filename )
+		
+		private void GenerateLightmap( string filename )
 		{
-			float[,] map = new float[LIGHTMAP_SIZE, LIGHTMAP_SIZE];
-			int[] rover = new int[LIGHTMAP_SIZE];
+			Lightmap.Generate( _level, filename );
 
-			// initialize lumels
-			foreach( var solid in _level.Solids )
-			{
-				foreach( var face in solid.Faces )
-				{
-					if( face.TextureName == "sky" )
-					{
-						foreach( var lumel in face.Lumels )
-						{
-							lumel.Radiance = 1.0f;
-						}
-					}
-				}
-			}
-
-			var innerwrits = 0;
-			for( int curSolid = 0; curSolid < _level.Solids.Count; curSolid++ )
-			{
-				var solid = _level.Solids[curSolid];
-				for( int curFace = 0; curFace < solid.Faces.Count; curFace++ )
-				{
-					var face = solid.Faces[curFace];
-
-					if( face.TextureName != "sky" && face.TextureName != "clip" && face.TextureName != "no_draw" )
-					{
-						Point mapIndex;
-						var allocated = allocLightmap( rover, 4, 4, out mapIndex );
-						if( allocated )
-						{
-							face.BuildLightmapUVs( mapIndex.X, mapIndex.Y, 4, 4 );
-
-							for( int curLumel = 0; curLumel < face.Lumels.Count; curLumel++ )
-							{
-								var a = face.Lumels[curLumel];
-
-								var hits = 0;
-								var radiance = 0.0f;
-
-								for( int curOtherSolid = 0; curOtherSolid < _level.Solids.Count; curOtherSolid++ )
-								{
-									if( curOtherSolid != curSolid )
-									{
-										var otherSolid = _level.Solids[curOtherSolid];
-										for( int curOtherFace = 0; curOtherFace < otherSolid.Faces.Count; curOtherFace++ )
-										{
-											var otherFace = otherSolid.Faces[curOtherFace];
-
-											if( otherFace.Plane.Normal.Dot( face.Plane.Normal ) < 0 ) // make sure planes are at least vaguely pointing toward each other
-											{
-												for( int curOtherLumel = 0; curOtherLumel < otherFace.Lumels.Count; curOtherLumel++ )
-												{
-													var b = otherFace.Lumels[curOtherLumel];
-
-													radiance += b.Radiance;
-													hits++;
-												}
-											}
-										}
-									}
-								}
-
-								//a.Radiance = radiance / hits;
-								a.Radiance = radiance;
-								if( radiance > 0 )
-									innerwrits++;
-							}
-
-							for( int y = 0; y < 4; y++ )
-							{
-								for( int x = 0; x < 4; x++ )
-								{
-									var lumelIndex = Extensions.IndexFromXY( x, y, 4 );
-									var lumel = face.Lumels[lumelIndex];
-
-									//map[mapIndex + x + y * 1024] = lumel.Radiance;
-									map[mapIndex.X + x, mapIndex.Y + y] = lumel.Radiance;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			var stream = new FileStream( filename, FileMode.Create, FileAccess.Write );
-			var writer = new BinaryWriter( stream );
-
-			byte idlen = 0;
-			byte colormapType = 0;
-			byte imageType = 2;
-			Int16 origin = 0;
-			Int16 length = 0;
-			byte depth = 0;
-			Int16 xorigin = 0;
-			Int16 yorigin = 0;
-			Int16 width = LIGHTMAP_SIZE;
-			Int16 height = LIGHTMAP_SIZE;
-			byte bpp = 24;
-			byte imageDesc = 0;
-
-			writer.Write( idlen );
-			writer.Write( colormapType );
-			writer.Write( imageType );
-			writer.Write( origin );
-			writer.Write( length );
-			writer.Write( depth );
-			writer.Write( xorigin );
-			writer.Write( yorigin );
-			writer.Write( width );
-			writer.Write( height );
-			writer.Write( bpp );
-			writer.Write( imageDesc );
-
-			var writs = 0;
-			for( int y = LIGHTMAP_SIZE-1; y >= 0; y-- )
-			{
-				for( int x = 0; x < LIGHTMAP_SIZE; x++ )
-				{
-					var radiance = map[x,y] * 255.0f;
-					if( radiance > 255.0f )
-						radiance = 255.0f;
-					byte r = (byte)radiance;
-
-					writer.Write( r );
-					writer.Write( r );
-					writer.Write( r );
-
-					if( radiance > 0 )
-						writs++;
-				}
-			}
-
-			writer.Close();
-			stream.Close();
-		}
-
-		private bool allocLightmap( int[] rover, int width, int height, out Point index )
-		{
-			index = new Point( -1, -1 );
-			int bestHeight = LIGHTMAP_SIZE, tentativeHeight = 0;
-
-			for( int i = 0; i < LIGHTMAP_SIZE - width; i++ )
-			{
-				tentativeHeight = 0;
-
-				var validSpot = true;
-				for( int j = 0; j < width && validSpot; j++ )
-				{
-					if( rover[i + j] >= bestHeight )
-						validSpot = false;
-					if( rover[i + j] > tentativeHeight )
-						tentativeHeight = rover[i + j];
-				}
-
-				if( validSpot )
-				{
-					bestHeight = tentativeHeight;
-					index.X = i;
-					index.Y = tentativeHeight;
-				}
-			}
-
-			if( bestHeight + height > LIGHTMAP_SIZE )
-				return false;
-
-			for( int i = 0; i < width; i++ )
-				rover[index.X + i] = bestHeight + height;
-
-			return true;
+			view_3d.Invalidate();
 		}
 
 		private void exitToolStripMenuItem_Click( object sender, EventArgs e )

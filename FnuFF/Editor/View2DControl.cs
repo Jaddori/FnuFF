@@ -240,6 +240,17 @@ namespace Editor
 			Log.AddFunctor( Name, () => "Clip end: " + _clipEnd.ToString() );
 			Log.AddFunctor( Name, () =>
 				{
+					var result = "No face selected.";
+					if( EditorTool.SelectedFace != null )
+					{
+						result = "LW: " + EditorTool.SelectedFace.LumelWidth + ", LH: " + EditorTool.SelectedFace.LumelHeight;
+					}
+
+					return result;
+				}
+			);
+			Log.AddFunctor( Name, () =>
+				{
 					var sb = new StringBuilder();
 					sb.Append( "Command stack:\r\n" );
 					foreach( var command in _commandStack.Commands )
@@ -753,14 +764,12 @@ namespace Editor
 									face.Vertices[i] += unprojectedDif * scale;
 
 								face.BuildPlane();
-								face.BuildLumels( selectedSolid );
 							}
 
 							var allFaces = selectedSolid.Faces;
 							foreach( var face in allFaces )
 							{
 								face.BuildVertices( selectedSolid );
-								face.BuildLumels( selectedSolid );
 							}
 
 							_handlePosition = localSnap;
@@ -837,8 +846,6 @@ namespace Editor
 
 						if( !EditorFlags.TextureLock )
 							face.UpdateUVs();
-
-						face.BuildLumels( selectedSolid );
 					}
 
 					Invalidate();

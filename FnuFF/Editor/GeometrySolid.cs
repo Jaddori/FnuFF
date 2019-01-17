@@ -110,7 +110,6 @@ namespace Editor
 				face.TextureName = TextureMap.CurrentTextureName;
 
 				face.BuildVertices( this );
-				face.BuildLumels( this );
 			}
 		}
 
@@ -158,7 +157,6 @@ namespace Editor
 				foreach( var face in _faces )
 				{
 					face.BuildVertices( this );
-					face.BuildLumels( this );
 				}
 
 				didClip = true;
@@ -177,7 +175,6 @@ namespace Editor
 				}
 
 				face.BuildPlane();
-				face.BuildLumels( this );
 			}
 		}
 
@@ -357,6 +354,9 @@ namespace Editor
 					var textureID = TextureMap.GetID( face.PackName, face.TextureName );
 					GL.SetTexture( textureID );
 					GL.Color4f( shade, alpha );
+
+					if( EditorTool.CurrentLightmapID > 0 && face.LightmapUVs.Count > 0 )
+						GL.SetTexture( EditorTool.CurrentLightmapID );
 				}
 
 				if( face.Hovered || _hovered )
@@ -372,6 +372,8 @@ namespace Editor
 
 				var v0 = face.Vertices[0] / Grid.SIZE_BASE;
 				var uv0 = face.UVs[0];
+				if( EditorTool.CurrentLightmapID > 0 && face.LightmapUVs.Count > 0 )
+					uv0 = face.LightmapUVs[0].Div( 128 );
 
 				for( int i = 1; i < face.Vertices.Count - 1; i++ )
 				{
@@ -380,6 +382,12 @@ namespace Editor
 
 					var uv1 = face.UVs[i];
 					var uv2 = face.UVs[i+1];
+
+					if( EditorTool.CurrentLightmapID > 0 && face.LightmapUVs.Count > 0 )
+					{
+						uv1 = face.LightmapUVs[i].Div( 128 );
+						uv2 = face.LightmapUVs[i + 1].Div( 128 );
+					}
 
 					var v1v0 = v0 - v1;
 					var v2v0 = v0 - v2;

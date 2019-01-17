@@ -9,6 +9,9 @@ namespace Editor
 {
 	public static class EditorTool
 	{
+		public static Targa CurrentLightmap;
+		public static UInt32 CurrentLightmapID;
+
 		public delegate void ChangeHandler<T>( T prev, T current );
 
 		public static event ChangeHandler<EditorTools> OnEditorToolChanged;

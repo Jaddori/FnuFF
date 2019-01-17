@@ -138,6 +138,11 @@ namespace Editor
 			vertex3f( x, y, z );
 		}
 
+		public static void Vertex3f( Triple t )
+		{
+			vertex3f( t.X, t.Y, t.Z );
+		}
+
 		public static void Color4f( float r, float g, float b, float a )
 		{
 			color4f( r, g, b, a );

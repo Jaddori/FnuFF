@@ -145,6 +145,37 @@ namespace Editor
 				GL.EnableDepthMask( true );
 
 				// (DEBUG): Draw lumel tracing
+
+				/*GL.BeginLines();
+
+				foreach( var solid in _level.Solids )
+				{
+					foreach( var face in solid.Faces )
+					{
+						GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
+						if( face.GOOD_LINES.Count > 0 )
+						{
+							foreach( var pair in face.GOOD_LINES )
+							{
+								GL.Vertex3f( pair.Item1 / Grid.SIZE_BASE );
+								GL.Vertex3f( pair.Item2 / Grid.SIZE_BASE );
+							}
+						}
+
+						GL.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
+						if( face.BAD_LINES.Count > 0 )
+						{
+							foreach( var pair in face.BAD_LINES )
+							{
+								GL.Vertex3f( pair.Item1 / Grid.SIZE_BASE );
+								GL.Vertex3f( pair.Item2 / Grid.SIZE_BASE );
+							}
+						}
+					}
+				}
+
+				GL.End();*/
+
 				/*GL.BeginLines();
 				for( int curSolid = 0; curSolid < _level.Solids.Count; curSolid++ )
 				{

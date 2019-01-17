@@ -108,6 +108,7 @@
     <Compile Include="GL\GL.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="Lightmap.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Lumel.cs" />
     <Compile Include="Plane.cs" />

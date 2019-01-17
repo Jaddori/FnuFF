@@ -23,12 +23,21 @@ namespace Editor
 		private List<PointF> _uvs;
 		private bool _hovered;
 		private bool _selected;
-
-		//private List<Triple> _lumels;
+		
 		private List<Lumel> _lumels;
 		private List<PointF> _lightmapUVs;
 		private Triple _tangent;
 		private Triple _bitangent;
+		private float _width;
+		private float _height;
+		private int _lumelWidth;
+		private int _lumelHeight;
+
+		[XmlIgnore]
+		public List<Tuple<Triple, Triple>> GOOD_LINES = new List<Tuple<Triple, Triple>>();
+
+		[XmlIgnore]
+		public List<Tuple<Triple, Triple>> BAD_LINES = new List<Tuple<Triple, Triple>>();
 
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public string PackName { get { return _packName; } set { _packName = value; } }
@@ -81,6 +90,18 @@ namespace Editor
 
 		[XmlIgnore]
 		public List<PointF> LightmapUVs => _lightmapUVs;
+
+		[XmlIgnore]
+		public float Width => _width;
+
+		[XmlIgnore]
+		public float Height => _height;
+
+		[XmlIgnore]
+		public int LumelWidth => _lumelWidth;
+
+		[XmlIgnore]
+		public int LumelHeight => _lumelHeight;
 
 		public Face()
 		{
@@ -239,21 +260,21 @@ namespace Editor
 			var yaxis = _bitangent;
 			yaxis.Normalize();
 
-			var minx = _vertices.Min( x => x.Dot( xaxis ) );// / Grid.SIZE_BASE;
-			var miny = _vertices.Min( x => x.Dot( yaxis ) );// / Grid.SIZE_BASE;
-			var maxx = _vertices.Max( x => x.Dot( xaxis ) );// / Grid.SIZE_BASE;
-			var maxy = _vertices.Max( x => x.Dot( yaxis ) );// / Grid.SIZE_BASE;
-			var z = _plane.D;// / Grid.SIZE_BASE;
+			var minx = _vertices.Min( x => x.Dot( xaxis ) );;
+			var miny = _vertices.Min( x => x.Dot( yaxis ) );;
+			var maxx = _vertices.Max( x => x.Dot( xaxis ) );;
+			var maxy = _vertices.Max( x => x.Dot( yaxis ) );;
+			var z = _plane.D;
 
-			var width = ( maxx - minx );
-			var height = ( maxy - miny );
+			_width = ( maxx - minx );
+			_height = ( maxy - miny );
 
-			var stepx = width * 0.25f;
-			var stepy = height * 0.25f;
+			/*var stepx = _width / EditorTool.LUMELS;
+			var stepy = _height / EditorTool.LUMELS;
 
-			for( int y = 0; y < 4; y++ )
+			for( int y = 0; y < EditorTool.LUMELS; y++ )
 			{
-				for( int x = 0; x < 4; x++ )
+				for( int x = 0; x < EditorTool.LUMELS; x++ )
 				{
 					var p0 = xaxis * ( minx + stepx * ( x + 0.5f ) ) + yaxis * ( miny + stepy * ( y + 0.5f ) ) + _plane.Normal * z;
 
@@ -272,10 +293,38 @@ namespace Editor
 						_lumels.Add( new Lumel( p0 ) );
 					}
 				}
+			}*/
+
+			_lumelWidth = (int)( _width / Lightmap.LUMEL_SIZE );
+			_lumelHeight = (int)( _height / Lightmap.LUMEL_SIZE );
+
+			var stepx = _width / _lumelWidth;
+			var stepy = _height / _lumelHeight;
+
+			for( int y = 0; y < _lumelHeight; y++ )
+			{
+				for( int x = 0; x < _lumelWidth; x++ )
+				{
+					var p0 = xaxis * ( minx + stepx * ( x + 0.5f ) ) + yaxis * ( miny + stepy * ( y + 0.5f ) ) + _plane.Normal * z;
+
+					var behindAll = true;
+					for( int j = 0; j < otherPlanes.Length && behindAll; j++ )
+					{
+						if( otherPlanes[j].InFront( p0 ) )
+						{
+							behindAll = false;
+						}
+					}
+
+					if( behindAll )
+					{
+						_lumels.Add( new Lumel( p0 ) );
+					}
+				}
 			}
 		}
 
-		public void BuildLightmapUVs( int x, int y, int w, int h )
+		public void BuildLightmapUVs( int x, int y )
 		{
 			_lightmapUVs.Clear();
 
@@ -305,8 +354,8 @@ namespace Editor
 				curx = ( curx - minx ) / width;
 				cury = ( cury - miny ) / height;
 
-				var finalx = x + curx * w;
-				var finaly = y + cury * h;
+				var finalx = x + curx * _lumelWidth;
+				var finaly = y + cury * _lumelHeight;
 
 				_lightmapUVs.Add( new PointF( finalx, finaly ) );
 			}
