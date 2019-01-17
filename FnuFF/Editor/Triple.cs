@@ -28,6 +28,11 @@ namespace Editor
 		[XmlIgnore]
 		public bool IsEmpty { get { return Math.Abs( X ) < EPSILON && Math.Abs( Y ) < EPSILON && Math.Abs( Z ) < EPSILON; } }
 
+		public Triple( float all )
+			: this( all, all, all )
+		{
+		}
+
 		public Triple( float x, float y, float z )
 		{
 			X = x;

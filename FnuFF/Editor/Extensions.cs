@@ -170,6 +170,36 @@ namespace Editor
 			return result;
 		}
 
+		public static PointF Add( this PointF a, PointF b )
+		{
+			return new PointF( a.X + b.X, a.Y + b.Y );
+		}
+
+		public static PointF Sub( this PointF a, PointF b )
+		{
+			return new PointF( a.X - b.X, a.Y - b.Y );
+		}
+
+		public static PointF Mul( this PointF a, PointF b )
+		{
+			return new PointF( a.X * b.X, a.Y * b.Y );
+		}
+
+		public static PointF Mul( this PointF a, float b )
+		{
+			return new PointF( a.X * b, a.Y * b );
+		}
+
+		public static PointF Div( this PointF a, PointF b )
+		{
+			return new PointF( a.X / b.X, a.Y / b.Y );
+		}
+
+		public static PointF Div( this PointF a, float b )
+		{
+			return new PointF( a.X / b, a.Y / b );
+		}
+
 		public static Triple ToTriple( this PointF point )
 		{
 			return new Triple( point.X, point.Y, 0 );
@@ -415,6 +445,11 @@ namespace Editor
 			}
 
 			return points.ToArray();
+		}
+
+		public static int IndexFromXY( int x, int y, int width )
+		{
+			return ( y * width + x );
 		}
 
 		public static void Write( this BinaryWriter writer, Face f, float divider = 1.0f )

@@ -144,6 +144,55 @@ namespace Editor
 				}
 				GL.EnableDepthMask( true );
 
+				// (DEBUG): Draw lumel tracing
+				/*GL.BeginLines();
+				for( int curSolid = 0; curSolid < _level.Solids.Count; curSolid++ )
+				{
+					var solid = _level.Solids[curSolid];
+					for( int curFace = 0; curFace < solid.Faces.Count; curFace++ )
+					{
+						var face = solid.Faces[curFace];
+
+						if( face.Plane.Normal.Dot( new Triple( 0, 1, 0 ) ) < 1 )
+							continue;
+
+						for( int curLumel = 0; curLumel < face.Lumels.Count; curLumel++ )
+						{
+							var a = face.Lumels[curLumel];
+
+							for( int curOtherSolid = 0; curOtherSolid < _level.Solids.Count; curOtherSolid++ )
+							{
+								if( curOtherSolid != curSolid )
+								{
+									var otherSolid = _level.Solids[curOtherSolid];
+									for( int curOtherFace = 0; curOtherFace < otherSolid.Faces.Count; curOtherFace++ )
+									{
+										var otherFace = otherSolid.Faces[curOtherFace];
+
+										if( otherFace.Plane.Normal.Dot( new Triple( 0, -1, 0 ) ) < 1 )
+											continue;
+
+										for( int curOtherLumel = 0; curOtherLumel < otherFace.Lumels.Count; curOtherLumel++ )
+										{
+											var b = otherFace.Lumels[curOtherLumel];
+
+											if( otherFace.Plane.Normal.Dot( face.Plane.Normal ) < 0 )
+											{
+												var p0 = a.Position / Grid.SIZE_BASE;
+												var p1 = b.Position / Grid.SIZE_BASE;
+
+												GL.Vertex3f( p0.X, p0.Y, p0.Z );
+												GL.Vertex3f( p1.X, p1.Y, p1.Z );
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				GL.End();*/
+
 				// draw entities
 				foreach( var entity in _level.Entities )
 				{

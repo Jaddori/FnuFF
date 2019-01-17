@@ -753,12 +753,14 @@ namespace Editor
 									face.Vertices[i] += unprojectedDif * scale;
 
 								face.BuildPlane();
+								face.BuildLumels( selectedSolid );
 							}
 
 							var allFaces = selectedSolid.Faces;
 							foreach( var face in allFaces )
 							{
 								face.BuildVertices( selectedSolid );
+								face.BuildLumels( selectedSolid );
 							}
 
 							_handlePosition = localSnap;
@@ -835,6 +837,8 @@ namespace Editor
 
 						if( !EditorFlags.TextureLock )
 							face.UpdateUVs();
+
+						face.BuildLumels( selectedSolid );
 					}
 
 					Invalidate();

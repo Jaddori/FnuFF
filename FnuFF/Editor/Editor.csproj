@@ -109,6 +109,7 @@
     <Compile Include="Grid.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="Lumel.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="Ray.cs" />
     <Compile Include="Settings.cs" />

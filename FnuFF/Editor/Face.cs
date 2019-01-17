@@ -24,6 +24,9 @@ namespace Editor
 		private bool _hovered;
 		private bool _selected;
 
+		//private List<Triple> _lumels;
+		private List<Lumel> _lumels;
+
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public string PackName { get { return _packName; } set { _packName = value; } }
 		public string TextureName { get { return _textureName; } set { _textureName = value; } }
@@ -70,6 +73,10 @@ namespace Editor
 		[XmlIgnore]
 		public bool Selected { get { return _selected; } set { _selected = value; } }
 
+		[XmlIgnore]
+		//public List<Triple> Lumels => _lumels;
+		public List<Lumel> Lumels => _lumels;
+
 		public Face()
 		{
 			_plane = new Plane();
@@ -79,6 +86,8 @@ namespace Editor
 			_uvs = new List<PointF>();
 			_rotation = 0.0f;
 			_hovered = false;
+			//_lumels = new List<Triple>();
+			_lumels = new List<Lumel>();
 		}
 
 		public Face( Triple normal, float d )
@@ -95,6 +104,8 @@ namespace Editor
 			_uvs = new List<PointF>();
 			_rotation = rotation;
 			_hovered = false;
+			//_lumels = new List<Triple>();
+			_lumels = new List<Lumel>();
 		}
 
 		public Face Copy()
@@ -146,13 +157,13 @@ namespace Editor
 			var points = Extensions.IntersectPlanes( _plane, otherPlanes );
 			var indices = Extensions.WindingIndex3D( points, _plane.Normal );
 			var texCoords = points.Select( x => Extensions.EmitTextureCoordinates( _plane.Normal, x, this ) ).ToArray();
-			
-			for( int i=0; i<indices.Length; i++ )
+
+			for( int i = 0; i < indices.Length; i++ )
 			{
 				var index = indices[i];
 				_vertices.Add( points[index] );
-				
-				if( i > _uvs.Count-1 )
+
+				if( i > _uvs.Count - 1 )
 					_uvs.Add( texCoords[index] );
 			}
 		}
@@ -186,6 +197,75 @@ namespace Editor
 
 			_plane.Normal = normal;
 			_plane.D = d;
+		}
+
+		public void BuildLumels( GeometrySolid parent )
+		{
+			_lumels.Clear();
+
+			if( _vertices.Count < 3 )
+				return;
+
+			var otherPlanes = parent.Faces.Where( x => x != this ).Select( x => x.Plane ).ToArray();
+
+			var v0 = _vertices[0];// / Grid.SIZE_BASE;
+			var v1 = _vertices[1];// / Grid.SIZE_BASE;
+			var v2 = _vertices[2];// / Grid.SIZE_BASE;
+
+			var uv0 = _uvs[0];
+			var uv1 = _uvs[1];
+			var uv2 = _uvs[2];
+
+			var deltaPos1 = v1 - v0;
+			var deltaPos2 = v2 - v0;
+
+			var deltaUV1 = uv1.Sub( uv0 );
+			var deltaUV2 = uv2.Sub( uv0 );
+
+			var r = 1.0f / ( deltaUV1.X * deltaUV2.Y - deltaUV1.Y * deltaUV2.X + 0.0001f );
+			var tangent = ( deltaPos1 * deltaUV2.Y - deltaPos2 * deltaUV1.Y ) * r;
+			var bitangent = ( deltaPos2 * deltaUV1.X - deltaPos1 * deltaUV2.X ) * r;
+
+			var xaxis = tangent;
+			xaxis.Normalize();
+
+			var yaxis = bitangent;
+			yaxis.Normalize();
+
+			var minx = _vertices.Min( x => x.Dot( xaxis ) );// / Grid.SIZE_BASE;
+			var miny = _vertices.Min( x => x.Dot( yaxis ) );// / Grid.SIZE_BASE;
+			var maxx = _vertices.Max( x => x.Dot( xaxis ) );// / Grid.SIZE_BASE;
+			var maxy = _vertices.Max( x => x.Dot( yaxis ) );// / Grid.SIZE_BASE;
+			var z = _plane.D;// / Grid.SIZE_BASE;
+
+			var width = ( maxx - minx );
+			var height = ( maxy - miny );
+
+			var stepx = width * 0.25f;
+			var stepy = height * 0.25f;
+
+			for( int y = 0; y < 4; y++ )
+			{
+				for( int x = 0; x < 4; x++ )
+				{
+					var p0 = xaxis * ( minx + stepx * ( x + 0.5f ) ) + yaxis * ( miny + stepy * ( y + 0.5f ) ) + _plane.Normal * z;
+
+					var behindAll = true;
+					for( int j = 0; j < otherPlanes.Length && behindAll; j++ )
+					{
+						if( otherPlanes[j].InFront( p0 )) // * Grid.SIZE_BASE ) )
+						{
+							behindAll = false;
+						}
+					}
+
+					if( behindAll )
+					{
+						//_lumels.Add( p0 );
+						_lumels.Add( new Lumel( p0 ) );
+					}
+				}
+			}
 		}
 	}
 }

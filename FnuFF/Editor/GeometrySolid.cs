@@ -110,6 +110,7 @@ namespace Editor
 				face.TextureName = TextureMap.CurrentTextureName;
 
 				face.BuildVertices( this );
+				face.BuildLumels( this );
 			}
 		}
 
@@ -155,7 +156,10 @@ namespace Editor
 
 				// rebuild vertices
 				foreach( var face in _faces )
+				{
 					face.BuildVertices( this );
+					face.BuildLumels( this );
+				}
 
 				didClip = true;
 			}
@@ -173,6 +177,7 @@ namespace Editor
 				}
 
 				face.BuildPlane();
+				face.BuildLumels( this );
 			}
 		}
 
@@ -329,6 +334,11 @@ namespace Editor
 				//if( cur != 4 )
 				//	continue;
 
+				//if( face.Plane.Normal.Dot( new Triple( 0, -1, 0 ) ) != 1 )
+				//	continue;
+
+				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+
 				var shade = 1.0f;
 				if( face.Plane.Normal.Dot( new Triple( 1, 0, 0 ) ) < 0 ||
 					face.Plane.Normal.Dot( new Triple( 0, 1, 0 ) ) < 0 ||
@@ -359,7 +369,7 @@ namespace Editor
 				}
 
 				GL.BeginTriangles();
-				
+
 				var v0 = face.Vertices[0] / Grid.SIZE_BASE;
 				var uv0 = face.UVs[0];
 
@@ -400,6 +410,21 @@ namespace Editor
 				}
 
 				GL.End();
+
+				/*GL.SetTexture( 0 );
+				GL.BeginLines();
+				GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
+
+				foreach( var lumel in face.Lumels )
+				{
+					var p0 = lumel;
+					var p1 = p0 + face.Plane.Normal * 0.1f;
+
+					GL.Vertex3f( p0.X, p0.Y, p0.Z );
+					GL.Vertex3f( p1.X, p1.Y, p1.Z );
+				}
+
+				GL.End();*/
 
 				// draw vertex handles
 				if( _selected && EditorTool.Current == EditorTools.Vertex )
