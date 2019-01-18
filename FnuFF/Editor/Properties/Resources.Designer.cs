@@ -163,6 +163,46 @@ namespace Editor.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icon_show_lumels {
+            get {
+                object obj = ResourceManager.GetObject("icon_show_lumels", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icon_show_lumels_on_face {
+            get {
+                object obj = ResourceManager.GetObject("icon_show_lumels_on_face", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icon_show_lumels_on_face_selected {
+            get {
+                object obj = ResourceManager.GetObject("icon_show_lumels_on_face_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icon_show_lumels_selected {
+            get {
+                object obj = ResourceManager.GetObject("icon_show_lumels_selected", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icon_snap_to_grid {
             get {
                 object obj = ResourceManager.GetObject("icon_snap_to_grid", resourceCulture);

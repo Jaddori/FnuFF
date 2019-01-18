@@ -10,5 +10,7 @@ namespace Editor
 	{
 		public static bool SnapToGrid { get; set; } = true;
 		public static bool TextureLock { get; set; } = false;
+		public static bool ShowLumels { get; set; } = false;
+		public static bool ShowLumelsOnFace { get; set; } = false;
 	}
 }

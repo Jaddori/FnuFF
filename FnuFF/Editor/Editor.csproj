@@ -253,6 +253,18 @@
   <ItemGroup>
     <None Include="Resources\icon_snap_to_grid_selected.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_show_lumels.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_show_lumels_on_face.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_show_lumels_on_face_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon_show_lumels_selected.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

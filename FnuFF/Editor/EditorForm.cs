@@ -536,5 +536,17 @@ namespace Editor
 		{
 			EditorFlags.SnapToGrid = btn_snapToGrid.Selected;
 		}
+
+		private void btn_showLumels_Click( object sender, EventArgs e )
+		{
+			EditorFlags.ShowLumels = btn_showLumels.Selected;
+			view_3d.Invalidate();
+		}
+
+		private void btn_showLumelsOnFace_Click( object sender, EventArgs e )
+		{
+			EditorFlags.ShowLumelsOnFace = btn_showLumelsOnFace.Selected;
+			view_3d.Invalidate();
+		}
 	}
 }

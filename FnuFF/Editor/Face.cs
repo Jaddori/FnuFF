@@ -32,6 +32,7 @@ namespace Editor
 		private float _height;
 		private int _lumelWidth;
 		private int _lumelHeight;
+		private int _lumelSize;
 
 		[XmlIgnore]
 		public List<Tuple<Triple, Triple>> GOOD_LINES = new List<Tuple<Triple, Triple>>();
@@ -70,6 +71,18 @@ namespace Editor
 			{
 				_rotation = value;
 				UpdateUVs();
+			}
+		}
+
+		public int LumelSize
+		{
+			get { return _lumelSize; }
+			set
+			{
+				_lumelSize = value;
+
+				if( _lumels != null )
+					_lumels.Clear();
 			}
 		}
 
@@ -115,6 +128,7 @@ namespace Editor
 			//_lumels = new List<Triple>();
 			_lumels = new List<Lumel>();
 			_lightmapUVs = new List<PointF>();
+			_lumelSize = 16;
 		}
 
 		public Face( Triple normal, float d )
@@ -134,6 +148,7 @@ namespace Editor
 			//_lumels = new List<Triple>();
 			_lumels = new List<Lumel>();
 			_lightmapUVs = new List<PointF>();
+			_lumelSize = 16;
 		}
 
 		public Face Copy()
@@ -269,8 +284,10 @@ namespace Editor
 			_width = ( maxx - minx );
 			_height = ( maxy - miny );
 
-			_lumelWidth = (int)( _width / Lightmap.LUMEL_SIZE );
-			_lumelHeight = (int)( _height / Lightmap.LUMEL_SIZE );
+			//_lumelWidth = (int)( _width / Lightmap.LUMEL_SIZE );
+			//_lumelHeight = (int)( _height / Lightmap.LUMEL_SIZE );
+			_lumelWidth = (int)( _width / _lumelSize );
+			_lumelHeight = (int)( _height / _lumelSize );
 
 			var stepx = _width / _lumelWidth;
 			var stepy = _height / _lumelHeight;

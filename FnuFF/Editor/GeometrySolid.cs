@@ -334,6 +334,13 @@ namespace Editor
 				//if( face.Plane.Normal.Dot( new Triple( 0, -1, 0 ) ) != 1 )
 				//	continue;
 
+				var showLumels = EditorFlags.ShowLumels || ( EditorFlags.ShowLumelsOnFace && EditorTool.SelectedFace == face );
+				if( showLumels )
+				{
+					if( face.Lumels.Count <= 0 )
+						face.BuildLumels( this );
+				}
+
 				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
 
 				var shade = 1.0f;
@@ -419,20 +426,23 @@ namespace Editor
 
 				GL.End();
 
-				/*GL.SetTexture( 0 );
-				GL.BeginLines();
-				GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
-
-				foreach( var lumel in face.Lumels )
+				if( showLumels )
 				{
-					var p0 = lumel;
-					var p1 = p0 + face.Plane.Normal * 0.1f;
+					GL.SetTexture( 0 );
+					GL.BeginLines();
+					GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
 
-					GL.Vertex3f( p0.X, p0.Y, p0.Z );
-					GL.Vertex3f( p1.X, p1.Y, p1.Z );
+					foreach( var lumel in face.Lumels )
+					{
+						var p0 = lumel.Position / Grid.SIZE_BASE;
+						var p1 = p0 + face.Plane.Normal * 0.1f;
+
+						GL.Vertex3f( p0.X, p0.Y, p0.Z );
+						GL.Vertex3f( p1.X, p1.Y, p1.Z );
+					}
+
+					GL.End();
 				}
-
-				GL.End();*/
 
 				// draw vertex handles
 				if( _selected && EditorTool.Current == EditorTools.Vertex )

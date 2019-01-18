@@ -23,6 +23,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -44,6 +45,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -65,6 +67,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -86,6 +89,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -107,6 +111,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -128,6 +133,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 			</Faces>
 		</GeometrySolid>
@@ -153,6 +159,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -174,6 +181,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -195,6 +203,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -216,6 +225,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -237,6 +247,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 				<Face>
 					<Plane>
@@ -258,6 +269,7 @@
 						<Y>1</Y>
 					</Scale>
 					<Rotation>0</Rotation>
+					<LumelSize>16</LumelSize>
 				</Face>
 			</Faces>
 		</GeometrySolid>

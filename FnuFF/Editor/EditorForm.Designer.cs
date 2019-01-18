@@ -42,12 +42,12 @@
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.pnl_left = new System.Windows.Forms.Panel();
 			this.pnl_right = new System.Windows.Forms.Panel();
+			this.lbl_commandHistory = new System.Windows.Forms.Label();
 			this.pnl_tabPanel = new System.Windows.Forms.Panel();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.timer_hotload = new System.Windows.Forms.Timer(this.components);
 			this.pnl_flags = new System.Windows.Forms.Panel();
-			this.lbl_commandHistory = new System.Windows.Forms.Label();
 			this.ws_viewports = new Editor.WorkspaceControl();
 			this.view_bottomLeft = new Editor.View2DControl();
 			this.view_bottomRight = new Editor.View2DControl();
@@ -64,6 +64,8 @@
 			this.btn_vertex = new Editor.FlatButtonControl();
 			this.btn_solid = new Editor.FlatButtonControl();
 			this.btn_select = new Editor.FlatButtonControl();
+			this.btn_showLumelsOnFace = new Editor.FlatToggleButtonControl();
+			this.btn_showLumels = new Editor.FlatToggleButtonControl();
 			this.btn_snapToGrid = new Editor.FlatToggleButtonControl();
 			this.btn_textureLock = new Editor.FlatToggleButtonControl();
 			this.status_editor.SuspendLayout();
@@ -197,6 +199,18 @@
 			this.pnl_right.Size = new System.Drawing.Size(200, 678);
 			this.pnl_right.TabIndex = 4;
 			// 
+			// lbl_commandHistory
+			// 
+			this.lbl_commandHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.lbl_commandHistory.AutoSize = true;
+			this.lbl_commandHistory.ForeColor = System.Drawing.Color.White;
+			this.lbl_commandHistory.Location = new System.Drawing.Point(6, 341);
+			this.lbl_commandHistory.Name = "lbl_commandHistory";
+			this.lbl_commandHistory.Size = new System.Drawing.Size(92, 13);
+			this.lbl_commandHistory.TabIndex = 3;
+			this.lbl_commandHistory.Text = "Command History:";
+			// 
 			// pnl_tabPanel
 			// 
 			this.pnl_tabPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -222,6 +236,8 @@
 			// pnl_flags
 			// 
 			this.pnl_flags.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.pnl_flags.Controls.Add(this.btn_showLumelsOnFace);
+			this.pnl_flags.Controls.Add(this.btn_showLumels);
 			this.pnl_flags.Controls.Add(this.btn_snapToGrid);
 			this.pnl_flags.Controls.Add(this.btn_textureLock);
 			this.pnl_flags.Dock = System.Windows.Forms.DockStyle.Top;
@@ -229,18 +245,6 @@
 			this.pnl_flags.Name = "pnl_flags";
 			this.pnl_flags.Size = new System.Drawing.Size(1239, 24);
 			this.pnl_flags.TabIndex = 6;
-			// 
-			// lbl_commandHistory
-			// 
-			this.lbl_commandHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.lbl_commandHistory.AutoSize = true;
-			this.lbl_commandHistory.ForeColor = System.Drawing.Color.White;
-			this.lbl_commandHistory.Location = new System.Drawing.Point(6, 325);
-			this.lbl_commandHistory.Name = "lbl_commandHistory";
-			this.lbl_commandHistory.Size = new System.Drawing.Size(92, 13);
-			this.lbl_commandHistory.TabIndex = 3;
-			this.lbl_commandHistory.Text = "Command History:";
 			// 
 			// ws_viewports
 			// 
@@ -328,16 +332,16 @@
 			// 
 			this.cntl_commandHistory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.cntl_commandHistory.AutoScroll = true;
 			this.cntl_commandHistory.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
 			this.cntl_commandHistory.CurrentColor = System.Drawing.Color.FromArgb(((int)(((byte)(174)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
 			this.cntl_commandHistory.ForeColor = System.Drawing.Color.DarkGray;
-			this.cntl_commandHistory.Location = new System.Drawing.Point(3, 341);
+			this.cntl_commandHistory.Location = new System.Drawing.Point(3, 357);
 			this.cntl_commandHistory.Name = "cntl_commandHistory";
 			this.cntl_commandHistory.Padding = new System.Windows.Forms.Padding(3, 1, 3, 1);
 			this.cntl_commandHistory.RedoColor = System.Drawing.Color.DimGray;
-			this.cntl_commandHistory.Size = new System.Drawing.Size(194, 337);
+			this.cntl_commandHistory.Size = new System.Drawing.Size(194, 321);
 			this.cntl_commandHistory.TabIndex = 2;
-			this.cntl_commandHistory.Text = "commandHistoryControl1";
 			this.cntl_commandHistory.UndoColor = System.Drawing.Color.LightGray;
 			// 
 			// tab_face
@@ -347,7 +351,7 @@
 			this.tab_face.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
 			this.tab_face.Location = new System.Drawing.Point(3, 30);
 			this.tab_face.Name = "tab_face";
-			this.tab_face.Size = new System.Drawing.Size(194, 251);
+			this.tab_face.Size = new System.Drawing.Size(194, 308);
 			this.tab_face.TabIndex = 1;
 			this.tab_face.Visible = false;
 			// 
@@ -493,6 +497,34 @@
 			this.btn_select.UseVisualStyleBackColor = true;
 			this.btn_select.Click += new System.EventHandler(this.toolbarButton_Click);
 			// 
+			// btn_showLumelsOnFace
+			// 
+			this.btn_showLumelsOnFace.Image = global::Editor.Properties.Resources.icon_show_lumels_on_face;
+			this.btn_showLumelsOnFace.Location = new System.Drawing.Point(130, 0);
+			this.btn_showLumelsOnFace.Margin = new System.Windows.Forms.Padding(0);
+			this.btn_showLumelsOnFace.Name = "btn_showLumelsOnFace";
+			this.btn_showLumelsOnFace.Selected = false;
+			this.btn_showLumelsOnFace.SelectedImage = global::Editor.Properties.Resources.icon_show_lumels_on_face_selected;
+			this.btn_showLumelsOnFace.Size = new System.Drawing.Size(24, 24);
+			this.btn_showLumelsOnFace.TabIndex = 3;
+			this.btn_showLumelsOnFace.Text = "flatToggleButtonControl1";
+			this.btn_showLumelsOnFace.UseVisualStyleBackColor = true;
+			this.btn_showLumelsOnFace.Click += new System.EventHandler(this.btn_showLumelsOnFace_Click);
+			// 
+			// btn_showLumels
+			// 
+			this.btn_showLumels.Image = global::Editor.Properties.Resources.icon_show_lumels;
+			this.btn_showLumels.Location = new System.Drawing.Point(106, 0);
+			this.btn_showLumels.Margin = new System.Windows.Forms.Padding(0);
+			this.btn_showLumels.Name = "btn_showLumels";
+			this.btn_showLumels.Selected = false;
+			this.btn_showLumels.SelectedImage = global::Editor.Properties.Resources.icon_show_lumels_selected;
+			this.btn_showLumels.Size = new System.Drawing.Size(24, 24);
+			this.btn_showLumels.TabIndex = 2;
+			this.btn_showLumels.Text = "flatToggleButtonControl1";
+			this.btn_showLumels.UseVisualStyleBackColor = true;
+			this.btn_showLumels.Click += new System.EventHandler(this.btn_showLumels_Click);
+			// 
 			// btn_snapToGrid
 			// 
 			this.btn_snapToGrid.Image = global::Editor.Properties.Resources.icon_snap_to_grid;
@@ -596,6 +628,8 @@
 		private FlatToggleButtonControl btn_snapToGrid;
 		private CommandHistoryControl cntl_commandHistory;
 		private System.Windows.Forms.Label lbl_commandHistory;
+		private FlatToggleButtonControl btn_showLumelsOnFace;
+		private FlatToggleButtonControl btn_showLumels;
 	}
 }
 

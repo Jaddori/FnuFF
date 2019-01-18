@@ -71,12 +71,14 @@ namespace Editor
 				num_scalex.Value = (decimal)_face.Scale.X;
 				num_scaley.Value = (decimal)_face.Scale.Y;
 				num_rotation.Value = (decimal)_face.Rotation;
+				num_lumelSize.Value = (decimal)_face.LumelSize;
 
 				num_offsetx.Enabled = true;
 				num_offsety.Enabled = true;
 				num_scalex.Enabled = true;
 				num_scaley.Enabled = true;
 				num_rotation.Enabled = true;
+				num_lumelSize.Enabled = true;
 				_silent = false;
 			}
 			else
@@ -86,18 +88,21 @@ namespace Editor
 				num_scalex.Value = 0;
 				num_scaley.Value = 0;
 				num_rotation.Value = 0;
+				num_lumelSize.Value = 2;
 
 				num_offsetx.Enabled = false;
 				num_offsety.Enabled = false;
 				num_scalex.Enabled = false;
 				num_scaley.Enabled = false;
 				num_rotation.Enabled = false;
+				num_lumelSize.Enabled = false;
 			}
 		}
 
 		public PointF GetOffset() { return new PointF( (float)num_offsetx.Value, (float)num_offsety.Value ); }
 		public PointF GetScale() { return new PointF( (float)num_scalex.Value, (float)num_scaley.Value ); }
 		public float GetRotation() { return (float)num_rotation.Value; }
+		public int GetLumelSize() { return (int)num_lumelSize.Value; }
 
 		private void num_offsetx_ValueChanged( object sender, EventArgs e )
 		{
@@ -160,6 +165,18 @@ namespace Editor
 			if( _face != null )
 			{
 				_face.Rotation = GetRotation();
+				OnFaceMetricsChanged?.Invoke();
+			}
+		}
+
+		private void num_lumelSize_ValueChanged( object sender, EventArgs e )
+		{
+			if( _silent )
+				return;
+
+			if( _face != null )
+			{
+				_face.LumelSize = GetLumelSize();
 				OnFaceMetricsChanged?.Invoke();
 			}
 		}

@@ -97,6 +97,7 @@ namespace Editor
 			EditorTool.OnHoveredSolidChanged += ( prev, cur ) => Invalidate();
 			EditorTool.OnSelectedSolidChanged += ( prev, cur ) => Invalidate();
 			EditorTool.OnHoveredFaceChanged += ( prev, cur ) => Invalidate();
+			EditorTool.OnSelectedFaceChanged += ( prev, cur ) => Invalidate();
 		}
 
 		protected override void OnPaintBackground( PaintEventArgs pevent )

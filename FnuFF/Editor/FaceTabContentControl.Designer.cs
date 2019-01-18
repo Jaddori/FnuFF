@@ -41,12 +41,15 @@
 			this.num_scaley = new System.Windows.Forms.NumericUpDown();
 			this.num_scalex = new System.Windows.Forms.NumericUpDown();
 			this.num_rotation = new System.Windows.Forms.NumericUpDown();
+			this.lbl_lumelSize = new System.Windows.Forms.Label();
+			this.num_lumelSize = new System.Windows.Forms.NumericUpDown();
 			((System.ComponentModel.ISupportInitialize)(this.pb_texture)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.num_offsetx)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.num_offsety)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.num_scaley)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.num_scalex)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.num_rotation)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.num_lumelSize)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// lbl_textureName
@@ -243,10 +246,47 @@
 			this.num_rotation.TabIndex = 11;
 			this.num_rotation.ValueChanged += new System.EventHandler(this.num_rotation_ValueChanged);
 			// 
+			// lbl_lumelSize
+			// 
+			this.lbl_lumelSize.AutoSize = true;
+			this.lbl_lumelSize.ForeColor = System.Drawing.Color.White;
+			this.lbl_lumelSize.Location = new System.Drawing.Point(3, 239);
+			this.lbl_lumelSize.Name = "lbl_lumelSize";
+			this.lbl_lumelSize.Size = new System.Drawing.Size(59, 13);
+			this.lbl_lumelSize.TabIndex = 12;
+			this.lbl_lumelSize.Text = "Lumel size:";
+			// 
+			// num_lumelSize
+			// 
+			this.num_lumelSize.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+			this.num_lumelSize.ForeColor = System.Drawing.Color.White;
+			this.num_lumelSize.Location = new System.Drawing.Point(6, 255);
+			this.num_lumelSize.Maximum = new decimal(new int[] {
+            32,
+            0,
+            0,
+            0});
+			this.num_lumelSize.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.num_lumelSize.Name = "num_lumelSize";
+			this.num_lumelSize.Size = new System.Drawing.Size(149, 20);
+			this.num_lumelSize.TabIndex = 13;
+			this.num_lumelSize.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.num_lumelSize.ValueChanged += new System.EventHandler(this.num_lumelSize_ValueChanged);
+			// 
 			// FaceTabContentControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add(this.num_lumelSize);
+			this.Controls.Add(this.lbl_lumelSize);
 			this.Controls.Add(this.num_rotation);
 			this.Controls.Add(this.num_scaley);
 			this.Controls.Add(this.num_scalex);
@@ -268,6 +308,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.num_scaley)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.num_scalex)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.num_rotation)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.num_lumelSize)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -288,5 +329,7 @@
 		private System.Windows.Forms.NumericUpDown num_scalex;
 		private System.Windows.Forms.NumericUpDown num_offsety;
 		private System.Windows.Forms.NumericUpDown num_offsetx;
+		private System.Windows.Forms.Label lbl_lumelSize;
+		private System.Windows.Forms.NumericUpDown num_lumelSize;
 	}
 }
