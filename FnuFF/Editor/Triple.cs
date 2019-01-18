@@ -21,9 +21,13 @@ namespace Editor
 		public static Triple NegY = new Triple( 0, -1, 0 );
 		public static Triple NegZ = new Triple( 0, 0, -1 );
 
-		public float X { get; set; }
-		public float Y { get; set; }
-		public float Z { get; set; }
+		//public float X { get; set; }
+		//public float Y { get; set; }
+		//public float Z { get; set; }
+
+		public float X;
+		public float Y;
+		public float Z;
 
 		[XmlIgnore]
 		public bool IsEmpty { get { return Math.Abs( X ) < EPSILON && Math.Abs( Y ) < EPSILON && Math.Abs( Z ) < EPSILON; } }

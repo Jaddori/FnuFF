@@ -190,13 +190,13 @@ void Graphics::renderSolids()
 			const Texture* texture = assets.getTexture( textureIndex );
 			if( !texture->hasAlpha() )
 			{
-				glActiveTexture( GL_TEXTURE0 );
+				/*glActiveTexture( GL_TEXTURE0 );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
 				glActiveTexture( GL_TEXTURE1 );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );*/
 
 				texture->bind( GL_TEXTURE0 );
 				lightmap.bind( GL_TEXTURE1 );

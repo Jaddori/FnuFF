@@ -595,8 +595,8 @@
 						</Normal>
 						<D>-192.000015</D>
 					</Plane>
-					<PackName>tools</PackName>
-					<TextureName>no_draw</TextureName>
+					<PackName>pack01</PackName>
+					<TextureName>concrete01</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>

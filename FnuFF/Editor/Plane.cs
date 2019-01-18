@@ -13,31 +13,34 @@ namespace Editor
 		private const float EPSILON = 0.001f;
 		private const float EPSILON_MINOR = 0.00001f;
 
-		private Triple _normal;
-		private float _d;
+		//private Triple _normal;
+		//private float _d;
+		//
+		//public Triple Normal { get { return _normal; } set { _normal = value; } }
+		//public float D { get { return _d; } set { _d = value; } }
 
-		public Triple Normal { get { return _normal; } set { _normal = value; } }
-		public float D { get { return _d; } set { _d = value; } }
+		public Triple Normal;
+		public float D;
 
 		public Plane()
 		{
-			_normal = new Triple();
-			_d = 0.0f;
+			Normal = new Triple();
+			D = 0.0f;
 		}
 
 		public Plane(Triple normal, float d)
 		{
-			_normal = normal;
-			_normal.Normalize();
-			_d = d;
+			Normal = normal;
+			Normal.Normalize();
+			D = d;
 		}
 
 		public Plane( Triple normal, Triple pointOnPlane )
 		{
-			_normal = normal;
-			_normal.Normalize();
+			Normal = normal;
+			Normal.Normalize();
 
-			_d = pointOnPlane.Dot( _normal );
+			D = pointOnPlane.Dot( Normal );
 		}
 
 		public override bool Equals( object obj )
@@ -49,13 +52,13 @@ namespace Editor
 				var plane = (Plane)obj;
 				result =
 				(
-					Math.Abs(_normal.X - plane._normal.X) < EPSILON &&
-					Math.Abs(_normal.Y - plane._normal.Y) < EPSILON &&
-					Math.Abs(_normal.Z - plane._normal.Z) < EPSILON &&
-					Math.Abs(_d - plane._d ) < EPSILON
+					Math.Abs( Normal.X - plane.Normal.X) < EPSILON &&
+					Math.Abs( Normal.Y - plane.Normal.Y) < EPSILON &&
+					Math.Abs( Normal.Z - plane.Normal.Z) < EPSILON &&
+					Math.Abs(D - plane.D ) < EPSILON
 				);
 
-				var derp = Math.Abs( _d - plane._d );
+				var derp = Math.Abs( D - plane.D );
 			}
 
 			return result;
@@ -63,25 +66,25 @@ namespace Editor
 
 		public bool InFront( Triple point, float margin = 0.0f )
 		{
-			var distanceAlongNormal = point.Dot( _normal );
+			var distanceAlongNormal = point.Dot( Normal );
 			//var dif = Math.Abs( distanceAlongNormal - _d );
 			//return ( dif > -EPSILON );
 
-			var greater = (distanceAlongNormal - EPSILON_MINOR + margin > _d);
+			var greater = (distanceAlongNormal - EPSILON_MINOR + margin > D );
 			//var greater = ( distanceAlongNormal > _d );
 			return greater;
 		}
 
 		public bool OnPlane( Triple point )
 		{
-			var distanceAlongNormal = point.Dot( _normal );
-			return ( Math.Abs( distanceAlongNormal - _d ) < EPSILON );
+			var distanceAlongNormal = point.Dot( Normal );
+			return ( Math.Abs( distanceAlongNormal - D ) < EPSILON );
 		}
 
 		public float Distance( Triple point )
 		{
-			var distanceAlongNormal = point.Dot( _normal );
-			return ( _d - distanceAlongNormal );
+			var distanceAlongNormal = point.Dot( Normal );
+			return ( D - distanceAlongNormal );
 		}
 	}
 }
