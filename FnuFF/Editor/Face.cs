@@ -269,32 +269,6 @@ namespace Editor
 			_width = ( maxx - minx );
 			_height = ( maxy - miny );
 
-			/*var stepx = _width / EditorTool.LUMELS;
-			var stepy = _height / EditorTool.LUMELS;
-
-			for( int y = 0; y < EditorTool.LUMELS; y++ )
-			{
-				for( int x = 0; x < EditorTool.LUMELS; x++ )
-				{
-					var p0 = xaxis * ( minx + stepx * ( x + 0.5f ) ) + yaxis * ( miny + stepy * ( y + 0.5f ) ) + _plane.Normal * z;
-
-					var behindAll = true;
-					for( int j = 0; j < otherPlanes.Length && behindAll; j++ )
-					{
-						if( otherPlanes[j].InFront( p0 )) // * Grid.SIZE_BASE ) )
-						{
-							behindAll = false;
-						}
-					}
-
-					if( behindAll )
-					{
-						//_lumels.Add( p0 );
-						_lumels.Add( new Lumel( p0 ) );
-					}
-				}
-			}*/
-
 			_lumelWidth = (int)( _width / Lightmap.LUMEL_SIZE );
 			_lumelHeight = (int)( _height / Lightmap.LUMEL_SIZE );
 
@@ -318,7 +292,7 @@ namespace Editor
 
 					if( behindAll )
 					{
-						_lumels.Add( new Lumel( p0 ) );
+						_lumels.Add( new Lumel( p0, _plane.Normal ) );
 					}
 				}
 			}

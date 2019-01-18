@@ -14,8 +14,14 @@ namespace Editor
 		public const int SIZE = 128;
 		public const float LUMEL_SIZE = 16.0f;
 
+		private static int _traces;
+
+		public static int Traces => _traces;
+
 		public static void Generate( Level level, string filename )
 		{
+			_traces = 0;
+
 			float[,] map = new float[SIZE, SIZE];
 			int[] rover = new int[SIZE];
 
@@ -36,79 +42,63 @@ namespace Editor
 				}
 			}
 
-			for( int curSolid = 0; curSolid < level.Solids.Count; curSolid++ )
+			BuildTransfers( level );
+
+			var faceIndices = new Dictionary<Face, Point>();
+			foreach( var solid in level.Solids )
 			{
-				var solid = level.Solids[curSolid];
-				for( int curFace = 0; curFace < solid.Faces.Count; curFace++ )
+				foreach( var face in solid.Faces )
 				{
-					var face = solid.Faces[curFace];
+					if( face.PackName == "tools" )
+						continue;
 
-					if( face.PackName != "tools" )
+					Point mapIndex;
+					var allocated = AllocLightmap( rover, face.LumelWidth, face.LumelHeight, out mapIndex );
+					if( !allocated )
+						throw new OutOfMemoryException( "Lightmap texture is full." );
+
+					faceIndices.Add( face, mapIndex );
+					face.BuildLightmapUVs( mapIndex.X, mapIndex.Y );
+				}
+			}
+
+			const int ITERATIONS = 9;
+			for( int iteration = 0; iteration < ITERATIONS; iteration++ )
+			{
+				foreach( var curSolid in level.Solids )
+				{
+					foreach( var curFace in curSolid.Faces )
 					{
-						face.GOOD_LINES.Clear();
-						face.BAD_LINES.Clear();
-
-						Point mapIndex;
-						var allocated = AllocLightmap( rover, face.LumelWidth, face.LumelHeight, out mapIndex );
-						if( allocated )
+						if( curFace.PackName != "tools" )
 						{
-							face.BuildLightmapUVs( mapIndex.X, mapIndex.Y );
-
-							for( int curLumel = 0; curLumel < face.Lumels.Count; curLumel++ )
+							foreach( var a in curFace.Lumels )
 							{
-								var a = face.Lumels[curLumel];
-
-								var hits = 0;
 								var radiance = 0.0f;
+								var hits = 0;
 
-								for( int curOtherSolid = 0; curOtherSolid < level.Solids.Count; curOtherSolid++ )
+								foreach( var b in a.Transfers )
 								{
-									if( curOtherSolid != curSolid )
-									{
-										var otherSolid = level.Solids[curOtherSolid];
-										for( int curOtherFace = 0; curOtherFace < otherSolid.Faces.Count; curOtherFace++ )
-										{
-											var otherFace = otherSolid.Faces[curOtherFace];
+									var dir = b.Position - a.Position;
+									dir.Normalize();
 
-											//if( otherFace.Plane.Normal.Dot( face.Plane.Normal ) < 0 && otherFace.TextureName == "sky" )
-											{
-												for( int curOtherLumel = 0; curOtherLumel < otherFace.Lumels.Count; curOtherLumel++ )
-												{
-													var b = otherFace.Lumels[curOtherLumel];
+									var addition = curFace.Plane.Normal.Dot( dir ) * b.Radiance;
 
-													var direction = b.Position - a.Position;
-													direction.Normalize();
-
-													if( face.Plane.Normal.Dot( direction ) > 0 && otherFace.TextureName == "sky" )
-													{
-														if( Trace( level, a.Position, b.Position, solid ) )
-														{
-															radiance += b.Radiance;
-															hits++;
-
-															//face.GOOD_LINES.Add( new Tuple<Triple, Triple>( a.Position, b.Position ) );
-														}
-														else
-														{
-															//face.BAD_LINES.Add( new Tuple<Triple, Triple>( a.Position, end ) );
-														}
-													}
-												}
-											}
-										}
-									}
+									radiance += addition;
+									hits++;
 								}
 
-								//a.Radiance = radiance / hits;
-								a.Radiance = radiance;
+								a.Radiance = radiance / hits;
+								if( a.Radiance <= 0.0f )
+									a.Radiance = 0.01f;
 							}
-							
-							for( int y = 0; y < face.LumelHeight; y++ )
+
+							var mapIndex = faceIndices[curFace];
+							for( int y = 0; y < curFace.LumelHeight; y++ )
 							{
-								for( int x = 0; x < face.LumelWidth; x++ )
+								for( int x = 0; x < curFace.LumelWidth; x++ )
 								{
-									var lumelIndex = Extensions.IndexFromXY( x, y, face.LumelWidth );
-									var lumel = face.Lumels[lumelIndex];
+									var lumelIndex = Extensions.IndexFromXY( x, y, curFace.LumelWidth );
+									var lumel = curFace.Lumels[lumelIndex];
 
 									map[mapIndex.X + x, mapIndex.Y + y] = lumel.Radiance;
 								}
@@ -118,59 +108,128 @@ namespace Editor
 				}
 			}
 
-			var stream = new FileStream( filename, FileMode.Create, FileAccess.Write );
-			var writer = new BinaryWriter( stream );
-
-			byte idlen = 0;
-			byte colormapType = 0;
-			byte imageType = 2;
-			Int16 origin = 0;
-			Int16 length = 0;
-			byte depth = 0;
-			Int16 xorigin = 0;
-			Int16 yorigin = 0;
-			Int16 width = SIZE;
-			Int16 height = SIZE;
-			byte bpp = 24;
-			byte imageDesc = 0;
-
-			writer.Write( idlen );
-			writer.Write( colormapType );
-			writer.Write( imageType );
-			writer.Write( origin );
-			writer.Write( length );
-			writer.Write( depth );
-			writer.Write( xorigin );
-			writer.Write( yorigin );
-			writer.Write( width );
-			writer.Write( height );
-			writer.Write( bpp );
-			writer.Write( imageDesc );
-
-			for( int y = SIZE - 1; y >= 0; y-- )
+			// blur radiance data
+			/*for( int y = 0; y < SIZE; y++ )
 			{
 				for( int x = 0; x < SIZE; x++ )
 				{
-					var radiance = map[x, y] * 255.0f;
-					if( radiance > 255.0f )
-						radiance = 255.0f;
-					byte r = (byte)radiance;
+					var rad = map[x, y];
+					if( rad < 0.01f )
+						continue;
 
-					writer.Write( r );
-					writer.Write( r );
-					writer.Write( r );
+					var sum = 0.0f;
+					var hits = 1;
+					for( int ny = -1; ny <= 1; ny++ )
+					{
+						for( int nx = -1; nx <= 1; nx++ )
+						{
+							if( x + nx < 0 || y + ny < 0 || x + nx >= SIZE || y + ny >= SIZE )
+								continue;
+							if( ny == 0 && nx == 0 )
+								continue;
+
+							var cur = map[x + nx, y + ny];
+							if( cur >= 0.01f ) // make sure pixel is legal
+							{
+								sum += cur;
+								hits++;
+							}
+						}
+					}
+
+					var final = ( rad + sum ) / hits;
+					map[x, y] = final;
+				}
+			}*/
+
+			var pixels = new byte[SIZE * SIZE * 3];
+			for( int y = 0; y < SIZE; y++ )
+			{
+				for( int x = 0; x < SIZE; x++ )
+				{
+					var rad = map[x, y] * 255.0f;
+					if( rad > 255.0f )
+						rad = 255.0f;
+					//byte r = (byte)( map[x, y] * 255.0f );
+					byte r = (byte)rad;
+
+					var index = ( ( SIZE - 1 - y ) * SIZE + x ) * 3;
+
+					pixels[index] = r;
+					pixels[index + 1] = r;
+					pixels[index + 2] = r;
 				}
 			}
 
-			writer.Close();
-			stream.Close();
+			var lightmap = new Targa()
+			{
+				Width = SIZE,
+				Height = SIZE,
+				Bpp = 3,
+				Pixels = pixels
+			};
+			lightmap.Write( filename );
 
 			if( EditorTool.CurrentLightmap != null )
 				EditorTool.CurrentLightmap.Dispose();
 
-			EditorTool.CurrentLightmap = new Targa();
-			EditorTool.CurrentLightmap.Load( filename );
-			EditorTool.CurrentLightmapID = GL.LoadTexture( filename );
+			EditorTool.CurrentLightmap = lightmap;
+			EditorTool.CurrentLightmapID = GL.UploadTexture( SIZE, SIZE, 3, pixels );
+		}
+
+		private static void BuildTransfers( Level level )
+		{
+			for( int curSolid = 0; curSolid < level.Solids.Count; curSolid++ )
+			{
+				var solid = level.Solids[curSolid];
+				for( int curFace = 0; curFace < solid.Faces.Count; curFace++ )
+				{
+					var face = solid.Faces[curFace];
+
+					if( face.PackName != "tools" )
+					{
+						for( int curLumel = 0; curLumel < face.Lumels.Count; curLumel++ )
+						{
+							var a = face.Lumels[curLumel];
+							a.Transfers.Clear();
+							
+							for( int curOtherSolid = 0; curOtherSolid < level.Solids.Count; curOtherSolid++ )
+							{
+								if( curOtherSolid != curSolid )
+								{
+									var otherSolid = level.Solids[curOtherSolid];
+									for( int curOtherFace = 0; curOtherFace < otherSolid.Faces.Count; curOtherFace++ )
+									{
+										var otherFace = otherSolid.Faces[curOtherFace];
+
+										if( otherFace.PackName != "tools" || otherFace.TextureName == "sky" )
+										{
+											for( int curOtherLumel = 0; curOtherLumel < otherFace.Lumels.Count; curOtherLumel++ )
+											{
+												var b = otherFace.Lumels[curOtherLumel];
+
+												var direction = b.Position - a.Position;
+												direction.Normalize();
+
+												var dirPlaneDot = face.Plane.Normal.Dot( direction );
+												var dirOtherPlaneDot = otherFace.Plane.Normal.Dot( direction );
+
+												if( dirPlaneDot > 0 && dirOtherPlaneDot < 0 )
+												{
+													if( Trace( level, a.Position, b.Position, solid ) )
+													{
+														a.Transfers.Add( b );
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		private static bool AllocLightmap( int[] rover, int width, int height, out Point index )
@@ -210,6 +269,8 @@ namespace Editor
 
 		private static bool Trace( Level level, Triple start, Triple end, GeometrySolid currentSolid )
 		{
+			_traces++;
+
 			var ray = Ray.FromPoints( start, end );
 
 			foreach( var solid in level.Solids )

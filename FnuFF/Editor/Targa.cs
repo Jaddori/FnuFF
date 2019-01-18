@@ -19,10 +19,10 @@ namespace Editor
 		private Image _image;
 		private bool _imageDirty;
 
-		public int Width => _width;
-		public int Height => _height;
-		public int Bpp => _bpp;
-		public byte[] Pixels => _pixels;
+		public int Width { get { return _width; } set { _width = value; _imageDirty = true; } }
+		public int Height { get { return _height; } set { _height = value; _imageDirty = true; } }
+		public int Bpp { get { return _bpp; } set { _bpp = value; _imageDirty = true; } }
+		public byte[] Pixels { get { return _pixels; } set { _pixels = value; _imageDirty = true; } }
 
 		public Targa()
 		{
@@ -183,6 +183,48 @@ namespace Editor
 			}
 
 			return result;
+		}
+
+		public void Write( string filename )
+		{
+			var stream = new FileStream( filename, FileMode.Create, FileAccess.Write );
+			
+			Write( stream );
+
+			stream.Close();
+		}
+
+		public void Write( Stream stream )
+		{
+			if( _width <= 0 )
+				throw new InvalidOperationException( "Width is not set." );
+			if( _height <= 0 )
+				throw new InvalidOperationException( "Height is not set." );
+			if( _bpp <= 0 )
+				throw new InvalidOperationException( "Bpp is not set." );
+			if( _pixels == null )
+				throw new InvalidOperationException( "Pixel data is not set." );
+
+			var writer = new BinaryWriter( stream );
+
+			byte imageType = 2;
+			Int16 width = (Int16)_width;
+			Int16 height = (Int16)_height;
+			byte bpp = (byte)(_bpp*8);
+
+			var zeroes = new byte[16];
+			writer.Write( zeroes, 0, 2 ); // id, colormap type
+			writer.Write( imageType ); // image type (unmapped RGBA)
+			writer.Write( zeroes, 0, 9 ); // origin, length, depth, x/y-origin
+			writer.Write( width );
+			writer.Write( height );
+			writer.Write( bpp );
+			writer.Write( zeroes, 0, 1 ); // image descriptor
+
+			var pixelCount = _width * _height * _bpp;
+			writer.Write( _pixels, 0, pixelCount );
+
+			writer.Close();
 		}
 
 		public Image ToImage()

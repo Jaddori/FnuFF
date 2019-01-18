@@ -12,8 +12,8 @@
 						</Normal>
 						<D>64</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -33,8 +33,8 @@
 						</Normal>
 						<D>448.000031</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -75,8 +75,8 @@
 						</Normal>
 						<D>64.0000153</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -96,8 +96,8 @@
 						</Normal>
 						<D>0</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -117,8 +117,8 @@
 						</Normal>
 						<D>832</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -163,8 +163,8 @@
 						</Normal>
 						<D>448.000031</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -184,8 +184,8 @@
 						</Normal>
 						<D>192</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>concrete01</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -205,8 +205,8 @@
 						</Normal>
 						<D>0</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -226,8 +226,8 @@
 						</Normal>
 						<D>0</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -293,8 +293,8 @@
 						</Normal>
 						<D>448.000031</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -314,8 +314,8 @@
 						</Normal>
 						<D>192</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>concrete01</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -335,8 +335,8 @@
 						</Normal>
 						<D>-0</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -377,8 +377,8 @@
 						</Normal>
 						<D>832</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -423,8 +423,8 @@
 						</Normal>
 						<D>448.000031</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -444,8 +444,8 @@
 						</Normal>
 						<D>191.999969</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>concrete01</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -465,8 +465,8 @@
 						</Normal>
 						<D>4.57763672E-05</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -486,8 +486,8 @@
 						</Normal>
 						<D>-64.0000153</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -507,8 +507,8 @@
 						</Normal>
 						<D>768</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -551,10 +551,10 @@
 							<Y>0</Y>
 							<Z>1</Z>
 						</Normal>
-						<D>384</D>
+						<D>448</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -574,8 +574,8 @@
 						</Normal>
 						<D>256</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>concrete01</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -595,8 +595,8 @@
 						</Normal>
 						<D>-192.000015</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -614,10 +614,10 @@
 							<Y>0</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>-64.0000153</D>
+						<D>-1.52587891E-05</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -635,10 +635,10 @@
 							<Y>0</Y>
 							<Z>0</Z>
 						</Normal>
-						<D>768</D>
+						<D>832</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -704,8 +704,8 @@
 						</Normal>
 						<D>192</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -725,8 +725,8 @@
 						</Normal>
 						<D>-0</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -746,8 +746,8 @@
 						</Normal>
 						<D>-63.99997</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -834,8 +834,8 @@
 						</Normal>
 						<D>192</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -855,8 +855,8 @@
 						</Normal>
 						<D>-0</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>
@@ -897,8 +897,8 @@
 						</Normal>
 						<D>768</D>
 					</Plane>
-					<PackName>pack01</PackName>
-					<TextureName>bricks</TextureName>
+					<PackName>tools</PackName>
+					<TextureName>no_draw</TextureName>
 					<Offset>
 						<X>0</X>
 						<Y>0</Y>

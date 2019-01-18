@@ -11,7 +11,7 @@ uniform sampler2D fragLightmap;
 void main()
 {
 	float brightness = texture( fragLightmap, fragLM ).r;
-	finalColor = texture( fragDiffuse, fragUV ) * (brightness+0.1);
+	finalColor = texture( fragDiffuse, fragUV ) * brightness;
 	finalColor.a = 1.0;
 	
 	//finalColor = texture( fragDiffuse, fragUV );
