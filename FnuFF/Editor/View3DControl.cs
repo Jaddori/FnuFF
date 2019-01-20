@@ -186,24 +186,6 @@ namespace Editor
 			}
 		}
 
-		private void PaintNode( OctTree<GeometrySolid>.Node node )
-		{
-			GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
-
-			if( node.Children == null || node.Empty )
-			{
-				if( node.Objects.Count > 0 )
-					GL.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
-
-				PaintBox( node.Min, node.Max );
-			}
-			else
-			{
-				foreach( var child in node.Children )
-					PaintNode( child );
-			}
-		}
-
 		private void PaintBox( Triple min, Triple max )
 		{
 			min /= Grid.SIZE_BASE;

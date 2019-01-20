@@ -65,7 +65,7 @@ namespace Editor
 
 			const int THREAD_COUNT = 12;
 			//var chunk = level.Solids.Count / THREAD_COUNT;
-			var chunk = normalLumels.Length;
+			var chunk = normalLumels.Length / THREAD_COUNT;
 			if( chunk < 1 )
 				chunk = 1;
 
@@ -88,7 +88,7 @@ namespace Editor
 
 				first += chunk;
 
-				if( last >= level.Solids.Count )
+				if( last >= normalLumels.Length )
 					break;
 			}
 
