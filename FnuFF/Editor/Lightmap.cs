@@ -20,14 +20,52 @@ namespace Editor
 
 		public const int SIZE = 128;
 		public const float LUMEL_SIZE = 16.0f;
+		public const float MAX_LIGHT_DISTANCE = 15.0f;
 
 		private static int _traces;
+		private static OctTree<GeometrySolid> _octTree;
 
 		public static int Traces => _traces;
+		public static OctTree<GeometrySolid> OctTree => _octTree;
 
 		public static void Generate( Level level, string filename )
 		{
 			_traces = 0;
+
+			if( _octTree == null )
+				_octTree = new OctTree<GeometrySolid>( 4096, 64 );
+			_octTree.Clear();
+
+			// populate octtree
+
+			foreach( var solid in level.Solids )
+			{
+				var min = new Triple(float.MaxValue);
+				var max = new Triple(float.MinValue);
+
+				foreach( var face in solid.Faces )
+				{
+					foreach( var vertex in face.Vertices )
+					{
+						if( vertex.X < min.X )
+							min.X = vertex.X;
+						if( vertex.X > max.X )
+							max.X = vertex.X;
+
+						if( vertex.Y < min.Y )
+							min.Y = vertex.Y;
+						if( vertex.Y > max.Y )
+							max.Y = vertex.Y;
+
+						if( vertex.Z < min.Z )
+							min.Z = vertex.Z;
+						if( vertex.Z > max.Z )
+							max.Z = vertex.Z;
+					}
+				}
+
+				_octTree.Add( solid, min, max );
+			}
 
 			float[,] map = new float[SIZE, SIZE];
 			int[] rover = new int[SIZE];
@@ -393,7 +431,12 @@ namespace Editor
 										dir.X = b.Position.X - a.Position.X;
 										dir.Y = b.Position.Y - a.Position.Y;
 										dir.Z = b.Position.Z - a.Position.Z;
-										dir.Normalize();
+										var dist = dir.Normalize();
+
+										dist /= Grid.SIZE_BASE;
+
+										if( dist > MAX_LIGHT_DISTANCE )
+											continue;
 
 										var dirPlaneDot = face.Plane.Normal.Dot( dir );
 										var dirOtherPlaneDot = otherFace.Plane.Normal.Dot( dir );

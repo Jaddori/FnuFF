@@ -176,6 +176,16 @@ namespace Editor
 
 				GL.End();*/
 
+				if( Lightmap.OctTree != null )
+				{
+					GL.BeginLines();
+
+					var root = Lightmap.OctTree.Root;
+					PaintNode( root );
+
+					GL.End();
+				}
+
 				// draw entities
 				foreach( var entity in _level.Entities )
 				{
@@ -184,6 +194,69 @@ namespace Editor
 
 				GL.SwapBuffers( Handle );
 			}
+		}
+
+		private void PaintNode( OctTree<GeometrySolid>.Node node )
+		{
+			GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
+
+			if( node.Children == null || node.Empty )
+			{
+				if( node.Objects.Count > 0 )
+					GL.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
+
+				PaintBox( node.Min, node.Max );
+			}
+			else
+			{
+				foreach( var child in node.Children )
+					PaintNode( child );
+			}
+		}
+
+		private void PaintBox( Triple min, Triple max )
+		{
+			min /= Grid.SIZE_BASE;
+			max /= Grid.SIZE_BASE;
+
+			// bottom circle
+			GL.Vertex3f( min );
+			GL.Vertex3f( new Triple( max.X, min.Y, min.Z ) );
+
+			GL.Vertex3f( new Triple( max.X, min.Y, min.Z ) );
+			GL.Vertex3f( new Triple( max.X, min.Y, max.Z ) );
+
+			GL.Vertex3f( new Triple( max.X, min.Y, max.Z ) );
+			GL.Vertex3f( new Triple( min.X, min.Y, max.Z ) );
+
+			GL.Vertex3f( new Triple( min.X, min.Y, max.Z ) );
+			GL.Vertex3f( min );
+
+			// top circle
+			GL.Vertex3f( new Triple( min.X, max.Y, min.Z ) );
+			GL.Vertex3f( new Triple( max.X, max.Y, min.Z ) );
+
+			GL.Vertex3f( new Triple( max.X, max.Y, min.Z ) );
+			GL.Vertex3f( new Triple( max.X, max.Y, max.Z ) );
+
+			GL.Vertex3f( new Triple( max.X, max.Y, max.Z ) );
+			GL.Vertex3f( new Triple( min.X, max.Y, max.Z ) );
+
+			GL.Vertex3f( new Triple( min.X, max.Y, max.Z ) );
+			GL.Vertex3f( new Triple( min.X, max.Y, min.Z ) );
+
+			// supports
+			GL.Vertex3f( min );
+			GL.Vertex3f( new Triple( min.X, max.Y, min.Z ) );
+
+			GL.Vertex3f( new Triple( max.X, min.Y, min.Z ) );
+			GL.Vertex3f( new Triple( max.X, max.Y, min.Z ) );
+
+			GL.Vertex3f( new Triple( max.X, min.Y, max.Z ) );
+			GL.Vertex3f( new Triple( max.X, max.Y, max.Z ) );
+
+			GL.Vertex3f( new Triple( min.X, min.Y, max.Z ) );
+			GL.Vertex3f( new Triple( min.X, max.Y, max.Z ) );
 		}
 
 		protected override void OnMouseEnter( EventArgs e )

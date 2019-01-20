@@ -111,6 +111,7 @@
     <Compile Include="Lightmap.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Lumel.cs" />
+    <Compile Include="OctTree.cs" />
     <Compile Include="Plane.cs" />
     <Compile Include="Ray.cs" />
     <Compile Include="Settings.cs" />
