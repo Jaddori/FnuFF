@@ -15,6 +15,9 @@ namespace Editor
 		private class ThreadData
 		{
 			public int first, last;
+			//public List<GeometrySolid> solids;
+			public Lumel[] allLumels;
+			public Lumel[] normalLumels;
 			public List<GeometrySolid> solids;
 		}
 
@@ -22,51 +25,8 @@ namespace Editor
 		public const float LUMEL_SIZE = 16.0f;
 		public const float MAX_LIGHT_DISTANCE = 15.0f;
 
-		private static int _traces;
-		private static OctTree<GeometrySolid> _octTree;
-
-		public static int Traces => _traces;
-		public static OctTree<GeometrySolid> OctTree => _octTree;
-
 		public static void Generate( Level level, string filename )
 		{
-			_traces = 0;
-
-			if( _octTree == null )
-				_octTree = new OctTree<GeometrySolid>( 4096, 64 );
-			_octTree.Clear();
-
-			// populate octtree
-
-			foreach( var solid in level.Solids )
-			{
-				var min = new Triple(float.MaxValue);
-				var max = new Triple(float.MinValue);
-
-				foreach( var face in solid.Faces )
-				{
-					foreach( var vertex in face.Vertices )
-					{
-						if( vertex.X < min.X )
-							min.X = vertex.X;
-						if( vertex.X > max.X )
-							max.X = vertex.X;
-
-						if( vertex.Y < min.Y )
-							min.Y = vertex.Y;
-						if( vertex.Y > max.Y )
-							max.Y = vertex.Y;
-
-						if( vertex.Z < min.Z )
-							min.Z = vertex.Z;
-						if( vertex.Z > max.Z )
-							max.Z = vertex.Z;
-					}
-				}
-
-				_octTree.Add( solid, min, max );
-			}
-
 			float[,] map = new float[SIZE, SIZE];
 			int[] rover = new int[SIZE];
 
@@ -100,8 +60,12 @@ namespace Editor
 
 			var startTime = DateTime.Now;
 
+			var allLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" || face.TextureName == "sky" ).SelectMany( x => x.Lumels ) ).ToArray();
+			var normalLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" ).SelectMany( x => x.Lumels ) ).ToArray();
+
 			const int THREAD_COUNT = 12;
-			var chunk = level.Solids.Count / THREAD_COUNT;
+			//var chunk = level.Solids.Count / THREAD_COUNT;
+			var chunk = normalLumels.Length;
 			if( chunk < 1 )
 				chunk = 1;
 
@@ -114,9 +78,10 @@ namespace Editor
 
 				var last = first + chunk;
 				if( i >= THREAD_COUNT-1 )
-					last = level.Solids.Count;
+					last = normalLumels.Length;
 
-				var data = new ThreadData() { first = first, last = last, solids = level.Solids };
+				//var data = new ThreadData() { first = first, last = last, solids = level.Solids };
+				var data = new ThreadData() { first = first, last = last, allLumels = allLumels, normalLumels = normalLumels, solids = level.Solids };
 				thread.Start( data );
 
 				threads.Add( thread );
@@ -129,8 +94,7 @@ namespace Editor
 
 			foreach( var thread in threads )
 				thread.Join();
-
-
+			
 			//BuildTransfers( level );
 			var endTime = DateTime.Now;
 
@@ -397,8 +361,46 @@ namespace Editor
 				}
 			}
 		}*/
-		
+
 		private static void BuildTransfersAsync( object args )
+		{
+			var data = args as ThreadData;
+
+			var dir = new Triple();
+			for( int i = data.first; i < data.last; i++ )
+			{
+				var a = data.normalLumels[i];
+
+				foreach( var b in data.allLumels )
+				{
+					if( a == b )
+						continue;
+
+					dir.X = b.Position.X - a.Position.X;
+					dir.Y = b.Position.Y - a.Position.Y;
+					dir.Z = b.Position.Z - a.Position.Z;
+					var dist = dir.Normalize();
+
+					dist /= Grid.SIZE_BASE;
+
+					if( dist > MAX_LIGHT_DISTANCE )
+						continue;
+
+					var dirPlaneDot = a.Normal.Dot( dir );
+					var dirOtherPlaneDot = b.Normal.Dot( dir );
+
+					if( dirPlaneDot > 0 && dirOtherPlaneDot < 0 )
+					{
+						if( Trace( data.solids, a.Position, b.Position, a.Parent, b.Parent ) )
+						{
+							a.Transfers.Add( b );
+						}
+					}
+				}
+			}
+		}
+		
+		/*private static void BuildTransfersAsync( object args )
 		{
 			var data = args as ThreadData;
 
@@ -455,7 +457,7 @@ namespace Editor
 					}
 				}
 			}
-		}
+		}*/
 
 		private static bool AllocLightmap( int[] rover, int width, int height, out Point index )
 		{
@@ -491,7 +493,7 @@ namespace Editor
 
 			return true;
 		}
-		
+
 		/*private static bool Trace( Level level, Triple start, Triple end, GeometrySolid currentSolid )
 		{
 			_traces++;
@@ -532,7 +534,7 @@ namespace Editor
 			return true;
 		}*/
 
-		private static bool Trace( List<GeometrySolid> solids, Triple start, Triple end, GeometrySolid currentSolid )
+		/*private static bool Trace( List<GeometrySolid> solids, Triple start, Triple end, GeometrySolid currentSolid )
 		{
 			_traces++;
 
@@ -566,6 +568,46 @@ namespace Editor
 								{
 									return false;
 								}
+							}
+						}
+					}
+				}
+			}
+
+			return true;
+		}*/
+
+		private static bool Trace( List<GeometrySolid> solids, Triple start, Triple end, params GeometrySolid[] ignoreSolids )
+		{
+			var ray = Ray.FromPoints( start, end );
+
+			foreach( var solid in solids )
+			{
+				if( ignoreSolids.Contains( solid ) )
+					continue;
+
+				foreach( var face in solid.Faces )
+				{
+					var length = 0.0f;
+					if( ray.Intersect( face.Plane, ref length ) )
+					{
+						if( length < ray.Length )
+						{
+							var p = ray.Start + ray.Direction * length;
+
+							var behindAll = true;
+							foreach( var otherFace in solid.Faces )
+							{
+								if( otherFace == face )
+									continue;
+
+								if( otherFace.Plane.InFront( p ) )
+									behindAll = false;
+							}
+
+							if( behindAll )
+							{
+								return false;
 							}
 						}
 					}

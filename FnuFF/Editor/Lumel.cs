@@ -15,6 +15,7 @@ namespace Editor
 		public float Excidence;
 		public float Emission;
 		public float Reflectiveness;
+		public GeometrySolid Parent;
 
 		public Lumel()
 		{

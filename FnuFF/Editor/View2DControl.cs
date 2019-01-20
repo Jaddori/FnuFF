@@ -271,7 +271,6 @@ namespace Editor
 					return result;
 				}
 			);
-			Log.AddFunctor( Name, () => "Lightmap traces: " + Lightmap.Traces.ToString() );
 		}
 
 		protected override void OnPaint( PaintEventArgs e )

@@ -309,7 +309,7 @@ namespace Editor
 
 					if( behindAll )
 					{
-						_lumels.Add( new Lumel( p0, _plane.Normal ) );
+						_lumels.Add( new Lumel( p0, _plane.Normal ) { Parent = parent } );
 					}
 				}
 			}

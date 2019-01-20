@@ -176,16 +176,6 @@ namespace Editor
 
 				GL.End();*/
 
-				if( Lightmap.OctTree != null )
-				{
-					GL.BeginLines();
-
-					var root = Lightmap.OctTree.Root;
-					PaintNode( root );
-
-					GL.End();
-				}
-
 				// draw entities
 				foreach( var entity in _level.Entities )
 				{
