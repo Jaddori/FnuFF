@@ -104,7 +104,8 @@ int update( void* args )
 	//level.load( "./assets/levels/course.lvl" );
 	//level.load( "./assets/levels/cross_section_slopes.lvl" );
 	//level.load( "./assets/levels/no_draw_export_test.lvl" );
-	level.load( "./assets/levels/lightmap_test01.lvl" );
+	level.load( "./assets/levels/lightmap_test03.lvl" );
+	//level.load( "./assets/levels/great_hall.lvl" );
 
 	Ray ray;
 	Triangle triangle;
@@ -194,7 +195,7 @@ int update( void* args )
 			//script.update( deltaTime );
 			//script.render();
 
-			glm::vec4 green( 0.0f, 1.0f, 0.0f, 1.0f );
+			/*glm::vec4 green( 0.0f, 1.0f, 0.0f, 1.0f );
 			debugShapes.addLine( { ray.start, ray.start + ray.direction * ray.length, green }, false );
 
 			for( int i=0; i<3; i++ )
@@ -205,7 +206,7 @@ int update( void* args )
 				debugShapes.addLine( { triangle.v[i], triangle.v[second], green }, true );
 			}
 
-			debugShapes.addSphere( { hitPoint, 0.5f, green }, false );
+			debugShapes.addSphere( { hitPoint, 0.5f, green }, false );*/
 
 			level.render();
 			player.render();
@@ -450,7 +451,7 @@ int main( int argc, char* argv[] )
 				const glm::mat4& projectionMatrix = graphics.getPerspectiveCamera()->getProjectionMatrix();
 				const glm::mat4& viewMatrix = graphics.getPerspectiveCamera()->getViewMatrix();
 
-				debugShapes.render( projectionMatrix, viewMatrix );
+				//debugShapes.render( projectionMatrix, viewMatrix );
 
 				uint64_t curTick = SDL_GetTicks();
 				float deltaTime = ( curTick - lastTick ) * 0.001f;

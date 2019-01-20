@@ -32,6 +32,8 @@ namespace Editor
 			float[,] map = new float[SIZE, SIZE];
 			int[] rover = new int[SIZE];
 
+			const float SKY_LIGHT_INTENSITY = 800.0f;
+
 			// initialize lumels
 			foreach( var solid in level.Solids )
 			{
@@ -43,7 +45,16 @@ namespace Editor
 					{
 						foreach( var lumel in face.Lumels )
 						{
-							lumel.Radiance = 1.0f;
+							lumel.Emission = SKY_LIGHT_INTENSITY;
+							lumel.Excidence = lumel.Emission;
+						}
+					}
+					else
+					{
+						foreach( var lumel in face.Lumels )
+						{
+							lumel.Emission = 0.0f;
+							lumel.Excidence = lumel.Emission;
 						}
 					}
 				}
@@ -97,16 +108,16 @@ namespace Editor
 						continue;
 
 					Point mapIndex;
-					var allocated = AllocLightmap( rover, face.LumelWidth, face.LumelHeight, out mapIndex );
+					var allocated = AllocLightmap( rover, face.LumelWidth+2, face.LumelHeight+2, out mapIndex );
 					if( !allocated )
 						throw new OutOfMemoryException( "Lightmap texture is full." );
 
 					faceIndices.Add( face, mapIndex );
-					face.BuildLightmapUVs( mapIndex.X, mapIndex.Y );
+					face.BuildLightmapUVs( mapIndex.X+1, mapIndex.Y+1 );
 				}
 			}
 
-			const int ITERATIONS = 9;
+			const int ITERATIONS = 2;
 			for( int iteration = 0; iteration < ITERATIONS; iteration++ )
 			{
 				foreach( var curSolid in level.Solids )
@@ -117,36 +128,123 @@ namespace Editor
 						{
 							foreach( var a in curFace.Lumels )
 							{
-								var radiance = 0.0f;
+								var incidence = 0.0f;
 								var hits = 0;
 
 								foreach( var b in a.Transfers )
 								{
 									var dir = b.Position - a.Position;
-									dir.Normalize();
+									var len = dir.Normalize() / Grid.SIZE_BASE;
 
-									var addition = curFace.Plane.Normal.Dot( dir ) * b.Radiance;
-
-									radiance += addition;
+									incidence += ( curFace.Plane.Normal.Dot( dir ) * b.Excidence ) / len;
 									hits++;
 								}
 
-								a.Radiance = radiance / hits;
-								if( a.Radiance <= 0.0f )
-									a.Radiance = 0.01f;
+								incidence /= hits;
+								if( incidence > SKY_LIGHT_INTENSITY )
+									incidence = SKY_LIGHT_INTENSITY;
+
+								a.Incidence = incidence;
 							}
 
-							var mapIndex = faceIndices[curFace];
-							for( int y = 0; y < curFace.LumelHeight; y++ )
+							if( iteration >= ITERATIONS - 1 )
 							{
-								for( int x = 0; x < curFace.LumelWidth; x++ )
+								var mapIndex = faceIndices[curFace];
+								for( int y = 0; y < curFace.LumelHeight; y++ )
 								{
-									var lumelIndex = Extensions.IndexFromXY( x, y, curFace.LumelWidth );
-									var lumel = curFace.Lumels[lumelIndex];
+									for( int x = 0; x < curFace.LumelWidth; x++ )
+									{
+										var lumelIndex = Extensions.IndexFromXY( x, y, curFace.LumelWidth );
+										var lumel = curFace.Lumels[lumelIndex];
 
-									map[mapIndex.X + x, mapIndex.Y + y] = lumel.Radiance;
+										//map[mapIndex.X + x, mapIndex.Y + y] = lumel.Incidence;
+										var value = lumel.Incidence;
+										if( value > SKY_LIGHT_INTENSITY )
+											value = SKY_LIGHT_INTENSITY;
+										else if( value < 0.01f )
+											value = 0.01f;
+										map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = value;
+									}
+								}
+
+								// blur data
+								for( int y = 0; y < curFace.LumelHeight; y++ )
+								{
+									for( int x = 0; x < curFace.LumelWidth; x++ )
+									{
+										var sum = 0.0f;
+										var hits = 0;
+
+										for( int ny = -1; ny <= 1; ny++ )
+										{
+											for( int nx = -1; nx <= 1; nx++ )
+											{
+												if( x + nx < 0 )
+													continue;
+												if( y + ny < 0 )
+													continue;
+												if( x + nx >= curFace.LumelWidth )
+													continue;
+												if( y + ny >= curFace.LumelHeight )
+													continue;
+												if( nx == 0 && ny == 0 )
+													continue;
+
+												var neighbour = map[mapIndex.X + x + nx + 1, mapIndex.Y + y + ny + 1];
+												sum += neighbour;
+												hits++;
+											}
+										}
+
+										if( sum > 0 && hits > 1 )
+										{
+											var average = sum / hits;
+											map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = average;
+										}
+									}
+								}
+
+								// left
+								for( int y = 0; y < curFace.LumelHeight; y++ )
+								{
+									map[mapIndex.X, mapIndex.Y + y + 1] = map[mapIndex.X + 1, mapIndex.Y + y + 1];
+								}
+
+								// right
+								for( int y = 0; y < curFace.LumelHeight; y++ )
+								{
+									map[mapIndex.X + curFace.LumelWidth + 1, mapIndex.Y+y+1] = map[mapIndex.X + curFace.LumelWidth, mapIndex.Y+y + 1];
+								}
+
+								// top
+								for( int x = 0; x < curFace.LumelWidth+2; x++ )
+								{
+									map[mapIndex.X + x, mapIndex.Y] = map[mapIndex.X + x, mapIndex.Y + 1];
+								}
+
+								// bottom
+								for( int x = 0; x < curFace.LumelWidth + 2; x++ )
+								{
+									map[mapIndex.X + x, mapIndex.Y + curFace.LumelHeight + 1] = map[mapIndex.X + x, mapIndex.Y + curFace.LumelHeight];
 								}
 							}
+						}
+					}
+				}
+
+				foreach( var solid in level.Solids )
+				{
+					foreach( var face in solid.Faces )
+					{
+						foreach( var lumel in face.Lumels )
+						{
+							var I = lumel.Incidence;
+							var R = lumel.Reflectiveness;
+							var E = lumel.Emission;
+
+							lumel.Excidence = ( I * R ) + E;
+							if( lumel.Excidence > SKY_LIGHT_INTENSITY )
+								lumel.Excidence = SKY_LIGHT_INTENSITY;
 						}
 					}
 				}
@@ -155,40 +253,6 @@ namespace Editor
 			endTime = DateTime.Now;
 
 			var radianceTime = ( endTime - startTime ).TotalSeconds;
-
-			// blur radiance data
-			/*for( int y = 0; y < SIZE; y++ )
-			{
-				for( int x = 0; x < SIZE; x++ )
-				{
-					var rad = map[x, y];
-					if( rad < 0.01f )
-						continue;
-
-					var sum = 0.0f;
-					var hits = 1;
-					for( int ny = -1; ny <= 1; ny++ )
-					{
-						for( int nx = -1; nx <= 1; nx++ )
-						{
-							if( x + nx < 0 || y + ny < 0 || x + nx >= SIZE || y + ny >= SIZE )
-								continue;
-							if( ny == 0 && nx == 0 )
-								continue;
-
-							var cur = map[x + nx, y + ny];
-							if( cur >= 0.01f ) // make sure pixel is legal
-							{
-								sum += cur;
-								hits++;
-							}
-						}
-					}
-
-					var final = ( rad + sum ) / hits;
-					map[x, y] = final;
-				}
-			}*/
 
 			startTime = DateTime.Now;
 
@@ -348,66 +412,6 @@ namespace Editor
 					}
 				}
 			}
-
-			/*var totalLumelCount = _level.Solids.Sum( a => a.Faces.Sum( b => b.Lumels.Count ) );
-
-			var direction = new Triple();
-			for( int curSolid = 0; curSolid < _level.Solids.Count; curSolid++ )
-			{
-				var solid = _level.Solids[curSolid];
-				for( int curFace = 0; curFace < solid.Faces.Count; curFace++ )
-				{
-					var face = solid.Faces[curFace];
-
-					if( face.PackName != "tools" )
-					{
-						for( int curLumel = 0; curLumel < face.Lumels.Count; curLumel++ )
-						{
-							var a = face.Lumels[curLumel];
-							a.Transfers.Clear();
-							a.Transfers.Capacity = totalLumelCount / 2;
-
-							for( int curOtherSolid = 0; curOtherSolid < _level.Solids.Count; curOtherSolid++ )
-							{
-								if( curOtherSolid != curSolid )
-								{
-									var otherSolid = _level.Solids[curOtherSolid];
-									for( int curOtherFace = 0; curOtherFace < otherSolid.Faces.Count; curOtherFace++ )
-									{
-										var otherFace = otherSolid.Faces[curOtherFace];
-
-										if( otherFace.PackName != "tools" || otherFace.TextureName == "sky" )
-										{
-											for( int curOtherLumel = 0; curOtherLumel < otherFace.Lumels.Count; curOtherLumel++ )
-											{
-												var b = otherFace.Lumels[curOtherLumel];
-
-												//var direction = b.Position - a.Position;
-												direction.X = b.Position.X - a.Position.X;
-												direction.Y = b.Position.Y - a.Position.Y;
-												direction.Z = b.Position.Z - a.Position.Z;
-
-												direction.Normalize();
-
-												var dirPlaneDot = face.Plane.Normal.Dot( direction );
-												var dirOtherPlaneDot = otherFace.Plane.Normal.Dot( direction );
-
-												if( dirPlaneDot > 0 && dirOtherPlaneDot < 0 )
-												{
-													if( Trace( _level, a.Position, b.Position, solid ) )
-													{
-														a.Transfers.Add( b );
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}*/
 		}
 
 		private static bool AllocLightmap( int[] rover, int width, int height, out Point index )

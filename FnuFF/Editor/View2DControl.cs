@@ -249,7 +249,7 @@ namespace Editor
 					return result;
 				}
 			);
-			Log.AddFunctor( Name, () =>
+			/*Log.AddFunctor( Name, () =>
 				{
 					var sb = new StringBuilder();
 					sb.Append( "Command stack:\r\n" );
@@ -259,7 +259,7 @@ namespace Editor
 					return sb.ToString();
 				}
 			);
-			Log.AddFunctor( Name, () => "Command index: " + _commandStack.Index.ToString() );
+			Log.AddFunctor( Name, () => "Command index: " + _commandStack.Index.ToString() );*/
 			Log.AddFunctor( Name, () =>
 				{
 					var result = "No solid selected.";
@@ -380,6 +380,10 @@ namespace Editor
         protected override void OnMouseLeave( EventArgs e )
         {
             base.OnMouseLeave( e );
+
+			_lmbDown = false;
+			_mmbDown = false;
+			_shiftDown = false;
         }
 
         protected override void OnMouseDown( MouseEventArgs e )
@@ -1182,7 +1186,7 @@ namespace Editor
 			if( e.KeyCode == Keys.Space )
 				_spaceDown = false;
 			else if( e.KeyCode == Keys.ShiftKey )
-				_shiftDown = true;
+				_shiftDown = false;
 
 			// solid manipulation
 			if( e.KeyCode == Keys.Delete )

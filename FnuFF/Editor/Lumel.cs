@@ -9,28 +9,29 @@ namespace Editor
 	public class Lumel
 	{
 		public Triple Position;
-		public float Radiance;
 		public Triple Normal;
 		public List<Lumel> Transfers;
+		public float Incidence;
+		public float Excidence;
+		public float Emission;
+		public float Reflectiveness;
 
 		public Lumel()
-			: this( new Triple( 0.0f ) )
 		{
+			Position = new Triple();
+			Normal = new Triple();
+			Incidence = Excidence = Emission = Reflectiveness = 0.0f;
 		}
 
-		public Lumel( Triple position, float radiance = 0.0f )
+		public Lumel( Triple position, Triple normal, float emission = 0.0f, float reflectiveness = 0.5f  )
 		{
 			Position = position;
-			Radiance = radiance;
-			Transfers = new List<Lumel>();
-		}
-
-		public Lumel( Triple position, Triple normal, float radiance = 0.0f  )
-		{
-			Position = position;
-			Radiance = radiance;
 			Normal = normal;
 			Transfers = new List<Lumel>();
+
+			Emission = emission;
+			Reflectiveness = reflectiveness;
+			Incidence = Excidence = 0.0f;
 		}
 	}
 }

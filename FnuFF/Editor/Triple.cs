@@ -114,12 +114,14 @@ namespace Editor
 			);
 		}
 
-		public void Normalize()
+		public float Normalize()
 		{
 			var magnitude = (float)Math.Sqrt( X * X + Y * Y + Z * Z );
 			X /= magnitude;
 			Y /= magnitude;
 			Z /= magnitude;
+
+			return magnitude;
 		}
 
 		public PointF Project( Triple t )

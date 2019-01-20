@@ -23,7 +23,8 @@ void Graphics::load()
 
 	assets.loadPack( "./assets/textures/pack01.bin" );
 	assets.loadPack( "./assets/textures/tools.bin" );
-	lightmap.load( "./assets/levels/lightmap_test01.lvl_light.tga" );
+	lightmap.load( "./assets/levels/lightmap_test03.lvl_light.tga" );
+	//lightmap.load( "./assets/levels/great_hall.lvl_light.tga" );
 	lightmap.upload();
 	
 	textShader.load( "./assets/shaders/font.vs", "./assets/shaders/font.gs", "./assets/shaders/font.fs" );
@@ -190,13 +191,13 @@ void Graphics::renderSolids()
 			const Texture* texture = assets.getTexture( textureIndex );
 			if( !texture->hasAlpha() )
 			{
-				/*glActiveTexture( GL_TEXTURE0 );
+				glActiveTexture( GL_TEXTURE0 );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
 				glActiveTexture( GL_TEXTURE1 );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );*/
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
 				texture->bind( GL_TEXTURE0 );
 				lightmap.bind( GL_TEXTURE1 );
