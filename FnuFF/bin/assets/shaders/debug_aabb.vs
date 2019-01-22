@@ -1,4 +1,4 @@
-#version 330
+#version 420
 
 layout(location=0) in vec3 vertMin;
 layout(location=1) in vec3 vertMax;
