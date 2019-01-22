@@ -326,7 +326,9 @@ namespace Editor
 			{
 				var path = saveFileDialog.FileName;
 
-				GenerateLightmap( path + "_light.tga" );
+				//GenerateLightmap( path + "_light.tga" );
+				var lightmapForm = new LightmapForm( _level, path + "_light.tga" );
+				lightmapForm.ShowDialog();
 
 				var solids = _level.Solids;
 				var entities = _level.Entities;

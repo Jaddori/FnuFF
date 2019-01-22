@@ -14,7 +14,7 @@ namespace Editor
 	{
 		private class ThreadData
 		{
-			public int first, last;
+			public int first, last, current;
 			//public List<GeometrySolid> solids;
 			public Lumel[] allLumels;
 			public Lumel[] normalLumels;
@@ -25,6 +25,8 @@ namespace Editor
 		public const float LUMEL_SIZE = 16.0f;
 		public const float MAX_LIGHT_DISTANCE = 15.0f;
 
+		private static List<ThreadData> _threadData = new List<ThreadData>();
+		
 		public static void Generate( Level level, string filename )
 		{
 			float[,] map = new float[SIZE, SIZE];
@@ -71,6 +73,7 @@ namespace Editor
 
 			var first = 0;
 
+			_threadData.Clear();
 			var threads = new List<Thread>();
 			for( int i = 0; i < THREAD_COUNT; i++ )
 			{
@@ -85,6 +88,7 @@ namespace Editor
 				thread.Start( data );
 
 				threads.Add( thread );
+				_threadData.Add( data );
 
 				first += chunk;
 
@@ -94,6 +98,9 @@ namespace Editor
 
 			foreach( var thread in threads )
 				thread.Join();
+
+			foreach( var data in _threadData )
+				data.current = data.last;
 			
 			//BuildTransfers( level );
 			var endTime = DateTime.Now;
@@ -397,6 +404,8 @@ namespace Editor
 						}
 					}
 				}
+
+				data.current = i;
 			}
 		}
 		
@@ -615,6 +624,18 @@ namespace Editor
 			}
 
 			return true;
+		}
+
+		public static void PollProgress( out int done, out int total )
+		{
+			done = 0;
+			total = 0;
+
+			foreach( var data in _threadData )
+			{
+				done += data.current - data.first;
+				total += data.last - data.first;
+			}
 		}
 	}
 }
