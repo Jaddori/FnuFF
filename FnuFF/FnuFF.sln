@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FnuFF", "FnuFF\FnuFF.vcxproj", "{58DC43B2-304D-42F8-A122-6D1D5BD4485B}"
 EndProject
@@ -26,7 +26,7 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{58DC43B2-304D-42F8-A122-6D1D5BD4485B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{58DC43B2-304D-42F8-A122-6D1D5BD4485B}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{58DC43B2-304D-42F8-A122-6D1D5BD4485B}.Debug|x64.ActiveCfg = Debug|x64
 		{58DC43B2-304D-42F8-A122-6D1D5BD4485B}.Debug|x64.Build.0 = Debug|x64
 		{58DC43B2-304D-42F8-A122-6D1D5BD4485B}.Debug|x86.ActiveCfg = Debug|Win32
@@ -83,5 +83,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37936DCE-E1E8-4FB5-83C2-4BAA33CADE94}
 	EndGlobalSection
 EndGlobal
