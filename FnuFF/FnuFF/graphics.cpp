@@ -24,7 +24,8 @@ void Graphics::load()
 	assets.loadPack( "./assets/textures/pack01.bin" );
 	assets.loadPack( "./assets/textures/tools.bin" );
 	//lightmap.load( "./assets/levels/lightmap_test03.lvl_light.tga" );
-	lightmap.load( "./assets/levels/great_hall.lvl_light.tga" );
+	//lightmap.load( "./assets/levels/great_hall.lvl_light.tga" );
+	lightmap.load( "./assets/levels/lightmap_test04.lvl_light.tga" );
 	lightmap.upload();
 	
 	textShader.load( "./assets/shaders/font.vs", "./assets/shaders/font.gs", "./assets/shaders/font.fs" );
