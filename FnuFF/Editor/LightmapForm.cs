@@ -15,13 +15,11 @@ namespace Editor
 	{
 		private Thread _thread;
 		private Level _level;
-		private string _filename;
 
-		public LightmapForm( Level level, string filename )
+		public LightmapForm( Level level )
 		{
 			InitializeComponent();
 			_level = level;
-			_filename = filename;
 		}
 
 		private void LightmapForm_Load( object sender, EventArgs e )
@@ -32,6 +30,7 @@ namespace Editor
 		private void LightmapForm_Shown( object sender, EventArgs e )
 		{
 			PollProgress();
+			btn_close.Enabled = false;
 
 			timer_progress.Start();
 
@@ -41,22 +40,24 @@ namespace Editor
 
 		private void ThreadWork()
 		{
-			Lightmap.Generate( _level, _filename );
+			Lightmap.Generate( _level );
 		}
 
 		private void PollProgress()
 		{
-			int done, total;
-			Lightmap.PollProgress( out done, out total );
+			int completed, total;
+			bool done;
+			Lightmap.PollProgress( out completed, out total, out done );
 
-			lbl_progress.Text = $"Lumel: {done}/{total}";
+			lbl_progress.Text = $"Lumel: {completed}/{total}";
 
 			if( pb_progress.Maximum != total )
 				pb_progress.Maximum = total;
-			if( pb_progress.Value != done )
-				pb_progress.Value = done;
+			if( pb_progress.Value != completed )
+				pb_progress.Value = completed;
 
-			if( done >= total )
+			//if( completed >= total )
+			if( done )
 			{
 				timer_progress.Stop();
 				btn_close.Enabled = true;

@@ -26,9 +26,13 @@ namespace Editor
 		public const float MAX_LIGHT_DISTANCE = 15.0f;
 
 		private static List<ThreadData> _threadData = new List<ThreadData>();
+		private static bool _done = false;
+		private static byte[] _pixels;
 		
-		public static void Generate( Level level, string filename )
+		public static void Generate( Level level )
 		{
+			_done = false;
+
 			float[,] map = new float[SIZE, SIZE];
 			int[] rover = new int[SIZE];
 
@@ -273,7 +277,7 @@ namespace Editor
 
 			startTime = DateTime.Now;
 
-			var pixels = new byte[SIZE * SIZE * 3];
+			_pixels = new byte[SIZE * SIZE * 3];
 			for( int y = 0; y < SIZE; y++ )
 			{
 				for( int x = 0; x < SIZE; x++ )
@@ -286,96 +290,20 @@ namespace Editor
 
 					var index = ( ( SIZE - 1 - y ) * SIZE + x ) * 3;
 
-					pixels[index] = r;
-					pixels[index + 1] = r;
-					pixels[index + 2] = r;
+					_pixels[index] = r;
+					_pixels[index + 1] = r;
+					_pixels[index + 2] = r;
 				}
 			}
-
-			var lightmap = new Targa()
-			{
-				Width = SIZE,
-				Height = SIZE,
-				Bpp = 3,
-				Pixels = pixels
-			};
-			lightmap.Write( filename );
-
-			if( EditorTool.CurrentLightmap != null )
-				EditorTool.CurrentLightmap.Dispose();
-
-			EditorTool.CurrentLightmap = lightmap;
-			EditorTool.CurrentLightmapID = GL.UploadTexture( SIZE, SIZE, 3, pixels );
 
 			endTime = DateTime.Now;
 
 			var textureTime = ( endTime - startTime ).TotalSeconds;
 
+			_done = true;
+
 			MessageBox.Show( "Transfer time: " + transferTime.ToString() + "s\nRadiance time: " + radianceTime.ToString() + "s\nTexture time: " + textureTime.ToString() + "s" );
 		}
-
-		/*private static void BuildTransfers( Level level )
-		{
-			var totalLumelCount = level.Solids.Sum( a => a.Faces.Sum( b => b.Lumels.Count ) );
-
-			var direction = new Triple();
-			for( int curSolid = 0; curSolid < level.Solids.Count; curSolid++ )
-			{
-				var solid = level.Solids[curSolid];
-				for( int curFace = 0; curFace < solid.Faces.Count; curFace++ )
-				{
-					var face = solid.Faces[curFace];
-
-					if( face.PackName != "tools" )
-					{
-						for( int curLumel = 0; curLumel < face.Lumels.Count; curLumel++ )
-						{
-							var a = face.Lumels[curLumel];
-							a.Transfers.Clear();
-							a.Transfers.Capacity = totalLumelCount / 2;
-							
-							for( int curOtherSolid = 0; curOtherSolid < level.Solids.Count; curOtherSolid++ )
-							{
-								if( curOtherSolid != curSolid )
-								{
-									var otherSolid = level.Solids[curOtherSolid];
-									for( int curOtherFace = 0; curOtherFace < otherSolid.Faces.Count; curOtherFace++ )
-									{
-										var otherFace = otherSolid.Faces[curOtherFace];
-
-										if( otherFace.PackName != "tools" || otherFace.TextureName == "sky" )
-										{
-											for( int curOtherLumel = 0; curOtherLumel < otherFace.Lumels.Count; curOtherLumel++ )
-											{
-												var b = otherFace.Lumels[curOtherLumel];
-
-												//var direction = b.Position - a.Position;
-												direction.X = b.Position.X - a.Position.X;
-												direction.Y = b.Position.Y - a.Position.Y;
-												direction.Z = b.Position.Z - a.Position.Z;
-
-												direction.Normalize();
-
-												var dirPlaneDot = face.Plane.Normal.Dot( direction );
-												var dirOtherPlaneDot = otherFace.Plane.Normal.Dot( direction );
-
-												if( dirPlaneDot > 0 && dirOtherPlaneDot < 0 )
-												{
-													if( Trace( level, a.Position, b.Position, solid ) )
-													{
-														a.Transfers.Add( b );
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}*/
 
 		private static void BuildTransfersAsync( object args )
 		{
@@ -400,11 +328,8 @@ namespace Editor
 
 					if( dist > MAX_LIGHT_DISTANCE )
 						continue;
-
-					var dirPlaneDot = a.Normal.Dot( dir );
-					var dirOtherPlaneDot = b.Normal.Dot( dir );
-
-					if( dirPlaneDot > 0 && dirOtherPlaneDot < 0 )
+					
+					if( a.Normal.Dot( b.Normal ) < 0 )
 					{
 						if( Trace( data.solids, a.Position, b.Position, a.Parent, b.Parent ) )
 						{
@@ -417,65 +342,6 @@ namespace Editor
 			}
 		}
 		
-		/*private static void BuildTransfersAsync( object args )
-		{
-			var data = args as ThreadData;
-
-			var dir = new Triple();
-			for( int i = data.first; i < data.last; i++ )
-			{
-				var solid = data.solids[i];
-
-				foreach( var face in solid.Faces )
-				{
-					if( face.PackName == "tools" )
-						continue;
-
-					foreach( var a in face.Lumels )
-					{
-						foreach( var otherSolid in data.solids )
-						{
-							if( otherSolid != solid )
-							{
-								foreach( var otherFace in otherSolid.Faces )
-								{
-									if( otherFace.PackName == "tools" && otherFace.TextureName != "sky" )
-										continue;
-
-									if( face.Plane.Normal.Dot( otherFace.Plane.Normal ) > 0.9f )
-										continue;
-
-									foreach( var b in otherFace.Lumels )
-									{
-										dir.X = b.Position.X - a.Position.X;
-										dir.Y = b.Position.Y - a.Position.Y;
-										dir.Z = b.Position.Z - a.Position.Z;
-										var dist = dir.Normalize();
-
-										dist /= Grid.SIZE_BASE;
-
-										if( dist > MAX_LIGHT_DISTANCE )
-											continue;
-
-										var dirPlaneDot = face.Plane.Normal.Dot( dir );
-										var dirOtherPlaneDot = otherFace.Plane.Normal.Dot( dir );
-
-										if( dirPlaneDot > 0 && dirOtherPlaneDot < 0 )
-										{
-											if( Trace( data.solids, a.Position, b.Position, solid ) )
-											{
-												a.Transfers.Add( b );
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}*/
-
 		private static bool AllocLightmap( int[] rover, int width, int height, out Point index )
 		{
 			index = new Point( -1, -1 );
@@ -510,90 +376,7 @@ namespace Editor
 
 			return true;
 		}
-
-		/*private static bool Trace( Level level, Triple start, Triple end, GeometrySolid currentSolid )
-		{
-			_traces++;
-
-			var ray = Ray.FromPoints( start, end );
-
-			foreach( var solid in level.Solids )
-			{
-				if( solid != currentSolid )
-				{
-					foreach( var face in solid.Faces )
-					{
-						var length = 0.0f;
-						if( ray.Intersect( face.Plane, ref length ) )
-						{
-							if( length < ray.Length )
-							{
-								var p = ray.Start + ray.Direction * length;
-								var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane );
-
-								var behindAll = true;
-								foreach( var plane in otherPlanes )
-								{
-									if( plane.InFront( p ) )
-										behindAll = false;
-								}
-
-								if( behindAll )
-								{
-									return false;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			return true;
-		}*/
-
-		/*private static bool Trace( List<GeometrySolid> solids, Triple start, Triple end, GeometrySolid currentSolid )
-		{
-			_traces++;
-
-			var ray = Ray.FromPoints( start, end );
-
-			foreach( var solid in solids )
-			{
-				if( solid != currentSolid )
-				{
-					foreach( var face in solid.Faces )
-					{
-						var length = 0.0f;
-						if( ray.Intersect( face.Plane, ref length ) )
-						{
-							if( length < ray.Length )
-							{
-								var p = ray.Start + ray.Direction * length;
-								//var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane );
-
-								var behindAll = true;
-								foreach( var otherFace in solid.Faces )
-								{
-									if( otherFace == face )
-										continue;
-
-									if( otherFace.Plane.InFront( p ) )
-										behindAll = false;
-								}
-
-								if( behindAll )
-								{
-									return false;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			return true;
-		}*/
-
+		
 		private static bool Trace( List<GeometrySolid> solids, Triple start, Triple end, params GeometrySolid[] ignoreSolids )
 		{
 			var ray = Ray.FromPoints( start, end );
@@ -634,16 +417,36 @@ namespace Editor
 			return true;
 		}
 
-		public static void PollProgress( out int done, out int total )
+		public static void PollProgress( out int completed, out int total, out bool done )
 		{
-			done = 0;
+			completed = 0;
 			total = 0;
 
 			foreach( var data in _threadData )
 			{
-				done += data.current - data.first;
+				completed += data.current - data.first;
 				total += data.last - data.first;
 			}
+
+			done = _done;
+		}
+
+		public static void Upload( string filename )
+		{
+			var lightmap = new Targa()
+			{
+				Width = SIZE,
+				Height = SIZE,
+				Bpp = 3,
+				Pixels = _pixels
+			};
+			lightmap.Write( filename );
+
+			if( EditorTool.CurrentLightmap != null )
+				EditorTool.CurrentLightmap.Dispose();
+
+			EditorTool.CurrentLightmap = lightmap;
+			EditorTool.CurrentLightmapID = GL.UploadTexture( SIZE, SIZE, 3, _pixels );
 		}
 	}
 }

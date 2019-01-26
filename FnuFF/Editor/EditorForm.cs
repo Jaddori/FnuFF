@@ -290,8 +290,10 @@ namespace Editor
 				var path = saveFileDialog.FileName;
 
 				//GenerateLightmap( path + "_light.tga" );
-				var lightmapForm = new LightmapForm( _level, path + "_light.tga" );
+				var lightmapForm = new LightmapForm( _level );
 				lightmapForm.ShowDialog();
+
+				Lightmap.Upload( path + "_light.tga" );
 
 				var solids = _level.Solids;
 				var entities = _level.Entities;
@@ -503,7 +505,8 @@ namespace Editor
 		
 		private void GenerateLightmap( string filename )
 		{
-			Lightmap.Generate( _level, filename );
+			Lightmap.Generate( _level );
+			Lightmap.Upload( filename );
 
 			view_3d.Invalidate();
 		}
