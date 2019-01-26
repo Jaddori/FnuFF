@@ -262,7 +262,7 @@
 			this.num_lumelSize.ForeColor = System.Drawing.Color.White;
 			this.num_lumelSize.Location = new System.Drawing.Point(6, 255);
 			this.num_lumelSize.Maximum = new decimal(new int[] {
-            32,
+            128,
             0,
             0,
             0});
