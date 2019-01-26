@@ -84,7 +84,15 @@ namespace Editor
 					last = normalLumels.Length;
 
 				//var data = new ThreadData() { first = first, last = last, solids = level.Solids };
-				var data = new ThreadData() { first = first, last = last, allLumels = allLumels, normalLumels = normalLumels, solids = level.Solids };
+				var data = new ThreadData()
+				{
+					first = first,
+					last = last,
+					current = first,
+					allLumels = allLumels,
+					normalLumels = normalLumels,
+					solids = level.Solids
+				};
 				thread.Start( data );
 
 				threads.Add( thread );

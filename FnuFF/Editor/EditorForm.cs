@@ -213,7 +213,7 @@ namespace Editor
 			view_3d.Invalidate();
 		}
 
-		private void loadToolStripMenuItem_Click( object sender, EventArgs e )
+		private void Level_Load()
 		{
 			openFileDialog.Filter = "XML Files|*.xml|All files|*.*";
 
@@ -262,45 +262,7 @@ namespace Editor
 			}
 		}
 
-		private void SaveLevel()
-		{
-			var ser = new XmlSerializer( typeof( Level ) );
-			using( var stream = new FileStream( _levelPath, FileMode.Create, FileAccess.Write ) )
-			{
-				var settings = new XmlWriterSettings();
-				settings.Indent = true;
-				settings.IndentChars = "\t";
-				settings.OmitXmlDeclaration = false;
-
-				using( var writer = XmlWriter.Create( stream, settings ) )
-				{
-					ser.Serialize( writer, _level );
-				}
-			}
-
-			_lastSaveCommandIndex = _commandStack.Index;
-			UpdateTitle();
-		}
-
-		private bool PromptLevelPath()
-		{
-			var result = false;
-
-			saveFileDialog.DefaultExt = ".xml";
-			saveFileDialog.Filter = "XML files|*.xml|All files|*.*";
-
-			if( saveFileDialog.ShowDialog() == DialogResult.OK )
-			{
-				_levelPath = saveFileDialog.FileName;
-				_levelName = _levelPath.NameFromPath();
-
-				result = true;
-			}
-
-			return result;
-		}
-
-		private void saveToolStripMenuItem_Click( object sender, EventArgs e )
+		private void Level_Save()
 		{
 			var hasPath = !string.IsNullOrEmpty( _levelPath );
 
@@ -311,14 +273,15 @@ namespace Editor
 				SaveLevel();
 		}
 
-		private void saveAsToolStripMenuItem_Click( object sender, EventArgs e )
+		private void Level_SaveAs()
 		{
 			if( PromptLevelPath() )
 				SaveLevel();
 		}
 
-		private void exportToolStripMenuItem_Click( object sender, EventArgs e )
+		private void Level_Export()
 		{
+			saveFileDialog.Title = "Export";
 			saveFileDialog.DefaultExt = ".lvl";
 			saveFileDialog.Filter = "Level files|*.lvl|All files|*.*";
 
@@ -332,10 +295,10 @@ namespace Editor
 
 				var solids = _level.Solids;
 				var entities = _level.Entities;
-				
+
 				var stream = new FileStream( path, FileMode.Create, FileAccess.Write );
 				var writer = new BinaryWriter( stream );
-				
+
 				writer.Write( solids.Count );
 				writer.Write( entities.Count );
 
@@ -397,7 +360,7 @@ namespace Editor
 						{
 							textureIndex = textureNames.IndexOf( face.TextureName );
 						}
-						
+
 						writer.Write( textureIndex );
 
 						// write vertex information
@@ -419,10 +382,10 @@ namespace Editor
 						for( int i = 1; i < vertices.Count - 1; i++ )
 						{
 							var v1 = vertices[i];
-							var v2 = vertices[i+1];
+							var v2 = vertices[i + 1];
 
 							var uv1 = uvs[i];
-							var uv2 = uvs[i+1];
+							var uv2 = uvs[i + 1];
 
 							var lm1 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
 							var lm2 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
@@ -477,6 +440,65 @@ namespace Editor
 				writer.Close();
 				stream.Close();
 			}
+		}
+
+		private void loadToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Level_Load();
+		}
+
+		private void SaveLevel()
+		{
+			var ser = new XmlSerializer( typeof( Level ) );
+			using( var stream = new FileStream( _levelPath, FileMode.Create, FileAccess.Write ) )
+			{
+				var settings = new XmlWriterSettings();
+				settings.Indent = true;
+				settings.IndentChars = "\t";
+				settings.OmitXmlDeclaration = false;
+
+				using( var writer = XmlWriter.Create( stream, settings ) )
+				{
+					ser.Serialize( writer, _level );
+				}
+			}
+
+			_lastSaveCommandIndex = _commandStack.Index;
+			UpdateTitle();
+		}
+
+		private bool PromptLevelPath()
+		{
+			var result = false;
+
+			saveFileDialog.Title = "Save";
+			saveFileDialog.DefaultExt = ".xml";
+			saveFileDialog.Filter = "XML files|*.xml|All files|*.*";
+
+			if( saveFileDialog.ShowDialog() == DialogResult.OK )
+			{
+				_levelPath = saveFileDialog.FileName;
+				_levelName = _levelPath.NameFromPath();
+
+				result = true;
+			}
+
+			return result;
+		}
+
+		private void saveToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Level_Save();
+		}
+
+		private void saveAsToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Level_SaveAs();
+		}
+
+		private void exportToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Level_Export();
 		}
 		
 		private void GenerateLightmap( string filename )
@@ -549,6 +571,28 @@ namespace Editor
 		{
 			EditorFlags.ShowLumelsOnFace = btn_showLumelsOnFace.Selected;
 			view_3d.Invalidate();
+		}
+
+		private void EditorForm_KeyUp( object sender, KeyEventArgs e )
+		{
+			if( e.Control )
+			{
+				if( e.KeyCode == Keys.O )
+				{
+					Level_Load();
+				}
+				else if( e.KeyCode == Keys.S )
+				{
+					if( e.Shift )
+						Level_SaveAs();
+					else
+						Level_Save();
+				}
+				else if( e.KeyCode == Keys.E )
+				{
+					Level_Export();
+				}
+			}
 		}
 	}
 }
