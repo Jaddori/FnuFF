@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor.GL", "Editor.GL\Edit
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetPacker", "AssetPacker\AssetPacker.vcxproj", "{76E7D3B3-3094-4F23-8DAD-207F649CD823}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Radiosity", "Radiosity\Radiosity.vcxproj", "{9390EE55-D985-4536-B2CE-3FFDB0C037F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,16 @@ Global
 		{76E7D3B3-3094-4F23-8DAD-207F649CD823}.Release|x64.Build.0 = Release|x64
 		{76E7D3B3-3094-4F23-8DAD-207F649CD823}.Release|x86.ActiveCfg = Release|Win32
 		{76E7D3B3-3094-4F23-8DAD-207F649CD823}.Release|x86.Build.0 = Release|Win32
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Debug|x64.ActiveCfg = Debug|x64
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Debug|x64.Build.0 = Debug|x64
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Debug|x86.ActiveCfg = Debug|Win32
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Debug|x86.Build.0 = Debug|Win32
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Release|x64.ActiveCfg = Release|x64
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Release|x64.Build.0 = Release|x64
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Release|x86.ActiveCfg = Release|Win32
+		{9390EE55-D985-4536-B2CE-3FFDB0C037F1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
