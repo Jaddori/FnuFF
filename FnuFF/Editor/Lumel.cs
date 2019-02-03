@@ -11,9 +11,11 @@ namespace Editor
 		public Triple Position;
 		public Triple Normal;
 		public List<Lumel> Transfers;
-		public float Incidence;
-		public float Excidence;
-		public float Emission;
+		//public float Incidence;
+		//public float Excidence;
+		//public float Emission;
+		public Triple Incidence;
+		public Triple Emission;
 		public float Reflectiveness;
 		public GeometrySolid Parent;
 		public int Traces;
@@ -23,13 +25,16 @@ namespace Editor
 		{
 			Position = new Triple();
 			Normal = new Triple();
-			Incidence = Excidence = Emission = Reflectiveness = 0.0f;
+			//Incidence = Excidence = Emission = Reflectiveness = 0.0f;
+			Incidence = Triple.Zero;
+			Emission = Triple.Zero;
+			Reflectiveness = 0.0f;
 
 			Traces = 0;
 			Blocked = false;
 		}
 
-		public Lumel( Triple position, Triple normal, float emission = 0.0f, float reflectiveness = 0.5f  )
+		public Lumel( Triple position, Triple normal, Triple emission, float reflectiveness = 0.5f  )
 		{
 			Position = position;
 			Normal = normal;
@@ -37,7 +42,8 @@ namespace Editor
 
 			Emission = emission;
 			Reflectiveness = reflectiveness;
-			Incidence = Excidence = 0.0f;
+			//Incidence = Excidence = 0.0f;
+			Incidence = Triple.Zero;
 
 			Traces = 0;
 			Blocked = false;

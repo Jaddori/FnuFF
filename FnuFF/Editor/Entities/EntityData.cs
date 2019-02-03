@@ -9,6 +9,7 @@ using System.Xml.Serialization;
 namespace Editor.Entities
 {
 	[XmlInclude( typeof( PlayerSpawn ) )]
+	[XmlInclude( typeof( PointLight) )]
 	public class EntityData
 	{
 		private static Image _icon = Properties.Resources.icon_entity;

@@ -25,7 +25,8 @@ namespace Editor
 		public const int SIZE = 128;
 		public const float LUMEL_SIZE = 16.0f;
 		public const float MAX_LIGHT_DISTANCE = 15.0f;
-		public const float AMBIENT_LIGHT = 0.1f;
+		//public const float AMBIENT_LIGHT = 0.1f;
+		public static Triple AMBIENT_LIGHT = new Triple( 0.1f );
 
 		private static List<ThreadData> _threadData = new List<ThreadData>();
 		private static bool _done = false;
@@ -35,7 +36,7 @@ namespace Editor
 		{
 			_done = false;
 
-			float[,] map = new float[SIZE, SIZE];
+			Triple[,] map = new Triple[SIZE, SIZE];
 			int[] rover = new int[SIZE];
 
 			const float SKY_LIGHT_INTENSITY = 1.0f;
@@ -51,16 +52,15 @@ namespace Editor
 					{
 						foreach( var lumel in face.Lumels )
 						{
-							lumel.Emission = SKY_LIGHT_INTENSITY;
-							lumel.Excidence = lumel.Emission;
+							//lumel.Emission = SKY_LIGHT_INTENSITY;
+							lumel.Emission = new Triple( SKY_LIGHT_INTENSITY );
 						}
 					}
 					else
 					{
 						foreach( var lumel in face.Lumels )
 						{
-							lumel.Emission = 0.0f;
-							lumel.Excidence = lumel.Emission;
+							lumel.Emission = Triple.Zero;
 						}
 					}
 				}
@@ -299,8 +299,8 @@ namespace Editor
 
 			allLumels = allLumels.Where( lumel => !lumel.Blocked ).ToArray();
 
-			var emissiveLumels = allLumels.Where( x => x.Emission > 0.0f );
-			var dimLumels = allLumels.Where( x => x.Emission <= 0.0f );
+			var emissiveLumels = allLumels.Where( x => x.Emission.Length() > 0.0f );
+			var dimLumels = allLumels.Where( x => x.Emission.Length() <= 0.0f );
 
 			foreach( var a in emissiveLumels )
 			{
@@ -321,7 +321,6 @@ namespace Editor
 							if( Trace( level.Solids, a.Position, b.Position, a.Parent, b.Parent ) )
 							{
 								b.Incidence += a.Emission * (dot*dot)/(dist*dist);
-								b.Excidence = b.Incidence * b.Reflectiveness;
 							}
 						}
 					}
@@ -345,8 +344,8 @@ namespace Editor
 					{
 						if( Trace( level.Solids, a.Position, b.Position, b.Parent ) )
 						{
-							b.Incidence += light.Intensity * ( dot * dot ) / ( dist * dist );
-							b.Excidence = b.Incidence * b.Reflectiveness;
+							var color = new Triple( light.Color.R / 255.0f, light.Color.G / 255.0f, light.Color.B / 255.0f );
+							b.Incidence += ( color * light.Intensity ) * ( dot * dot ) / ( dist * dist );
 						}
 					}
 				}
@@ -367,12 +366,9 @@ namespace Editor
 							var lumelIndex = Extensions.IndexFromXY( x, y, curFace.LumelWidth );
 							var lumel = curFace.Lumels[lumelIndex];
 
-							//map[mapIndex.X + x, mapIndex.Y + y] = lumel.Incidence;
 							var value = lumel.Incidence;
-							if( value > SKY_LIGHT_INTENSITY )
-								value = SKY_LIGHT_INTENSITY;
-							else if( value < 0.01f )
-								value = 0.01f;
+							value.Normalize();
+
 							map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = value;
 						}
 					}
@@ -382,7 +378,7 @@ namespace Editor
 					{
 						for( int x = 0; x < curFace.LumelWidth; x++ )
 						{
-							var sum = 0.0f;
+							var sum = Triple.Zero;
 							var hits = 0;
 
 							for( int ny = -1; ny <= 1; ny++ )
@@ -406,7 +402,7 @@ namespace Editor
 								}
 							}
 
-							if( sum > 0 && hits > 1 )
+							if( sum.Length() > 0 && hits > 1 )
 							{
 								var average = sum / hits;
 								map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = average;
@@ -451,17 +447,31 @@ namespace Editor
 			{
 				for( int x = 0; x < SIZE; x++ )
 				{
-					var rad = map[x, y] * 255.0f;
+					/*var rad = map[x, y] * 255.0f;
 					if( rad > 255.0f )
 						rad = 255.0f;
-					//byte r = (byte)( map[x, y] * 255.0f );
+
 					byte r = (byte)rad;
 
 					var index = ( ( SIZE - 1 - y ) * SIZE + x ) * 3;
 
 					_pixels[index] = r;
 					_pixels[index + 1] = r;
-					_pixels[index + 2] = r;
+					_pixels[index + 2] = r;*/
+
+					var color = map[x, y];
+					color.Normalize();
+					color *= 255.0f;
+
+					var r = (byte)color.X;
+					var g = (byte)color.Y;
+					var b = (byte)color.Z;
+
+					var index = ( ( SIZE - 1 - y ) * SIZE + x ) * 3;
+
+					_pixels[index] = r;
+					_pixels[index + 1] = g;
+					_pixels[index + 2] = b;
 				}
 			}
 

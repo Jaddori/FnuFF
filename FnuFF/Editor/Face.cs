@@ -315,7 +315,7 @@ namespace Editor
 
 					if( behindAll )
 					{
-						_lumels.Add( new Lumel( p0, _plane.Normal ) { Parent = parent } );
+						_lumels.Add( new Lumel( p0, _plane.Normal, Triple.Zero ) { Parent = parent } );
 					}
 				}
 			}

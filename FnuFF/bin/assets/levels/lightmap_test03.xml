@@ -1375,5 +1375,31 @@
 				<Angle>0</Angle>
 			</Data>
 		</Entity>
+		<Entity>
+			<Position>
+				<X>64.0000153</X>
+				<Y>64.0000153</Y>
+				<Z>192</Z>
+			</Position>
+			<Active>true</Active>
+			<Data xsi:type="PointLight">
+				<Name />
+				<Color />
+				<Intensity>0.6</Intensity>
+			</Data>
+		</Entity>
+		<Entity>
+			<Position>
+				<X>448.000031</X>
+				<Y>128.000031</Y>
+				<Z>64.0000153</Z>
+			</Position>
+			<Active>true</Active>
+			<Data xsi:type="PointLight">
+				<Name />
+				<Color />
+				<Intensity>0.4</Intensity>
+			</Data>
+		</Entity>
 	</Entities>
 </Level>

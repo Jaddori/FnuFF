@@ -14,6 +14,7 @@ namespace Editor
 	{
 		private const float EPSILON = 0.0001f;
 
+		public static Triple Zero = new Triple( 0.0f );
 		public static Triple PosX = new Triple( 1, 0, 0 );
 		public static Triple PosY = new Triple( 0, 1, 0 );
 		public static Triple PosZ = new Triple( 0, 0, 1 );
