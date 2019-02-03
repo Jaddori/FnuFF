@@ -7,6 +7,7 @@ using System.Threading;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using Editor.Entities;
 
 namespace Editor
 {
@@ -322,6 +323,30 @@ namespace Editor
 								b.Incidence += a.Emission * (dot*dot)/(dist*dist);
 								b.Excidence = b.Incidence * b.Reflectiveness;
 							}
+						}
+					}
+				}
+			}
+
+			var allLights = level.Entities.Where( x => x.Data.GetType() == typeof( PointLight ) ).ToArray();
+			foreach( var a in allLights )
+			{
+				var light = a.Data as PointLight;
+				foreach( var b in dimLumels )
+				{
+					var dir = a.Position - b.Position;
+					var dist = dir.Normalize() / Grid.SIZE_BASE;
+
+					if( dist > MAX_LIGHT_DISTANCE )
+						continue;
+
+					var dot = dir.Dot( b.Normal );
+					if( dot > 0 )
+					{
+						if( Trace( level.Solids, a.Position, b.Position, b.Parent ) )
+						{
+							b.Incidence += light.Intensity * ( dot * dot ) / ( dist * dist );
+							b.Excidence = b.Incidence * b.Reflectiveness;
 						}
 					}
 				}

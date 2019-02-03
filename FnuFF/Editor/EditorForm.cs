@@ -62,7 +62,7 @@ namespace Editor
 			_toolbarButtons.Add( btn_face );
 			_toolbarButtons.Add( btn_entity );
 
-			btn_tab_entity.Tag = null;
+			btn_tab_entity.Tag = tab_entity;
 			btn_tab_face.Tag = tab_face;
 
 			_tabButtons = new List<FlatTabButtonControl>();

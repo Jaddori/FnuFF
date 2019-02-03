@@ -130,9 +130,6 @@
   <data name="icon_face" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_face.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="icon32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="icon_entity_player_spawn_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_entity_player_spawn_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -151,14 +148,23 @@
   <data name="icon_entity_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_entity_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="icon32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="icon_snap_to_grid" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_snap_to_grid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icon_entity" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_entity.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="icon_show_lumels_on_face" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_show_lumels_on_face.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="icon_texture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_texture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_show_lumels" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_show_lumels.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icon_snap_to_grid_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_snap_to_grid_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -168,6 +174,9 @@
   </data>
   <data name="icon_solid" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_solid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_show_lumels_on_face_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_show_lumels_on_face_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="icon_vertex_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_vertex_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -181,16 +190,13 @@
   <data name="icon_select_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_select_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="icon_show_lumels" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_show_lumels.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="icon_show_lumels_on_face" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_show_lumels_on_face.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="icon_show_lumels_on_face_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\icon_show_lumels_on_face_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="icon_show_lumels_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\icon_show_lumels_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_light" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_light.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_light_selected" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_light_selected.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

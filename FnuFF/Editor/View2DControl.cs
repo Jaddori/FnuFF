@@ -689,7 +689,8 @@ namespace Editor
 
 					var position = _camera.Unproject( _camera.ToGlobal( _entityPosition ).Deflate( Grid.Gap ).Inflate( Grid.Size ) );
 					var entity = new Entity( position );
-					entity.Data = new PlayerSpawn();
+					//entity.Data = new PlayerSpawn();
+					entity.Data = new PointLight() { Intensity = 0.8f, Color = Color.Blue };
 					_level.AddEntity( entity );
 
 					var command = new CommandEntityCreated( _level.Entities, entity );

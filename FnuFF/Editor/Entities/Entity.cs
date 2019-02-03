@@ -59,7 +59,7 @@ namespace Editor.Entities
 		{
 			var localPosition = camera.ToLocal( camera.Project( _position ).Deflate( Grid.Size ).Inflate( Grid.Gap ) );
 
-			var icon = _data.GetIcon2D(_hovered, _selected);
+			var icon = _data.GetIcon2D( _hovered, _selected );
 			var iconBounds = Extensions.FromPoint( localPosition, icon.Width );
 			g.DrawImage( icon, iconBounds );
 		}
@@ -91,13 +91,33 @@ namespace Editor.Entities
 
 			GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
 			GL.Vertex3f( position.X, position.Y, position.Z );
-			GL.Vertex3f( position.X, position.Y+ 0.25f, position.Z );
+			GL.Vertex3f( position.X, position.Y + 0.25f, position.Z );
 
 			GL.Color4f( 0.0f, 0.0f, 1.0f, 1.0f );
 			GL.Vertex3f( position.X, position.Y, position.Z );
 			GL.Vertex3f( position.X, position.Y, position.Z + 0.25f );
 
 			GL.End();
+		}
+	}
+
+	public static class EntityList
+	{
+		public static string[] Names =
+		{
+			"Player Spawn",
+			"Point Light",
+		};
+
+		public static Type[] Types =
+		{
+			typeof(PlayerSpawn),
+			typeof(PointLight),
+		};
+
+		public static EntityData CreateData( int index )
+		{
+			return Activator.CreateInstance( Types[index] ) as EntityData;
 		}
 	}
 }
