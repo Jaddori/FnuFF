@@ -213,6 +213,48 @@ namespace Editor
 			view_3d.Invalidate();
 		}
 
+		private void LoadLevel( string path )
+		{
+			var success = false;
+
+			var ser = new XmlSerializer( typeof( Level ) );
+			using( var stream = new FileStream( path, FileMode.Open, FileAccess.Read ) )
+			{
+				using( var reader = XmlReader.Create( stream ) )
+				{
+					if( ser.CanDeserialize( reader ) )
+					{
+						_level = (Level)ser.Deserialize( reader );
+
+						foreach( var solid in _level.Solids )
+						{
+							foreach( var face in solid.Faces )
+							{
+								face.BuildVertices( solid );
+							}
+						}
+
+						success = true;
+					}
+				}
+			}
+
+			if( success )
+			{
+				EditorTool.Current = EditorTools.Select;
+
+				_levelPath = path;
+				_levelName = _levelPath.NameFromPath();
+
+				view_3d.Level = _level;
+				view_topRight.Level = _level;
+				view_bottomLeft.Level = _level;
+				view_bottomRight.Level = _level;
+			}
+			else
+				MessageBox.Show( "Failed to load level." );
+		}
+
 		private void Level_Load()
 		{
 			openFileDialog.Filter = "XML Files|*.xml|All files|*.*";
@@ -221,46 +263,10 @@ namespace Editor
 			{
 				var path = openFileDialog.FileName;
 
-				var success = false;
-
-				var ser = new XmlSerializer( typeof( Level ) );
-				using( var stream = new FileStream( path, FileMode.Open, FileAccess.Read ) )
-				{
-					using( var reader = XmlReader.Create( stream ) )
-					{
-						if( ser.CanDeserialize( reader ) )
-						{
-							_level = (Level)ser.Deserialize( reader );
-
-							foreach( var solid in _level.Solids )
-							{
-								foreach( var face in solid.Faces )
-								{
-									face.BuildVertices( solid );
-								}
-							}
-
-							success = true;
-						}
-					}
-				}
-
-				if( success )
-				{
-					EditorTool.Current = EditorTools.Select;
-
-					_levelPath = path;
-					_levelName = _levelPath.NameFromPath();
-
-					view_3d.Level = _level;
-					view_topRight.Level = _level;
-					view_bottomLeft.Level = _level;
-					view_bottomRight.Level = _level;
-				}
-				else
-					MessageBox.Show( "Failed to load level." );
+				LoadLevel( path );
 			}
 		}
+		
 
 		private void Level_Save()
 		{
@@ -279,6 +285,162 @@ namespace Editor
 				SaveLevel();
 		}
 
+		private void ExportLevel( string path )
+		{
+			//GenerateLightmap( path + "_light.tga" );
+			var lightmapForm = new LightmapForm( _level );
+			lightmapForm.ShowDialog();
+
+			Lightmap.Upload( path + "_light.tga" );
+
+			var solids = _level.Solids;
+			var entities = _level.Entities;
+
+			var stream = new FileStream( path, FileMode.Create, FileAccess.Write );
+			var writer = new BinaryWriter( stream );
+
+			writer.Write( solids.Count );
+			writer.Write( entities.Count );
+
+			writer.Write( TextureMap.Packs.Count );
+
+			var packNames = new List<string>();
+			foreach( var pack in TextureMap.Packs.Values )
+			{
+				packNames.Add( pack.Name );
+
+				byte[] buffer = new byte[64];
+				byte[] str = Encoding.Default.GetBytes( pack.Name );
+				Array.Copy( str, buffer, str.Length );
+
+				writer.Write( buffer );
+			}
+
+			var textureNames = new List<string>();
+			foreach( var solid in solids )
+			{
+				foreach( var face in solid.Faces )
+				{
+					if( !textureNames.Contains( face.TextureName ) )
+					{
+						textureNames.Add( face.TextureName );
+					}
+				}
+			}
+
+			writer.Write( textureNames.Count );
+			foreach( var name in textureNames )
+			{
+				byte[] buffer = new byte[64];
+				byte[] str = Encoding.Default.GetBytes( name );
+				Array.Copy( str, buffer, str.Length );
+
+				writer.Write( buffer );
+			}
+
+			foreach( var solid in solids )
+			{
+				writer.Write( solid.Faces.Count );
+				foreach( var face in solid.Faces )
+				{
+					writer.Write( face.Plane, Grid.SIZE_BASE );
+				}
+
+				var visibleFaceCount = solid.Faces.Count( x => x.PackName != "tools" );
+				writer.Write( visibleFaceCount );
+
+				foreach( var face in solid.Faces )
+				{
+					if( face.PackName == "tools" )
+						continue;
+
+					// write texture information
+					var textureIndex = -1;
+					if( !string.IsNullOrEmpty( face.TextureName ) )
+					{
+						textureIndex = textureNames.IndexOf( face.TextureName );
+					}
+
+					writer.Write( textureIndex );
+
+					// write vertex information
+					var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+
+					var vertices = face.Vertices;
+					var uvs = face.UVs;
+					var lms = face.LightmapUVs;
+
+					var indexCount = ( vertices.Count - 2 ) * 3;
+					writer.Write( indexCount );
+
+					var v0 = vertices[0];
+					var uv0 = uvs[0];
+					var lm0 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
+					if( lms.Count > 0 )
+						lm0 = lms[0];
+
+					for( int i = 1; i < vertices.Count - 1; i++ )
+					{
+						var v1 = vertices[i];
+						var v2 = vertices[i + 1];
+
+						var uv1 = uvs[i];
+						var uv2 = uvs[i + 1];
+
+						var lm1 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
+						var lm2 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
+
+						if( lms.Count > i )
+							lm1 = lms[i];
+						if( lms.Count > i + 1 )
+							lm2 = lms[i + 1];
+
+						var v1v0 = v0 - v1;
+						var v2v0 = v0 - v2;
+
+						var n = v2v0.Cross( v1v0 );
+						n.Normalize();
+
+						var flip = face.Plane.Normal.Dot( n ) > 0;
+						if( flip )
+						{
+							var temp = v2;
+							v2 = v1;
+							v1 = temp;
+
+							var tempUV = uv2;
+							uv2 = uv1;
+							uv1 = tempUV;
+
+							var tempLM = lm2;
+							lm2 = lm1;
+							lm1 = tempLM;
+						}
+
+						writer.Write( v0, Grid.SIZE_BASE );
+						writer.Write( uv0 );
+						writer.Write( lm0, Lightmap.SIZE );
+
+						writer.Write( v1, Grid.SIZE_BASE );
+						writer.Write( uv1 );
+						writer.Write( lm1, Lightmap.SIZE );
+
+						writer.Write( v2, Grid.SIZE_BASE );
+						writer.Write( uv2 );
+						writer.Write( lm2, Lightmap.SIZE );
+					}
+				}
+			}
+
+			foreach( var entity in entities )
+			{
+				writer.Write( entity.Position, Grid.SIZE_BASE );
+			}
+
+			writer.Close();
+			stream.Close();
+		}
+
 		private void Level_Export()
 		{
 			saveFileDialog.Title = "Export";
@@ -289,158 +451,7 @@ namespace Editor
 			{
 				var path = saveFileDialog.FileName;
 
-				//GenerateLightmap( path + "_light.tga" );
-				var lightmapForm = new LightmapForm( _level );
-				lightmapForm.ShowDialog();
-
-				Lightmap.Upload( path + "_light.tga" );
-
-				var solids = _level.Solids;
-				var entities = _level.Entities;
-
-				var stream = new FileStream( path, FileMode.Create, FileAccess.Write );
-				var writer = new BinaryWriter( stream );
-
-				writer.Write( solids.Count );
-				writer.Write( entities.Count );
-
-				writer.Write( TextureMap.Packs.Count );
-
-				var packNames = new List<string>();
-				foreach( var pack in TextureMap.Packs.Values )
-				{
-					packNames.Add( pack.Name );
-
-					byte[] buffer = new byte[64];
-					byte[] str = Encoding.Default.GetBytes( pack.Name );
-					Array.Copy( str, buffer, str.Length );
-
-					writer.Write( buffer );
-				}
-
-				var textureNames = new List<string>();
-				foreach( var solid in solids )
-				{
-					foreach( var face in solid.Faces )
-					{
-						if( !textureNames.Contains( face.TextureName ) )
-						{
-							textureNames.Add( face.TextureName );
-						}
-					}
-				}
-
-				writer.Write( textureNames.Count );
-				foreach( var name in textureNames )
-				{
-					byte[] buffer = new byte[64];
-					byte[] str = Encoding.Default.GetBytes( name );
-					Array.Copy( str, buffer, str.Length );
-
-					writer.Write( buffer );
-				}
-
-				foreach( var solid in solids )
-				{
-					writer.Write( solid.Faces.Count );
-					foreach( var face in solid.Faces )
-					{
-						writer.Write( face.Plane, Grid.SIZE_BASE );
-					}
-
-					var visibleFaceCount = solid.Faces.Count( x => x.PackName != "tools" );
-					writer.Write( visibleFaceCount );
-
-					foreach( var face in solid.Faces )
-					{
-						if( face.PackName == "tools" )
-							continue;
-
-						// write texture information
-						var textureIndex = -1;
-						if( !string.IsNullOrEmpty( face.TextureName ) )
-						{
-							textureIndex = textureNames.IndexOf( face.TextureName );
-						}
-
-						writer.Write( textureIndex );
-
-						// write vertex information
-						var otherPlanes = solid.Faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-
-						var vertices = face.Vertices;
-						var uvs = face.UVs;
-						var lms = face.LightmapUVs;
-
-						var indexCount = ( vertices.Count - 2 ) * 3;
-						writer.Write( indexCount );
-
-						var v0 = vertices[0];
-						var uv0 = uvs[0];
-						var lm0 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
-						if( lms.Count > 0 )
-							lm0 = lms[0];
-
-						for( int i = 1; i < vertices.Count - 1; i++ )
-						{
-							var v1 = vertices[i];
-							var v2 = vertices[i + 1];
-
-							var uv1 = uvs[i];
-							var uv2 = uvs[i + 1];
-
-							var lm1 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
-							var lm2 = new PointF( Lightmap.SIZE * 0.5f, Lightmap.SIZE * 0.5f );
-
-							if( lms.Count > i )
-								lm1 = lms[i];
-							if( lms.Count > i + 1 )
-								lm2 = lms[i + 1];
-
-							var v1v0 = v0 - v1;
-							var v2v0 = v0 - v2;
-
-							var n = v2v0.Cross( v1v0 );
-							n.Normalize();
-
-							var flip = face.Plane.Normal.Dot( n ) > 0;
-							if( flip )
-							{
-								var temp = v2;
-								v2 = v1;
-								v1 = temp;
-
-								var tempUV = uv2;
-								uv2 = uv1;
-								uv1 = tempUV;
-
-								var tempLM = lm2;
-								lm2 = lm1;
-								lm1 = tempLM;
-							}
-
-							writer.Write( v0, Grid.SIZE_BASE );
-							writer.Write( uv0 );
-							writer.Write( lm0, Lightmap.SIZE );
-
-							writer.Write( v1, Grid.SIZE_BASE );
-							writer.Write( uv1 );
-							writer.Write( lm1, Lightmap.SIZE );
-
-							writer.Write( v2, Grid.SIZE_BASE );
-							writer.Write( uv2 );
-							writer.Write( lm2, Lightmap.SIZE );
-						}
-					}
-				}
-
-				foreach( var entity in entities )
-				{
-					writer.Write( entity.Position, Grid.SIZE_BASE );
-				}
-
-				writer.Close();
-				stream.Close();
+				ExportLevel( path );
 			}
 		}
 
@@ -594,6 +605,11 @@ namespace Editor
 				else if( e.KeyCode == Keys.E )
 				{
 					Level_Export();
+				}
+				else if( e.KeyCode == Keys.L )
+				{
+					LoadLevel( "./assets/levels/lightmap_test04.xml" );
+					ExportLevel( "./assets/levels/lightmap_test04.lvl" );
 				}
 			}
 		}

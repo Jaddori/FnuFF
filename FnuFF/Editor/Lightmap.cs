@@ -24,6 +24,7 @@ namespace Editor
 		public const int SIZE = 128;
 		public const float LUMEL_SIZE = 16.0f;
 		public const float MAX_LIGHT_DISTANCE = 15.0f;
+		public const float AMBIENT_LIGHT = 0.1f;
 
 		private static List<ThreadData> _threadData = new List<ThreadData>();
 		private static bool _done = false;
@@ -36,7 +37,7 @@ namespace Editor
 			float[,] map = new float[SIZE, SIZE];
 			int[] rover = new int[SIZE];
 
-			const float SKY_LIGHT_INTENSITY = 800.0f;
+			const float SKY_LIGHT_INTENSITY = 1.0f;
 
 			// initialize lumels
 			foreach( var solid in level.Solids )
@@ -66,10 +67,10 @@ namespace Editor
 
 			var startTime = DateTime.Now;
 
-			var allLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" || face.TextureName == "sky" ).SelectMany( x => x.Lumels ) ).ToArray();
+			//var allLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" || face.TextureName == "sky" ).SelectMany( x => x.Lumels ) ).ToArray();
 			var normalLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" ).SelectMany( x => x.Lumels ) ).ToArray();
 
-			const int THREAD_COUNT = 12;
+			const int THREAD_COUNT = 2;
 			//var chunk = level.Solids.Count / THREAD_COUNT;
 			var chunk = normalLumels.Length / THREAD_COUNT;
 			if( chunk < 1 )
@@ -78,7 +79,7 @@ namespace Editor
 			var first = 0;
 
 			_threadData.Clear();
-			var threads = new List<Thread>();
+			/*var threads = new List<Thread>();
 			for( int i = 0; i < THREAD_COUNT; i++ )
 			{
 				var thread = new Thread( new ParameterizedThreadStart( BuildTransfersAsync ) );
@@ -112,7 +113,7 @@ namespace Editor
 				thread.Join();
 
 			foreach( var data in _threadData )
-				data.current = data.last;
+				data.current = data.last;*/
 			
 			//BuildTransfers( level );
 			var endTime = DateTime.Now;
@@ -138,7 +139,7 @@ namespace Editor
 				}
 			}
 
-			const int ITERATIONS = 2;
+			/*const int ITERATIONS = 9;
 			for( int iteration = 0; iteration < ITERATIONS; iteration++ )
 			{
 				foreach( var curSolid in level.Solids )
@@ -269,6 +270,149 @@ namespace Editor
 						}
 					}
 				}
+			}*/
+
+			var allLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" || face.TextureName == "sky" ).SelectMany( face => face.Lumels ) ).ToArray();
+
+			foreach( var l in allLumels )
+			{
+				for( int i = 0; i < level.Solids.Count && !l.Blocked; i++ )
+				{
+					var solid = level.Solids[i];
+					if( l.Parent == solid )
+						continue;
+
+					var behind = true;
+					for( int j = 0; j < solid.Faces.Count && behind; j++ )
+					{
+						if( solid.Faces[j].Plane.InFront( l.Position ) )
+							behind = false;
+					}
+
+					if( behind )
+						l.Blocked = true;
+				}
+
+				l.Incidence = AMBIENT_LIGHT;
+			}
+
+			allLumels = allLumels.Where( lumel => !lumel.Blocked ).ToArray();
+
+			var emissiveLumels = allLumels.Where( x => x.Emission > 0.0f );
+			var dimLumels = allLumels.Where( x => x.Emission <= 0.0f );
+
+			foreach( var a in emissiveLumels )
+			{
+				foreach( var b in dimLumels )
+				{
+					var infront = b.Position.Dot( a.Normal ) > a.Position.Dot( a.Normal );
+					if( infront )
+					{
+						var dir = a.Position - b.Position;
+						var dist = dir.Normalize() / Grid.SIZE_BASE;
+
+						if( dist > MAX_LIGHT_DISTANCE )
+							continue;
+
+						var dot = dir.Dot( b.Normal );
+						if( dot > 0 )
+						{
+							if( Trace( level.Solids, a.Position, b.Position, a.Parent, b.Parent ) )
+							{
+								b.Incidence += a.Emission * (dot*dot)/(dist*dist);
+								b.Excidence = b.Incidence * b.Reflectiveness;
+							}
+						}
+					}
+				}
+			}
+
+			foreach( var solid in level.Solids )
+			{
+				foreach( var curFace in solid.Faces )
+				{
+					if( curFace.PackName == "tools" )
+						continue;
+
+					var mapIndex = faceIndices[curFace];
+					for( int y = 0; y < curFace.LumelHeight; y++ )
+					{
+						for( int x = 0; x < curFace.LumelWidth; x++ )
+						{
+							var lumelIndex = Extensions.IndexFromXY( x, y, curFace.LumelWidth );
+							var lumel = curFace.Lumels[lumelIndex];
+
+							//map[mapIndex.X + x, mapIndex.Y + y] = lumel.Incidence;
+							var value = lumel.Incidence;
+							if( value > SKY_LIGHT_INTENSITY )
+								value = SKY_LIGHT_INTENSITY;
+							else if( value < 0.01f )
+								value = 0.01f;
+							map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = value;
+						}
+					}
+
+					// blur data
+					for( int y = 0; y < curFace.LumelHeight; y++ )
+					{
+						for( int x = 0; x < curFace.LumelWidth; x++ )
+						{
+							var sum = 0.0f;
+							var hits = 0;
+
+							for( int ny = -1; ny <= 1; ny++ )
+							{
+								for( int nx = -1; nx <= 1; nx++ )
+								{
+									if( x + nx < 0 )
+										continue;
+									if( y + ny < 0 )
+										continue;
+									if( x + nx >= curFace.LumelWidth )
+										continue;
+									if( y + ny >= curFace.LumelHeight )
+										continue;
+									if( nx == 0 && ny == 0 )
+										continue;
+
+									var neighbour = map[mapIndex.X + x + nx + 1, mapIndex.Y + y + ny + 1];
+									sum += neighbour;
+									hits++;
+								}
+							}
+
+							if( sum > 0 && hits > 1 )
+							{
+								var average = sum / hits;
+								map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = average;
+							}
+						}
+					}
+
+					// left
+					for( int y = 0; y < curFace.LumelHeight; y++ )
+					{
+						map[mapIndex.X, mapIndex.Y + y + 1] = map[mapIndex.X + 1, mapIndex.Y + y + 1];
+					}
+
+					// right
+					for( int y = 0; y < curFace.LumelHeight; y++ )
+					{
+						map[mapIndex.X + curFace.LumelWidth + 1, mapIndex.Y + y + 1] = map[mapIndex.X + curFace.LumelWidth, mapIndex.Y + y + 1];
+					}
+
+					// top
+					for( int x = 0; x < curFace.LumelWidth + 2; x++ )
+					{
+						map[mapIndex.X + x, mapIndex.Y] = map[mapIndex.X + x, mapIndex.Y + 1];
+					}
+
+					// bottom
+					for( int x = 0; x < curFace.LumelWidth + 2; x++ )
+					{
+						map[mapIndex.X + x, mapIndex.Y + curFace.LumelHeight + 1] = map[mapIndex.X + x, mapIndex.Y + curFace.LumelHeight];
+					}
+				}
 			}
 
 			endTime = DateTime.Now;
@@ -302,7 +446,10 @@ namespace Editor
 
 			_done = true;
 
-			MessageBox.Show( "Transfer time: " + transferTime.ToString() + "s\nRadiance time: " + radianceTime.ToString() + "s\nTexture time: " + textureTime.ToString() + "s" );
+			var traces = level.Solids.Sum( solid => solid.Faces.Sum( face => face.Lumels.Sum( lumel => lumel.Traces ) ) );
+			var averageTraces = traces / level.Solids.Sum( solid => solid.Faces.Sum( face => face.Lumels.Count ) );
+
+			MessageBox.Show( "Transfer time: " + transferTime.ToString() + "s\nRadiance time: " + radianceTime.ToString() + "s\nTexture time: " + textureTime.ToString() + "s\nTraces: " + traces.ToString() + "\nAverage traces: " + averageTraces.ToString() );
 		}
 
 		private static void BuildTransfersAsync( object args )
@@ -313,6 +460,7 @@ namespace Editor
 			for( int i = data.first; i < data.last; i++ )
 			{
 				var a = data.normalLumels[i];
+				a.Traces = 0;
 
 				foreach( var b in data.allLumels )
 				{
@@ -331,6 +479,7 @@ namespace Editor
 					
 					if( a.Normal.Dot( b.Normal ) < 0 )
 					{
+						a.Traces++;
 						if( Trace( data.solids, a.Position, b.Position, a.Parent, b.Parent ) )
 						{
 							a.Transfers.Add( b );
@@ -395,6 +544,7 @@ namespace Editor
 						{
 							var p = ray.Start + ray.Direction * length;
 
+#if true
 							var behindAll = true;
 							foreach( var otherFace in solid.Faces )
 							{
@@ -409,6 +559,13 @@ namespace Editor
 							{
 								return false;
 							}
+#else
+							var x = p.Dot( face.Tangent );
+							var y = p.Dot( face.Bitangent );
+
+							if( x >= 0 && x <= face.Width && y >= 0 && y <= face.Height )
+								return false;
+#endif
 						}
 					}
 				}

@@ -16,12 +16,17 @@ namespace Editor
 		public float Emission;
 		public float Reflectiveness;
 		public GeometrySolid Parent;
+		public int Traces;
+		public bool Blocked;
 
 		public Lumel()
 		{
 			Position = new Triple();
 			Normal = new Triple();
 			Incidence = Excidence = Emission = Reflectiveness = 0.0f;
+
+			Traces = 0;
+			Blocked = false;
 		}
 
 		public Lumel( Triple position, Triple normal, float emission = 0.0f, float reflectiveness = 0.5f  )
@@ -33,6 +38,9 @@ namespace Editor
 			Emission = emission;
 			Reflectiveness = reflectiveness;
 			Incidence = Excidence = 0.0f;
+
+			Traces = 0;
+			Blocked = false;
 		}
 	}
 }

@@ -105,6 +105,12 @@ namespace Editor
 		public List<PointF> LightmapUVs => _lightmapUVs;
 
 		[XmlIgnore]
+		public Triple Tangent => _tangent;
+
+		[XmlIgnore]
+		public Triple Bitangent => _bitangent;
+
+		[XmlIgnore]
 		public float Width => _width;
 
 		[XmlIgnore]

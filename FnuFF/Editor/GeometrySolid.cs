@@ -348,7 +348,8 @@ namespace Editor
 					face.Plane.Normal.Dot( new Triple( 0, 1, 0 ) ) < 0 ||
 					face.Plane.Normal.Dot( new Triple( 0, 0, 1 ) ) < 0 )
 				{
-					shade = 0.75f;
+					if( EditorTool.CurrentLightmapID <= 0 || face.LightmapUVs.Count <= 0 )
+						shade = 0.75f;
 				}
 
 				if( string.IsNullOrEmpty( face.TextureName ) )
@@ -430,13 +431,15 @@ namespace Editor
 				{
 					GL.SetTexture( 0 );
 					GL.BeginLines();
-					GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
-
+					
 					foreach( var lumel in face.Lumels )
 					{
 						var p0 = lumel.Position / Grid.SIZE_BASE;
 						var p1 = p0 + face.Plane.Normal * 0.1f;
 
+						GL.Color4f( 0.0f, 1.0f, 0.0f, 1.0f );
+						if( lumel.Blocked )
+							GL.Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
 						GL.Vertex3f( p0.X, p0.Y, p0.Z );
 						GL.Vertex3f( p1.X, p1.Y, p1.Z );
 					}
