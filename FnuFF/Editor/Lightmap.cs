@@ -26,7 +26,7 @@ namespace Editor
 		public const float LUMEL_SIZE = 16.0f;
 		public const float MAX_LIGHT_DISTANCE = 15.0f;
 		//public const float AMBIENT_LIGHT = 0.1f;
-		public static Triple AMBIENT_LIGHT = new Triple( 0.1f );
+		public static Triple AMBIENT_LIGHT = new Triple( 0.05f );
 
 		private static List<ThreadData> _threadData = new List<ThreadData>();
 		private static bool _done = false;
@@ -367,7 +367,8 @@ namespace Editor
 							var lumel = curFace.Lumels[lumelIndex];
 
 							var value = lumel.Incidence;
-							value.Normalize();
+							if( value.Length() > 1.0f )
+								value.Normalize();
 
 							map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = value;
 						}
@@ -460,8 +461,14 @@ namespace Editor
 					_pixels[index + 2] = r;*/
 
 					var color = map[x, y];
-					color.Normalize();
+					//color.Normalize();
 					color *= 255.0f;
+					if( color.X > 255.0f )
+						color.X = 255.0f;
+					if( color.Y > 255.0f )
+						color.Y = 255.0f;
+					if( color.Z > 255.0f )
+						color.Z = 255.0f;
 
 					var r = (byte)color.X;
 					var g = (byte)color.Y;

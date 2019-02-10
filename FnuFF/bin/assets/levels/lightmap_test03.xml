@@ -1384,7 +1384,7 @@
 			<Active>true</Active>
 			<Data xsi:type="PointLight">
 				<Name />
-				<Color />
+				<Color>-65536</Color>
 				<Intensity>0.6</Intensity>
 			</Data>
 		</Entity>
@@ -1397,7 +1397,7 @@
 			<Active>true</Active>
 			<Data xsi:type="PointLight">
 				<Name />
-				<Color />
+				<Color>-16711936</Color>
 				<Intensity>0.4</Intensity>
 			</Data>
 		</Entity>

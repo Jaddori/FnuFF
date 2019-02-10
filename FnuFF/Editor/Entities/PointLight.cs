@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace Editor.Entities
 {
@@ -16,7 +18,17 @@ namespace Editor.Entities
 		private Color _color;
 		private float _intensity;
 
+		[XmlIgnore]
 		public Color Color { get { return _color; } set { _color = value; } }
+
+		[XmlElement( "Color" )]
+		[Browsable(false)]
+		public int XmlColor
+		{
+			get { return _color.ToArgb(); }
+			set { _color = Color.FromArgb( value ); }
+		}
+
 		public float Intensity { get { return _intensity; } set { _intensity = value; } }
 
 		public PointLight()
