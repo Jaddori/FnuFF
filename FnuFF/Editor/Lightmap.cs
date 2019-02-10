@@ -16,7 +16,6 @@ namespace Editor
 		private class ThreadData
 		{
 			public int first, last, current;
-			//public List<GeometrySolid> solids;
 			public Lumel[] allLumels;
 			public Lumel[] normalLumels;
 			public List<GeometrySolid> solids;
@@ -25,8 +24,8 @@ namespace Editor
 		public const int SIZE = 128;
 		public const float LUMEL_SIZE = 16.0f;
 		public const float MAX_LIGHT_DISTANCE = 15.0f;
-		//public const float AMBIENT_LIGHT = 0.1f;
-		public static Triple AMBIENT_LIGHT = new Triple( 0.05f );
+		public static Triple DEFAULT_AMBIENT_LIGHT = new Triple( 0.05f );
+		public static Triple DEFAULT_SKY_LIGHT = new Triple( 1.0f );
 
 		private static List<ThreadData> _threadData = new List<ThreadData>();
 		private static bool _done = false;
@@ -39,7 +38,19 @@ namespace Editor
 			Triple[,] map = new Triple[SIZE, SIZE];
 			int[] rover = new int[SIZE];
 
-			const float SKY_LIGHT_INTENSITY = 1.0f;
+			var ambientLight = DEFAULT_AMBIENT_LIGHT;
+			var skyLight = DEFAULT_SKY_LIGHT;
+
+			var worldLightEntity = level.Entities.FirstOrDefault( x => x.Data.GetType() == typeof( WorldLight ) );
+			if( worldLightEntity != null )
+			{
+				var data = worldLightEntity.Data as WorldLight;
+				ambientLight = new Triple( data.AmbientColor.R, data.AmbientColor.G, data.AmbientColor.B ) * data.AmbientIntensity;
+				skyLight = new Triple( data.SkyColor.R, data.SkyColor.G, data.SkyColor.B ) * data.SkyIntensity;
+
+				ambientLight /= 255.0f;
+				skyLight /= 255.0f;
+			}
 
 			// initialize lumels
 			foreach( var solid in level.Solids )
@@ -52,8 +63,8 @@ namespace Editor
 					{
 						foreach( var lumel in face.Lumels )
 						{
-							//lumel.Emission = SKY_LIGHT_INTENSITY;
-							lumel.Emission = new Triple( SKY_LIGHT_INTENSITY );
+							//lumel.Emission = new Triple( SKY_LIGHT_INTENSITY );
+							lumel.Emission = skyLight;
 						}
 					}
 					else
@@ -67,12 +78,10 @@ namespace Editor
 			}
 
 			var startTime = DateTime.Now;
-
-			//var allLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" || face.TextureName == "sky" ).SelectMany( x => x.Lumels ) ).ToArray();
+			
 			var normalLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" ).SelectMany( x => x.Lumels ) ).ToArray();
 
 			const int THREAD_COUNT = 2;
-			//var chunk = level.Solids.Count / THREAD_COUNT;
 			var chunk = normalLumels.Length / THREAD_COUNT;
 			if( chunk < 1 )
 				chunk = 1;
@@ -80,43 +89,6 @@ namespace Editor
 			var first = 0;
 
 			_threadData.Clear();
-			/*var threads = new List<Thread>();
-			for( int i = 0; i < THREAD_COUNT; i++ )
-			{
-				var thread = new Thread( new ParameterizedThreadStart( BuildTransfersAsync ) );
-
-				var last = first + chunk;
-				if( i >= THREAD_COUNT-1 )
-					last = normalLumels.Length;
-
-				//var data = new ThreadData() { first = first, last = last, solids = level.Solids };
-				var data = new ThreadData()
-				{
-					first = first,
-					last = last,
-					current = first,
-					allLumels = allLumels,
-					normalLumels = normalLumels,
-					solids = level.Solids
-				};
-				thread.Start( data );
-
-				threads.Add( thread );
-				_threadData.Add( data );
-
-				first += chunk;
-
-				if( last >= normalLumels.Length )
-					break;
-			}
-
-			foreach( var thread in threads )
-				thread.Join();
-
-			foreach( var data in _threadData )
-				data.current = data.last;*/
-			
-			//BuildTransfers( level );
 			var endTime = DateTime.Now;
 
 			var transferTime = ( endTime - startTime ).TotalSeconds;
@@ -140,139 +112,6 @@ namespace Editor
 				}
 			}
 
-			/*const int ITERATIONS = 9;
-			for( int iteration = 0; iteration < ITERATIONS; iteration++ )
-			{
-				foreach( var curSolid in level.Solids )
-				{
-					foreach( var curFace in curSolid.Faces )
-					{
-						if( curFace.PackName != "tools" )
-						{
-							foreach( var a in curFace.Lumels )
-							{
-								var incidence = 0.0f;
-								var hits = 0;
-
-								foreach( var b in a.Transfers )
-								{
-									var dir = b.Position - a.Position;
-									var len = dir.Normalize() / Grid.SIZE_BASE;
-
-									incidence += ( curFace.Plane.Normal.Dot( dir ) * b.Excidence ) / len;
-									hits++;
-								}
-
-								incidence /= hits;
-								if( incidence > SKY_LIGHT_INTENSITY )
-									incidence = SKY_LIGHT_INTENSITY;
-
-								a.Incidence = incidence;
-							}
-
-							if( iteration >= ITERATIONS - 1 )
-							{
-								var mapIndex = faceIndices[curFace];
-								for( int y = 0; y < curFace.LumelHeight; y++ )
-								{
-									for( int x = 0; x < curFace.LumelWidth; x++ )
-									{
-										var lumelIndex = Extensions.IndexFromXY( x, y, curFace.LumelWidth );
-										var lumel = curFace.Lumels[lumelIndex];
-
-										//map[mapIndex.X + x, mapIndex.Y + y] = lumel.Incidence;
-										var value = lumel.Incidence;
-										if( value > SKY_LIGHT_INTENSITY )
-											value = SKY_LIGHT_INTENSITY;
-										else if( value < 0.01f )
-											value = 0.01f;
-										map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = value;
-									}
-								}
-
-								// blur data
-								for( int y = 0; y < curFace.LumelHeight; y++ )
-								{
-									for( int x = 0; x < curFace.LumelWidth; x++ )
-									{
-										var sum = 0.0f;
-										var hits = 0;
-
-										for( int ny = -1; ny <= 1; ny++ )
-										{
-											for( int nx = -1; nx <= 1; nx++ )
-											{
-												if( x + nx < 0 )
-													continue;
-												if( y + ny < 0 )
-													continue;
-												if( x + nx >= curFace.LumelWidth )
-													continue;
-												if( y + ny >= curFace.LumelHeight )
-													continue;
-												if( nx == 0 && ny == 0 )
-													continue;
-
-												var neighbour = map[mapIndex.X + x + nx + 1, mapIndex.Y + y + ny + 1];
-												sum += neighbour;
-												hits++;
-											}
-										}
-
-										if( sum > 0 && hits > 1 )
-										{
-											var average = sum / hits;
-											map[mapIndex.X + x + 1, mapIndex.Y + y + 1] = average;
-										}
-									}
-								}
-
-								// left
-								for( int y = 0; y < curFace.LumelHeight; y++ )
-								{
-									map[mapIndex.X, mapIndex.Y + y + 1] = map[mapIndex.X + 1, mapIndex.Y + y + 1];
-								}
-
-								// right
-								for( int y = 0; y < curFace.LumelHeight; y++ )
-								{
-									map[mapIndex.X + curFace.LumelWidth + 1, mapIndex.Y+y+1] = map[mapIndex.X + curFace.LumelWidth, mapIndex.Y+y + 1];
-								}
-
-								// top
-								for( int x = 0; x < curFace.LumelWidth+2; x++ )
-								{
-									map[mapIndex.X + x, mapIndex.Y] = map[mapIndex.X + x, mapIndex.Y + 1];
-								}
-
-								// bottom
-								for( int x = 0; x < curFace.LumelWidth + 2; x++ )
-								{
-									map[mapIndex.X + x, mapIndex.Y + curFace.LumelHeight + 1] = map[mapIndex.X + x, mapIndex.Y + curFace.LumelHeight];
-								}
-							}
-						}
-					}
-				}
-
-				foreach( var solid in level.Solids )
-				{
-					foreach( var face in solid.Faces )
-					{
-						foreach( var lumel in face.Lumels )
-						{
-							var I = lumel.Incidence;
-							var R = lumel.Reflectiveness;
-							var E = lumel.Emission;
-
-							lumel.Excidence = ( I * R ) + E;
-							if( lumel.Excidence > SKY_LIGHT_INTENSITY )
-								lumel.Excidence = SKY_LIGHT_INTENSITY;
-						}
-					}
-				}
-			}*/
-
 			var allLumels = level.Solids.SelectMany( solid => solid.Faces.Where( face => face.PackName != "tools" || face.TextureName == "sky" ).SelectMany( face => face.Lumels ) ).ToArray();
 
 			foreach( var l in allLumels )
@@ -294,7 +133,7 @@ namespace Editor
 						l.Blocked = true;
 				}
 
-				l.Incidence = AMBIENT_LIGHT;
+				l.Incidence = ambientLight;
 			}
 
 			allLumels = allLumels.Where( lumel => !lumel.Blocked ).ToArray();
@@ -448,20 +287,7 @@ namespace Editor
 			{
 				for( int x = 0; x < SIZE; x++ )
 				{
-					/*var rad = map[x, y] * 255.0f;
-					if( rad > 255.0f )
-						rad = 255.0f;
-
-					byte r = (byte)rad;
-
-					var index = ( ( SIZE - 1 - y ) * SIZE + x ) * 3;
-
-					_pixels[index] = r;
-					_pixels[index + 1] = r;
-					_pixels[index + 2] = r;*/
-
 					var color = map[x, y];
-					//color.Normalize();
 					color *= 255.0f;
 					if( color.X > 255.0f )
 						color.X = 255.0f;
@@ -476,9 +302,9 @@ namespace Editor
 
 					var index = ( ( SIZE - 1 - y ) * SIZE + x ) * 3;
 
-					_pixels[index] = r;
+					_pixels[index] = b;
 					_pixels[index + 1] = g;
-					_pixels[index + 2] = b;
+					_pixels[index + 2] = r;
 				}
 			}
 

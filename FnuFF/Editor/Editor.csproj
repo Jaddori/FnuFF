@@ -82,6 +82,7 @@
     <Compile Include="Entities\EntityData.cs" />
     <Compile Include="Entities\PlayerSpawn.cs" />
     <Compile Include="Entities\PointLight.cs" />
+    <Compile Include="Entities\WorldLight.cs" />
     <Compile Include="EntityTabContentControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -10,6 +10,7 @@ namespace Editor.Entities
 {
 	[XmlInclude( typeof( PlayerSpawn ) )]
 	[XmlInclude( typeof( PointLight) )]
+	[XmlInclude( typeof( WorldLight ) )]
 	public class EntityData
 	{
 		private static Image _icon = Properties.Resources.icon_entity;

@@ -107,12 +107,14 @@ namespace Editor.Entities
 		{
 			"Player Spawn",
 			"Point Light",
+			"World Light",
 		};
 
 		public static Type[] Types =
 		{
 			typeof(PlayerSpawn),
 			typeof(PointLight),
+			typeof(WorldLight),
 		};
 
 		public static EntityData CreateData( int index )
