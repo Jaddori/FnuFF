@@ -611,6 +611,46 @@ namespace Editor
 					LoadLevel( "./assets/levels/lightmap_test04.xml" );
 					ExportLevel( "./assets/levels/lightmap_test04.lvl" );
 				}
+				// command stack manipulation
+				else if( e.KeyCode == Keys.Z )
+				{
+					_commandStack.Undo();
+					ViewGlobalInvalidation();
+				}
+				else if( e.KeyCode == Keys.Y )
+				{
+					_commandStack.Redo();
+					ViewGlobalInvalidation();
+				}
+			}
+
+			if( e.KeyCode == Keys.Delete )
+			{
+				var selectedSolid = EditorTool.SelectedSolid;
+				var selectedEntity = EditorTool.SelectedEntity;
+
+				if( selectedSolid != null )
+				{
+					_level.RemoveSolid( selectedSolid );
+
+					var deleteCommand = new CommandSolidCreated( _level.Solids, selectedSolid, true );
+					_commandStack.Do( deleteCommand );
+
+					EditorTool.SelectedSolid = null;
+
+					ViewGlobalInvalidation();
+				}
+				else if( selectedEntity != null )
+				{
+					_level.RemoveEntity( selectedEntity );
+
+					var deleteCommand = new CommandEntityCreated( _level.Entities, selectedEntity, true );
+					_commandStack.Do( deleteCommand );
+
+					EditorTool.SelectedEntity = null;
+
+					ViewGlobalInvalidation();
+				}
 			}
 		}
 	}

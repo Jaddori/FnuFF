@@ -1124,23 +1124,6 @@ namespace Editor
 				OnGlobalInvalidation?.Invoke();
 			}
 
-			// command stack manipulation
-			if( e.Control )
-			{
-				if( e.KeyCode == Keys.Z )
-				{
-					_commandStack.Undo();
-					Invalidate();
-					OnGlobalInvalidation?.Invoke();
-				}
-				else if( e.KeyCode == Keys.Y )
-				{
-					_commandStack.Redo();
-					Invalidate();
-					OnGlobalInvalidation?.Invoke();
-				}
-			}
-
 			// clipping
 			if( e.KeyCode == Keys.Enter )
 			{
@@ -1187,32 +1170,6 @@ namespace Editor
 				_spaceDown = false;
 			else if( e.KeyCode == Keys.ShiftKey )
 				_shiftDown = false;
-
-			// solid manipulation
-			if( e.KeyCode == Keys.Delete )
-			{
-				var selectedSolid = EditorTool.SelectedSolid;
-				var selectedEntity = EditorTool.SelectedEntity;
-
-				if( selectedSolid != null )
-				{
-					_level.RemoveSolid( selectedSolid );
-
-					var deleteCommand = new CommandSolidCreated( _level.Solids, selectedSolid, true );
-					_commandStack.Do( deleteCommand );
-
-					EditorTool.SelectedSolid = null;
-				}
-				else if( selectedEntity != null )
-				{
-					_level.RemoveEntity( selectedEntity );
-
-					var deleteCommand = new CommandEntityCreated( _level.Entities, selectedEntity, true );
-					_commandStack.Do( deleteCommand );
-
-					EditorTool.SelectedEntity = null;
-				}
-			}
         }
     }
 }
