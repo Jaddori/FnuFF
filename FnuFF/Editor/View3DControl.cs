@@ -254,7 +254,7 @@ namespace Editor
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					GeometrySolid hitSolid;
+					Solid hitSolid;
 					Face hitFace;
 
 					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
@@ -269,7 +269,7 @@ namespace Editor
 			{
 				if( e.Button == MouseButtons.Left )
 				{
-					GeometrySolid hitSolid;
+					Solid hitSolid;
 					Face hitFace;
 
 					IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
@@ -277,7 +277,7 @@ namespace Editor
 				}
 				else if( e.Button == MouseButtons.Right )
 				{
-					GeometrySolid hitSolid;
+					Solid hitSolid;
 					Face hitFace;
 
 					if( IntersectFace( e.X, e.Y, out hitSolid, out hitFace ) )
@@ -336,7 +336,7 @@ namespace Editor
 
 			if( EditorTool.Current == EditorTools.Select )
 			{
-				GeometrySolid hitSolid;
+				Solid hitSolid;
 				Face hitFace;
 
 				IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
@@ -344,7 +344,7 @@ namespace Editor
 			}
 			else if( EditorTool.Current == EditorTools.Face )
 			{
-				GeometrySolid hitSolid;
+				Solid hitSolid;
 				Face hitFace;
 
 				IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
@@ -391,7 +391,7 @@ namespace Editor
 			base.OnKeyUp( e );
 		}
 
-		private bool IntersectFace( int x, int y, out GeometrySolid hitSolid, out Face hitFace )
+		private bool IntersectFace( int x, int y, out Solid hitSolid, out Face hitFace )
 		{
 			var result = false;
 

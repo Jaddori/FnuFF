@@ -16,25 +16,25 @@ namespace Editor
 		public event ChangeHandler OnSolidChange;
 		public event ChangeHandler OnEntityChange;
 
-		private List<GeometrySolid> _solids;
+		private List<Solid> _solids;
 		private List<Entity> _entities;
 
-		public List<GeometrySolid> Solids => _solids;
+		public List<Solid> Solids => _solids;
 		public List<Entity> Entities => _entities;
 
 		public Level()
 		{
-			_solids = new List<GeometrySolid>();
+			_solids = new List<Solid>();
 			_entities = new List<Entity>();
 		}
 
-		public void AddSolid( GeometrySolid solid )
+		public void AddSolid( Solid solid )
 		{
 			_solids.Add( solid );
 			OnSolidChange?.Invoke();
 		}
 
-		public void RemoveSolid( GeometrySolid solid )
+		public void RemoveSolid( Solid solid )
 		{
 			_solids.Remove( solid );
 			OnSolidChange?.Invoke();

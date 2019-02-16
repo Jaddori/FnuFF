@@ -17,7 +17,7 @@ namespace Editor
 		public Triple Incidence;
 		public Triple Emission;
 		public float Reflectiveness;
-		public GeometrySolid Parent;
+		public Solid Parent;
 		public int Traces;
 		public bool Blocked;
 

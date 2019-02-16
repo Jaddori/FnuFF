@@ -120,7 +120,7 @@ namespace Editor
 
 				if( _directionType == 0 )
 				{
-					var solid = new GeometrySolid();
+					var solid = new Solid();
 					// TRIANGLE
 					/*solid.Faces.AddRange
 					(
@@ -319,8 +319,8 @@ namespace Editor
 				var topTextSize = g.MeasureString( topText, EditorColors.SOLID_DIMENSIONS_FONT );
 
 				var center = solidRect.GetCenter();
-				var leftPosition = new PointF( solidRect.Left - leftTextSize.Width - GeometrySolid.DIMENSION_TEXT_OFFSET, center.Y - leftTextSize.Height/2 );
-				var topPosition = new PointF( center.X - topTextSize.Width / 2, solidRect.Top - topTextSize.Height - GeometrySolid.DIMENSION_TEXT_OFFSET );
+				var leftPosition = new PointF( solidRect.Left - leftTextSize.Width - Solid.DIMENSION_TEXT_OFFSET, center.Y - leftTextSize.Height/2 );
+				var topPosition = new PointF( center.X - topTextSize.Width / 2, solidRect.Top - topTextSize.Height - Solid.DIMENSION_TEXT_OFFSET );
 
 				g.DrawString( leftText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, leftPosition );
 				g.DrawString( topText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, topPosition );
@@ -592,7 +592,7 @@ namespace Editor
 						maxTriple /= Grid.Gap;
 						maxTriple *= Grid.Size;
 
-						var solid = new GeometrySolid( minTriple, maxTriple );
+						var solid = new Solid( minTriple, maxTriple );
 						_level.AddSolid( solid );
 
 						// add command to stack
@@ -894,7 +894,7 @@ namespace Editor
 					var mpos = new Triple( e.X, e.Y, 0 );
 
 					var minDepth = 99999.0f;
-					GeometrySolid minSolid = null;
+					Solid minSolid = null;
 					foreach( var solid in _level.Solids )
 					{
 						var faces = solid.Faces.Where( x => x.Plane.Normal.Dot( _camera.Direction ) > 0 ).ToArray();

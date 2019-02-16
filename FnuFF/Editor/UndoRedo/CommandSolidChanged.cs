@@ -8,7 +8,7 @@ namespace Editor.UndoRedo
 {
 	public class CommandSolidChanged : ICommand
 	{
-		private GeometrySolid _solid;
+		private Solid _solid;
 		private List<Face> _oldFaces;
 		private List<Face> _newFaces;
 		private bool _hasChanges;
@@ -19,7 +19,7 @@ namespace Editor.UndoRedo
 		{
 		}
 
-		public CommandSolidChanged(GeometrySolid solid)
+		public CommandSolidChanged(Solid solid)
 		{
 			_solid = solid;
 			_oldFaces = new List<Face>();

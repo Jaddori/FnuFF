@@ -13,7 +13,7 @@ using Editor.UndoRedo;
 
 namespace Editor
 {
-	public class GeometrySolid
+	public class Solid
 	{
 		private const float CLIP_MARGIN = 0.01f;
 		public const int DIMENSION_TEXT_OFFSET = 12;
@@ -38,7 +38,7 @@ namespace Editor
 
 		public List<Face> Faces => _faces;
 
-		public GeometrySolid()
+		public Solid()
 		{
 			_hovered = _selected = false;
 			_faces = new List<Face>();
@@ -46,7 +46,7 @@ namespace Editor
 			GenerateColor();
 		}
 
-		public GeometrySolid( Triple min, Triple max )
+		public Solid( Triple min, Triple max )
 		{
 			_hovered = _selected = false;
 			_faces = new List<Face>();
@@ -471,9 +471,9 @@ namespace Editor
 			GL.SetTexture( 0 );
 		}
 
-		public GeometrySolid Copy()
+		public Solid Copy()
 		{
-			var result = new GeometrySolid();
+			var result = new Solid();
 
 			foreach( var face in _faces )
 				result.Faces.Add( face.Copy() );

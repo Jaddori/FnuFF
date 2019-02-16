@@ -195,7 +195,7 @@ namespace Editor
 			return result;
 		}
 
-		public void BuildVertices( GeometrySolid parent )
+		public void BuildVertices( Solid parent )
 		{
 			_vertices.Clear();
 
@@ -248,7 +248,7 @@ namespace Editor
 			_plane.D = d;
 		}
 
-		public void BuildLumels( GeometrySolid parent )
+		public void BuildLumels( Solid parent )
 		{
 			_lumels.Clear();
 

@@ -18,7 +18,7 @@ namespace Editor
 			public int first, last, current;
 			public Lumel[] allLumels;
 			public Lumel[] normalLumels;
-			public List<GeometrySolid> solids;
+			public List<Solid> solids;
 		}
 
 		public const int SIZE = 128;
@@ -394,7 +394,7 @@ namespace Editor
 			return true;
 		}
 		
-		private static bool Trace( List<GeometrySolid> solids, Triple start, Triple end, params GeometrySolid[] ignoreSolids )
+		private static bool Trace( List<Solid> solids, Triple start, Triple end, params Solid[] ignoreSolids )
 		{
 			var ray = Ray.FromPoints( start, end );
 

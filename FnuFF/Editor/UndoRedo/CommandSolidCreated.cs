@@ -8,11 +8,11 @@ namespace Editor.UndoRedo
 {
 	public class CommandSolidCreated : ICommand
 	{
-		private IList<GeometrySolid> _container;
-		private GeometrySolid _solid;
+		private IList<Solid> _container;
+		private Solid _solid;
 		private bool _inverted;
 
-		public CommandSolidCreated( IList<GeometrySolid> container, GeometrySolid solid, bool inverted = false )
+		public CommandSolidCreated( IList<Solid> container, Solid solid, bool inverted = false )
 		{
 			_container = container;
 			_solid = solid;

@@ -106,7 +106,7 @@
     <Compile Include="FlatToggleButtonControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GeometrySolid.cs" />
+    <Compile Include="Solid.cs" />
     <Compile Include="GL\GL.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="Level.cs" />

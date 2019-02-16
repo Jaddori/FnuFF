@@ -8,13 +8,13 @@ namespace Editor.UnitTests
 	public class GeometrySolidTests
 	{
 		private Camera2D _camera;
-		private GeometrySolid _sut;
+		private Solid _sut;
 
 		[TestInitialize]
 		public void Initialize()
 		{
 			_camera = new Camera2D();
-			_sut = new GeometrySolid( new Triple( 1, 2, 3 ), new Triple( 2, 4, 6 ) );
+			_sut = new Solid( new Triple( 1, 2, 3 ), new Triple( 2, 4, 6 ) );
 		}
 
 		[TestCleanup]

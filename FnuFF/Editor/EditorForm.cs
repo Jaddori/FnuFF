@@ -37,7 +37,7 @@ namespace Editor
 		private void Form1_Load( object sender, EventArgs e )
 		{
 			_commandStack = new CommandStack();
-			GeometrySolid.CommandStack = _commandStack;
+			Solid.CommandStack = _commandStack;
 
 			_commandStack.OnDo += ( command ) => UpdateTitle();
 			_commandStack.OnUndo += ( command ) => UpdateTitle();
@@ -187,7 +187,7 @@ namespace Editor
 			view_bottomRight.Invalidate();
 		}
 
-		private void OnFaceSelected( GeometrySolid solid, Face face )
+		private void OnFaceSelected( Solid solid, Face face )
 		{
 			if( _solidChangedCommand != null )
 			{

@@ -16,8 +16,8 @@ namespace Editor
 
 		public static event ChangeHandler<EditorTools> OnEditorToolChanged;
 
-		public static event ChangeHandler<GeometrySolid> OnHoveredSolidChanged;
-		public static event ChangeHandler<GeometrySolid> OnSelectedSolidChanged;
+		public static event ChangeHandler<Solid> OnHoveredSolidChanged;
+		public static event ChangeHandler<Solid> OnSelectedSolidChanged;
 
 		public static event ChangeHandler<Face> OnHoveredFaceChanged;
 		public static event ChangeHandler<Face> OnSelectedFaceChanged;
@@ -25,8 +25,8 @@ namespace Editor
 		public static event ChangeHandler<Entity> OnSelectedEntityChanged;
 
 		private static EditorTools _current;
-		private static GeometrySolid _hoveredSolid;
-		private static GeometrySolid _selectedSolid;
+		private static Solid _hoveredSolid;
+		private static Solid _selectedSolid;
 		private static Face _hoveredFace;
 		private static Face _selectedFace;
 		private static Entity _selectedEntity;
@@ -42,7 +42,7 @@ namespace Editor
 			}
 		}
 
-		public static GeometrySolid HoveredSolid
+		public static Solid HoveredSolid
 		{
 			get { return _hoveredSolid; }
 			set
@@ -64,7 +64,7 @@ namespace Editor
 			}
 		}
 
-		public static GeometrySolid SelectedSolid
+		public static Solid SelectedSolid
 		{
 			get { return _selectedSolid; }
 			set
