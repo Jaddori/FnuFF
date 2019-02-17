@@ -73,7 +73,7 @@ namespace Editor
 		private bool _movingSelection;
 		private bool _duplactingSelection;
 		private bool _movingVertex;
-		private List<Tuple<int, int>> _selectedVertices;
+		private List<Tuple<int, int, int>> _selectedVertices;
 
 		private Level _level;
 		private Level.ChangeHandler _invalidateAction;
@@ -207,7 +207,7 @@ namespace Editor
 			_movingSelection = false;
 			_duplactingSelection = false;
 			_movingVertex = false;
-			_selectedVertices = new List<Tuple<int, int>>();
+			_selectedVertices = new List<Tuple<int, int, int>>();
 
 			_commandSolidsChanged = new List<CommandSolidChanged>();
 			_commandEntitiesChanged = new List<CommandEntityChanged>();
@@ -603,8 +603,9 @@ namespace Editor
 					var selectedSolids = EditorTool.SelectedSolids;
 					if( !selectedSolids.Empty() )
 					{
-						foreach( var solid in selectedSolids )
+						for( int curSolid = 0; curSolid < selectedSolids.Count; curSolid++ )
 						{
+							var solid = selectedSolids[curSolid];
 							for( int curFace = 0; curFace < solid.Faces.Count; curFace++ )
 							{
 								var face = solid.Faces[curFace];
@@ -615,12 +616,13 @@ namespace Editor
 									var bounds = Extensions.FromPoint( projectedVertices[curVertex], 8 );
 
 									if( bounds.Contains( e.Location ) )
-										_selectedVertices.Add( new Tuple<int, int>( curFace, curVertex ) );
+										_selectedVertices.Add( new Tuple<int, int, int>( curSolid, curFace, curVertex ) );
 								}
 							}
 
-							_movingVertex = ( _selectedVertices.Count > 0 );
 						}
+
+						_movingVertex = ( _selectedVertices.Count > 0 );
 					}
 				}
 			}
@@ -1048,40 +1050,43 @@ namespace Editor
 				var localSnap = SnapToGrid( e.Location );
 				_hoverPosition = localSnap;
 
-				// TODO: Fix for multiple selected solids
-				//var movedVertices = true;
-				//var selectedSolid = EditorTool.SelectedSolid;
-				//foreach( var pair in _selectedVertices )
-				//{
-				//	var face = pair.Item1;
-				//	var vertex = pair.Item2;
-				//
-				//	var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( Grid.Gap ).Inflate( Grid.Size ), selectedSolid.Faces//[face].Vertices[vertex].Dot( _camera.Direction ) );
-				//
-				//	if( globalSnap != selectedSolid.Faces[face].Vertices[vertex] )
-				//	{
-				//		selectedSolid.Faces[face].Vertices[vertex] = globalSnap;
-				//	}
-				//	else
-				//	{
-				//		movedVertices = false;
-				//		break; // if one of the vertices didn't move, then none of them did
-				//	}
-				//}
-				//
-				//if( movedVertices )
-				//{
-				//	foreach( var face in selectedSolid.Faces )
-				//	{
-				//		face.BuildPlane();
-				//
-				//		if( !EditorFlags.TextureLock )
-				//			face.UpdateUVs();
-				//	}
-				//
-				//	Invalidate();
-				//	OnGlobalInvalidation?.Invoke();
-				//}
+				var movedVertices = true;
+				var selectedSolids = EditorTool.SelectedSolids;
+				foreach( var pair in _selectedVertices )
+				{
+					var solid = pair.Item1;
+					var face = pair.Item2;
+					var vertex = pair.Item3;
+
+					var globalSnap = _camera.Unproject( _camera.ToGlobal( localSnap ).Deflate( Grid.Gap ).Inflate( Grid.Size ), selectedSolids[solid].Faces[face].Vertices[vertex].Dot( _camera.Direction ) );
+
+					if( globalSnap != selectedSolids[solid].Faces[face].Vertices[vertex] )
+					{
+						selectedSolids[solid].Faces[face].Vertices[vertex] = globalSnap;
+					}
+					else
+					{
+						movedVertices = false;
+						break;
+					}
+				}
+
+				if( movedVertices )
+				{
+					foreach( var solid in selectedSolids )
+					{
+						foreach( var face in solid.Faces )
+						{
+							face.BuildPlane();
+
+							if( !EditorFlags.TextureLock )
+								face.UpdateUVs();
+						}
+					}
+
+					Invalidate();
+					OnGlobalInvalidation?.Invoke();
+				}
 			}
 			else if( _spaceDown || _mmbDown )
 			{
