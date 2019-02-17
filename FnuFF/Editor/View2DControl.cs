@@ -302,6 +302,8 @@ namespace Editor
 			}
 
 			// paint selection bounds
+			var selectionMinPoint = new PointF( 9999.0f, 9999.0f );
+			var selectionMaxPoint = new PointF( -9999.0f, -9999.0f );
 			var facePoints = new List<PointF>();
 			var selectedSolids = EditorTool.SelectedSolids;
 			if( !selectedSolids.Empty() )
@@ -312,6 +314,18 @@ namespace Editor
 					var projectedPoints = face.Vertices.Select( x => _camera.ToLocal( _camera.Project( x ).Inflate( Grid.Gap ).Deflate( Grid.Size ) ) ).Distinct().ToArray();
 
 					facePoints.AddRange( projectedPoints );
+
+					foreach( var p in face.Vertices.Select( x => _camera.Project( x ) ) )
+					{
+						if( p.X < selectionMinPoint.X )
+							selectionMinPoint.X = p.X;
+						if( p.Y < selectionMinPoint.Y )
+							selectionMinPoint.Y = p.Y;
+						if( p.X > selectionMaxPoint.X )
+							selectionMaxPoint.X = p.X;
+						if( p.Y > selectionMaxPoint.Y )
+							selectionMaxPoint.Y = p.Y;
+					}
 				}
 			}
 
@@ -324,6 +338,18 @@ namespace Editor
 					var corners = center.GetCorners( Entity.ICON_SIZE );
 
 					facePoints.AddRange( corners );
+
+					foreach( var p in _camera.Project( entity.Position ).GetCorners( Entity.ICON_SIZE ) )
+					{
+						if( p.X < selectionMinPoint.X )
+							selectionMinPoint.X = p.X;
+						if( p.Y < selectionMinPoint.Y )
+							selectionMinPoint.Y = p.Y;
+						if( p.X > selectionMaxPoint.X )
+							selectionMaxPoint.X = p.X;
+						if( p.Y > selectionMaxPoint.Y )
+							selectionMaxPoint.Y = p.Y;
+					}
 				}
 			}
 
@@ -347,9 +373,10 @@ namespace Editor
 				}
 
 				// draw dimensions text
+				var size = new PointF( selectionMaxPoint.X - selectionMinPoint.X, selectionMaxPoint.Y - selectionMinPoint.Y );
 				var numberFormat = new NumberFormatInfo() { NumberDecimalSeparator = "." };
-				var leftText = bounds.Width.ToString( "0.0", numberFormat );
-				var topText = bounds.Height.ToString( "0.0", numberFormat );
+				var leftText = size.X.ToString( "0.0", numberFormat );
+				var topText = size.Y.ToString( "0.0", numberFormat );
 
 				var leftTextSize = g.MeasureString( leftText, EditorColors.SOLID_DIMENSIONS_FONT );
 				var topTextSize = g.MeasureString( topText, EditorColors.SOLID_DIMENSIONS_FONT );
@@ -969,30 +996,6 @@ namespace Editor
 
 						if( !unprojectedDif.IsEmpty )
 						{
-							// TODO: Fix for multiple selected solids
-							/*var selectedSolid = EditorTool.SelectedSolid;
-							var affectedFaces = selectedSolid.Faces.Where( x => x.Plane.Normal.Dot( unprojectedDirection ) > 0.0f ).ToArray();
-
-							foreach( var face in affectedFaces )
-							{
-								var scale = face.Plane.Normal.Dot( unprojectedDirection );
-
-								for( int i = 0; i < face.Vertices.Count; i++ )
-									face.Vertices[i] += unprojectedDif * scale;
-
-								face.BuildPlane();
-							}
-
-							var allFaces = selectedSolid.Faces;
-							foreach( var face in allFaces )
-							{
-								face.BuildVertices( selectedSolid );
-							}
-
-							_handlePosition = localSnap;
-
-							Invalidate();*/
-
 							foreach( var solid in EditorTool.SelectedSolids )
 							{
 								var affectedFaces = solid.Faces.Where( x => x.Plane.Normal.Dot( unprojectedDirection ) > 0.0f ).ToArray();
@@ -1330,15 +1333,18 @@ namespace Editor
 						var normal = v2v0.Cross( v1v0 );
 						var clipPlane = new Plane( normal, globalStart );
 
-						// TODO: Fix for multiple selected solids
-						//var command = new CommandSolidChanged( selectedSolid );
-						//command.Begin();
-						//
-						//if( selectedSolid.Clip( clipPlane ) )
-						//{
-						//	command.End();
-						//	_commandStack.Do( command );
-						//}
+						// TODO: Create command for clipping multiple solids
+						foreach( var solid in selectedSolids )
+						{
+							var command = new CommandSolidChanged( solid );
+							command.Begin();
+
+							if( solid.Clip( clipPlane ) )
+							{
+								command.End();
+								_commandStack.Do( command );
+							}
+						}
 
 						OnGlobalInvalidation?.Invoke();
 					}

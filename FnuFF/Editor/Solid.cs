@@ -117,13 +117,13 @@ namespace Editor
 			var facesToRemove = new List<Face>();
 			foreach( var face in _faces )
 			{
-				var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
-				var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
+				//var otherPlanes = _faces.Where( x => x != face ).Select( x => x.Plane ).ToArray();
+				//var points = Extensions.IntersectPlanes( face.Plane, otherPlanes );
 
 				var allInFront = true;
-				for( int i = 0; i < points.Length && ( allInFront || allVerticesBehind ); i++ )
+				for( int i = 0; i < face.Vertices.Count && ( allInFront || allVerticesBehind ); i++ )
 				{
-					if( !plane.InFront( points[i], CLIP_MARGIN ) )
+					if( !plane.InFront( face.Vertices[i], CLIP_MARGIN ) )
 						allInFront = false;
 					else
 						allVerticesBehind = false;
