@@ -60,5 +60,16 @@ namespace Editor.Entities
 		{
 			return _icon3D;
 		}
+
+		public override EntityData Copy()
+		{
+			return new WorldLight
+			{
+				AmbientColor = _ambientColor,
+				AmbientIntensity = _ambientIntensity,
+				SkyColor = _skyColor,
+				SkyIntensity = _skyIntensity
+			};
+		}
 	}
 }

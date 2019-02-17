@@ -33,5 +33,10 @@ namespace Editor.Entities
 		{
 			return _icon3D;
 		}
+
+		public override EntityData Copy()
+		{
+			return new PlayerSpawn { Angle = _angle };
+		}
 	}
 }

@@ -37,5 +37,10 @@ namespace Editor.Entities
 		{
 			return _icon3D;
 		}
+
+		public virtual EntityData Copy()
+		{
+			return null;
+		}
 	}
 }

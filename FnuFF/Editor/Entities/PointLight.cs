@@ -47,5 +47,10 @@ namespace Editor.Entities
 		{
 			return _icon3D;
 		}
+
+		public override EntityData Copy()
+		{
+			return new PointLight { Color = _color, Intensity = _intensity };
+		}
 	}
 }

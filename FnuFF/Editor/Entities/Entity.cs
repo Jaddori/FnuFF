@@ -41,6 +41,20 @@ namespace Editor.Entities
 			_selected = false;
 		}
 
+		public void Move( Triple movement )
+		{
+			_position += movement;
+		}
+
+		public Entity Copy()
+		{
+			return new Entity( _position )
+			{
+				Active = _active,
+				Data = _data.Copy()
+			};
+		}
+
 		public bool Contains2D( Point point, Camera2D camera )
 		{
 			var gpos = camera.Project( _position );
