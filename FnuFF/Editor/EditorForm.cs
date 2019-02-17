@@ -661,7 +661,8 @@ namespace Editor
 					selectedSolids.Clear();
 					ViewGlobalInvalidation();
 				}
-				else if( selectedEntities.Count > 0 )
+
+				if( selectedEntities.Count > 0 )
 				{
 					foreach( var entity in selectedEntities )
 					{
