@@ -96,7 +96,7 @@ namespace Editor
 			return new PointF( min.X + ( max.X - min.X ) * 0.5f, min.Y + ( max.Y - min.Y ) * 0.5f );
 		}
 
-		public static PointF[] GetHandlePoints( RectangleF r )
+		public static PointF[] GetHandlePoints( this RectangleF r )
 		{
 			var center = GetCenter( r );
 
@@ -116,7 +116,7 @@ namespace Editor
 			return result;
 		}
 
-		public static RectangleF[] GetHandles( RectangleF r, int size )
+		public static RectangleF[] GetHandles( this RectangleF r, int size )
 		{
 			var points = GetHandlePoints( r );
 
@@ -125,6 +125,28 @@ namespace Editor
 				result[i] = FromPoint( points[i], size );
 
 			return result;
+		}
+
+		public static PointF[] GetCorners( this RectangleF r )
+		{
+			return new PointF[]
+			{
+				new PointF( r.Left, r.Top ),
+				new PointF( r.Right, r.Top ),
+				new PointF( r.Left, r.Bottom ),
+				new PointF( r.Right, r.Bottom )
+			};
+		}
+
+		public static PointF[] GetCorners( this PointF p, float size )
+		{
+			return new PointF[]
+			{
+				new PointF( p.X - size*0.5f, p.Y - size*0.5f ),
+				new PointF( p.X + size*0.5f, p.Y - size*0.5f ),
+				new PointF( p.X - size*0.5f, p.Y + size*0.5f),
+				new PointF( p.X + size*0.5f, p.Y + size*0.5f ),
+			};
 		}
 
 		public static PointF TopLeft( this RectangleF r )
@@ -525,6 +547,20 @@ namespace Editor
 		{
 			var dotIndex = path.LastIndexOf( '.' );
 			return path.Substring( dotIndex + 1 ).Trim();
+		}
+
+		public static bool Empty<T>( this IList<T> list )
+		{
+			return list.Count <= 0;
+		}
+
+		public static int IndexOf<T>( this T[] array, T value )
+		{
+			var index = -1;
+			for( int i = 0; i < array.Length && index < 0; i++ )
+				if( array[i].Equals(value) )
+					index = i;
+			return index;
 		}
 	}
 }

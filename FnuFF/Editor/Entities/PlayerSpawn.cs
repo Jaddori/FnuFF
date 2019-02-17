@@ -22,9 +22,9 @@ namespace Editor.Entities
 		{
 		}
 
-		public override Image GetIcon2D(bool hovered, bool selected)
+		public override Image GetIcon2D(bool selected)
 		{
-			if( hovered || selected )
+			if( selected )
 				return _selectedIcon;
 			return _icon;
 		}

@@ -27,8 +27,14 @@ namespace Editor
 		protected override void OnCreateControl()
 		{
 			base.OnCreateControl();
-
-			EditorTool.OnSelectedFaceChanged += ( prev, cur ) => SetFace( cur );
+			
+			EditorTool.SelectedFaces.CollectionChanged += (sender, args) =>
+			{
+				if( EditorTool.SelectedFaces.Empty() || EditorTool.SelectedFaces.Count > 1 )
+					SetFace( null );
+				else
+					SetFace( EditorTool.SelectedFaces[0] );
+			};
 			SetFace( null );
 		}
 

@@ -16,31 +16,26 @@ namespace Editor
 	public class Solid
 	{
 		private const float CLIP_MARGIN = 0.01f;
-		public const int DIMENSION_TEXT_OFFSET = 12;
 		private static Random random = new Random();
 
 		[XmlIgnore]
 		public static CommandStack CommandStack;
 
 		private Color _color;
-		private bool _hovered;
-		private bool _selected;
+		//private bool _selected;
 		private List<Face> _faces;
 
 		[XmlIgnore]
 		public Color Color { get { return _color; } set { _color = value; } }
 
-		[XmlIgnore]
-		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
-
-		[XmlIgnore]
-		public bool Selected { get { return _selected; } set { _selected = value; } }
+		//[XmlIgnore]
+		//public bool Selected { get { return _selected; } set { _selected = value; } }
 
 		public List<Face> Faces => _faces;
 
 		public Solid()
 		{
-			_hovered = _selected = false;
+			//_selected = false;
 			_faces = new List<Face>();
 
 			GenerateColor();
@@ -48,7 +43,7 @@ namespace Editor
 
 		public Solid( Triple min, Triple max )
 		{
-			_hovered = _selected = false;
+			//_selected = false;
 			_faces = new List<Face>();
 
 			GenerateColor();
@@ -180,11 +175,11 @@ namespace Editor
 
 		public void Paint2D( Graphics g, Camera2D camera )
 		{
+			var selected = EditorTool.SelectedSolids.Contains( this );
+
 			var color = Color.FromArgb( EditorColors.FADE, _color );
-			if( _selected )
+			if( selected )
 				color = Color.White;
-			else if( _hovered )
-				color = _color;
 
 			var facePoints = new List<PointF>();
 
@@ -192,12 +187,7 @@ namespace Editor
 			var maxPoint = new PointF( -99999, -99999 );
 
 			using( var pen = new Pen( color ) )
-			{
-				if( !_selected && !_hovered )
-				{
-					pen.DashPattern = EditorColors.DASH_PATTERN;
-				}
-				
+			{				
 				var faces = _faces.Where( x => x.Plane.Normal.Dot( camera.Direction ) > 0 ).ToArray();
 				foreach( var face in faces )
 				{
@@ -235,7 +225,7 @@ namespace Editor
 							pen.DashStyle = prevStyle;
 						}
 
-						if( _selected && EditorTool.Current == EditorTools.Vertex )
+						if( selected && EditorTool.Current == EditorTools.Vertex )
 						{
 							foreach( var vertex in projectedPoints )
 							{
@@ -262,7 +252,7 @@ namespace Editor
 				}
 			}
 
-			if( _selected )
+			/*if( _selected )
 			{
 				var topleft = new PointF( facePoints.Min( x => x.X ), facePoints.Min( x => x.Y ) );
 				var bottomright = new PointF( facePoints.Max( x => x.X ), facePoints.Max( x => x.Y ) );
@@ -297,7 +287,7 @@ namespace Editor
 				
 				g.DrawString( leftText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, leftPosition );
 				g.DrawString( topText, EditorColors.SOLID_DIMENSIONS_FONT, EditorColors.BRUSH_WHITE, topPosition );
-			}
+			}*/
 		}
 
 		public void PaintOpaque3D()
@@ -314,12 +304,14 @@ namespace Editor
 
 		public void Paint3D( Face[] faces )
 		{
+			var selected = EditorTool.SelectedSolids.Contains( this );
+
 			float red = _color.R / 255.0f;
 			float green = _color.G / 255.0f;
 			float blue = _color.B / 255.0f;
 			float alpha = 1.0f;
 
-			if( _selected )
+			if( selected )
 			{
 				red = green = blue = 1.0f;
 			}
@@ -334,7 +326,7 @@ namespace Editor
 				//if( face.Plane.Normal.Dot( new Triple( 0, -1, 0 ) ) != 1 )
 				//	continue;
 
-				var showLumels = EditorFlags.ShowLumels || ( EditorFlags.ShowLumelsOnFace && EditorTool.SelectedFace == face );
+				var showLumels = EditorFlags.ShowLumels || ( EditorFlags.ShowLumelsOnFace && EditorTool.SelectedFaces.Contains( face ) );
 				if( showLumels )
 				{
 					if( face.Lumels.Count <= 0 )
@@ -367,7 +359,7 @@ namespace Editor
 						GL.SetTexture( EditorTool.CurrentLightmapID );
 				}
 
-				if( face.Hovered || _hovered )
+				if( face.Hovered )
 				{
 					GL.Color4f( 1.0f, 0.5f, 0.5f, alpha );
 				}
@@ -448,7 +440,7 @@ namespace Editor
 				}
 
 				// draw vertex handles
-				if( _selected && EditorTool.Current == EditorTools.Vertex )
+				if( selected && EditorTool.Current == EditorTools.Vertex )
 				{
 					GL.EnablePointSprite( true );
 					GL.EnableDepthMask( false );

@@ -28,24 +28,20 @@ namespace Editor
 				cmb_type.Items.Add( name );
 			}
 
-			EditorTool.OnSelectedEntityChanged += ( prev, cur ) =>
+			EditorTool.SelectedEntities.CollectionChanged += ( collectionSender, collectionArgs ) =>
 			{
 				_silent = true;
 
-				if( cur == null )
+				if( EditorTool.SelectedEntities.Empty() || EditorTool.SelectedEntities.Count > 1 )
 				{
 					cmb_type.SelectedIndex = -1;
 					pg_data.SelectedObject = null;
 				}
-				else
+				else if( EditorTool.SelectedEntities.Count == 1 )
 				{
-					var index = -1;
-					for( int i = 0; i < EntityList.Types.Length && index < 0; i++ )
-					{
-						if( EntityList.Types[i] == cur.Data.GetType() )
-							index = i;
-					}
+					var cur = EditorTool.SelectedEntities[0];
 
+					var index = EntityList.Types.IndexOf( cur.Data.GetType() );
 					if( index >= 0 )
 					{
 						cmb_type.SelectedIndex = index;
@@ -65,11 +61,11 @@ namespace Editor
 			if( cmb_type.SelectedIndex < 0 || cmb_type.SelectedIndex >= cmb_type.Items.Count )
 				return;
 
-			if( EditorTool.SelectedEntity == null )
+			if( EditorTool.SelectedEntities.Empty() || EditorTool.SelectedEntities.Count > 1 )
 				return;
 
-			EditorTool.SelectedEntity.Data = EntityList.CreateData( cmb_type.SelectedIndex );
-			pg_data.SelectedObject = EditorTool.SelectedEntity.Data;
+			EditorTool.SelectedEntities[0].Data = EntityList.CreateData( cmb_type.SelectedIndex );
+			pg_data.SelectedObject = EditorTool.SelectedEntities[0].Data;
 		}
 	}
 }

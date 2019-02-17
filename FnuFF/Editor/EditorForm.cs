@@ -147,13 +147,31 @@ namespace Editor
 
 		private void btn_texture_Click( object sender, EventArgs e )
 		{
-			var selectedSolid = _level.Solids.FirstOrDefault( x => x.Selected );
-			if( selectedSolid != null )
+			//var selectedSolid = _level.Solids.FirstOrDefault( x => x.Selected );
+			//if( selectedSolid != null )
+			//{
+			//	var command = new CommandSolidChanged( selectedSolid );
+			//	command.Begin();
+			//
+			//	foreach( var face in selectedSolid.Faces )
+			//	{
+			//		face.PackName = TextureMap.CurrentPackName;
+			//		face.TextureName = TextureMap.CurrentTextureName;
+			//	}
+			//
+			//	command.End();
+			//	if( command.HasChanges )
+			//		_commandStack.Do( command );
+			//
+			//	view_3d.Invalidate();
+			//}
+
+			foreach( var solid in EditorTool.SelectedSolids )
 			{
-				var command = new CommandSolidChanged( selectedSolid );
+				var command = new CommandSolidChanged( solid );
 				command.Begin();
 
-				foreach( var face in selectedSolid.Faces )
+				foreach( var face in solid.Faces )
 				{
 					face.PackName = TextureMap.CurrentPackName;
 					face.TextureName = TextureMap.CurrentTextureName;
@@ -162,9 +180,9 @@ namespace Editor
 				command.End();
 				if( command.HasChanges )
 					_commandStack.Do( command );
-
-				view_3d.Invalidate();
 			}
+
+			view_3d.Invalidate();
 		}
 
 		private void newToolStripMenuItem_Click( object sender, EventArgs e )
@@ -626,29 +644,34 @@ namespace Editor
 
 			if( e.KeyCode == Keys.Delete )
 			{
-				var selectedSolid = EditorTool.SelectedSolid;
-				var selectedEntity = EditorTool.SelectedEntity;
+				var selectedSolids = EditorTool.SelectedSolids;
+				var selectedEntities = EditorTool.SelectedEntities;
 
-				if( selectedSolid != null )
+				if( selectedSolids.Count > 0 )
 				{
-					_level.RemoveSolid( selectedSolid );
+					foreach( var solid in selectedSolids )
+					{
+						_level.RemoveSolid( solid );
 
-					var deleteCommand = new CommandSolidCreated( _level.Solids, selectedSolid, true );
-					_commandStack.Do( deleteCommand );
+						var deleteCommand = new CommandSolidCreated( _level.Solids, solid, true );
+						_commandStack.Do( deleteCommand );
 
-					EditorTool.SelectedSolid = null;
+					}
 
+					selectedSolids.Clear();
 					ViewGlobalInvalidation();
 				}
-				else if( selectedEntity != null )
+				else if( selectedEntities.Count > 0 )
 				{
-					_level.RemoveEntity( selectedEntity );
+					foreach( var entity in selectedEntities )
+					{
+						_level.RemoveEntity( entity );
 
-					var deleteCommand = new CommandEntityCreated( _level.Entities, selectedEntity, true );
-					_commandStack.Do( deleteCommand );
+						var deleteCommand = new CommandEntityCreated( _level.Entities, entity, true );
+						_commandStack.Do( deleteCommand );
+					}
 
-					EditorTool.SelectedEntity = null;
-
+					selectedEntities.Clear();
 					ViewGlobalInvalidation();
 				}
 			}

@@ -10,19 +10,18 @@ namespace Editor.Entities
 {
 	public class Entity
 	{
+		public const int ICON_SIZE = 32;
+
 		private Triple _position;
 		private bool _active;
 		private EntityData _data;
-		private bool _hovered;
 		private bool _selected;
 
 		public Triple Position { get { return _position; } set { _position = value; } }
 		public bool Active { get { return _active; } set { _active = value; } }
 
 		public EntityData Data { get { return _data; } set { _data = value; } }
-
-		[XmlIgnore]
-		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
+		
 		[XmlIgnore]
 		public bool Selected { get { return _selected; } set { _selected = value; } }
 
@@ -31,7 +30,6 @@ namespace Editor.Entities
 			_position = new Triple();
 			_active = true;
 			_data = new EntityData();
-			_hovered = false;
 			_selected = false;
 		}
 
@@ -40,7 +38,6 @@ namespace Editor.Entities
 			_position = position;
 			_active = true;
 			_data = new EntityData();
-			_hovered = false;
 			_selected = false;
 		}
 
@@ -49,7 +46,7 @@ namespace Editor.Entities
 			var gpos = camera.Project( _position );
 			var lpos = camera.ToLocal( gpos.Deflate( Grid.Size ).Inflate( Grid.Gap ) );
 
-			var bounds = Extensions.FromPoint( lpos, 32 );
+			var bounds = Extensions.FromPoint( lpos, ICON_SIZE );
 			var result = bounds.Contains( point );
 
 			return result;
@@ -59,8 +56,8 @@ namespace Editor.Entities
 		{
 			var localPosition = camera.ToLocal( camera.Project( _position ).Deflate( Grid.Size ).Inflate( Grid.Gap ) );
 
-			var icon = _data.GetIcon2D( _hovered, _selected );
-			var iconBounds = Extensions.FromPoint( localPosition, icon.Width );
+			var icon = _data.GetIcon2D( _selected );
+			var iconBounds = Extensions.FromPoint( localPosition, ICON_SIZE );
 			g.DrawImage( icon, iconBounds );
 		}
 

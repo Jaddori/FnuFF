@@ -26,9 +26,9 @@ namespace Editor.Entities
 			_name = string.Empty;
 		}
 
-		public virtual Image GetIcon2D(bool hovered, bool selected)
+		public virtual Image GetIcon2D(bool selected)
 		{
-			if( hovered || selected )
+			if( selected )
 				return _selectedIcon;
 			return _icon;
 		}
