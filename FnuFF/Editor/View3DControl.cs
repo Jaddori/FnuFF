@@ -39,8 +39,6 @@ namespace Editor
 		private CommandStack _commandStack;
 
 		private bool _mmbDown;
-		private bool _controlDown;
-		private bool _shiftDown;
 		private Point _previousMousePosition;
 
 		[Browsable( false )]
@@ -94,6 +92,10 @@ namespace Editor
 			}
 
 			_camera = new Camera3D { HorizontalSensitivity = 0.05f, VerticalSensitivity = 0.05f };
+
+			EditorTool.SelectedSolids.CollectionChanged += ( sender, args ) => Invalidate();
+			EditorTool.SelectedFaces.CollectionChanged += ( sender, args ) => Invalidate();
+			EditorTool.SelectedEntities.CollectionChanged += ( sender, args ) => Invalidate();
 		}
 
 		protected override void OnPaintBackground( PaintEventArgs pevent )
@@ -254,8 +256,8 @@ namespace Editor
 					Face hitFace;
 
 					IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
-
-					if( _controlDown )
+					
+					if( ( ModifierKeys & Keys.Control ) == Keys.Control )
 					{
 						if( EditorTool.SelectedSolids.Contains( hitSolid ) )
 							EditorTool.SelectedSolids.Remove( hitSolid );
@@ -279,7 +281,7 @@ namespace Editor
 
 					IntersectFace( e.X, e.Y, out hitSolid, out hitFace );
 
-					if( _controlDown )
+					if( ( ModifierKeys & Keys.Control ) == Keys.Control )
 					{
 						if( EditorTool.SelectedFaces.Contains( hitFace ) )
 							EditorTool.SelectedFaces.Remove( hitFace );
@@ -384,22 +386,12 @@ namespace Editor
 			else if( e.KeyCode == Keys.D )
 				_camera.RelativeMovement( new Triple( CAMERA_STRAFE_SPEED, 0, 0 ) );
 
-			if( e.KeyCode == Keys.ShiftKey )
-				_shiftDown = true;
-			else if( e.KeyCode == Keys.ControlKey )
-				_controlDown = true;
-
 			Invalidate();
 		}
 
 		protected override void OnKeyUp( KeyEventArgs e )
 		{
 			base.OnKeyUp( e );
-
-			if( e.KeyCode == Keys.ShiftKey )
-				_shiftDown = false;
-			else if( e.KeyCode == Keys.ControlKey )
-				_controlDown = false;
 		}
 
 		private bool IntersectFace( int x, int y, out Solid hitSolid, out Face hitFace )

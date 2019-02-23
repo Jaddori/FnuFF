@@ -21,8 +21,6 @@ namespace Editor
 
 		private List<Triple> _vertices;
 		private List<PointF> _uvs;
-		private bool _hovered;
-		private bool _selected;
 		
 		private List<Lumel> _lumels;
 		private List<PointF> _lightmapUVs;
@@ -33,12 +31,6 @@ namespace Editor
 		private int _lumelWidth;
 		private int _lumelHeight;
 		private int _lumelSize;
-
-		[XmlIgnore]
-		public List<Tuple<Triple, Triple>> GOOD_LINES = new List<Tuple<Triple, Triple>>();
-
-		[XmlIgnore]
-		public List<Tuple<Triple, Triple>> BAD_LINES = new List<Tuple<Triple, Triple>>();
 
 		public Plane Plane { get { return _plane; } set { _plane = value; } }
 		public string PackName { get { return _packName; } set { _packName = value; } }
@@ -93,12 +85,6 @@ namespace Editor
 		public List<PointF> UVs => _uvs;
 
 		[XmlIgnore]
-		public bool Hovered { get { return _hovered; } set { _hovered = value; } }
-
-		[XmlIgnore]
-		public bool Selected { get { return _selected; } set { _selected = value; } }
-
-		[XmlIgnore]
 		public List<Lumel> Lumels => _lumels;
 
 		[XmlIgnore]
@@ -130,8 +116,6 @@ namespace Editor
 			_vertices = new List<Triple>();
 			_uvs = new List<PointF>();
 			_rotation = 0.0f;
-			_hovered = false;
-			//_lumels = new List<Triple>();
 			_lumels = new List<Lumel>();
 			_lightmapUVs = new List<PointF>();
 			_lumelSize = 16;
@@ -150,8 +134,6 @@ namespace Editor
 			_vertices = new List<Triple>();
 			_uvs = new List<PointF>();
 			_rotation = rotation;
-			_hovered = false;
-			//_lumels = new List<Triple>();
 			_lumels = new List<Lumel>();
 			_lightmapUVs = new List<PointF>();
 			_lumelSize = 16;

@@ -305,18 +305,8 @@ namespace Editor
 		public void Paint3D( Face[] faces )
 		{
 			var selected = EditorTool.SelectedSolids.Contains( this );
-
-			float red = _color.R / 255.0f;
-			float green = _color.G / 255.0f;
-			float blue = _color.B / 255.0f;
-			float alpha = 1.0f;
-
-			if( selected )
-			{
-				red = green = blue = 1.0f;
-			}
-
-			var cur = 0;
+			
+			//var cur = 0;
 			foreach( var face in faces )
 			{
 				//cur++;
@@ -325,6 +315,8 @@ namespace Editor
 
 				//if( face.Plane.Normal.Dot( new Triple( 0, -1, 0 ) ) != 1 )
 				//	continue;
+
+				var faceSelected = EditorTool.SelectedFaces.Contains( face );
 
 				var showLumels = EditorFlags.ShowLumels || ( EditorFlags.ShowLumelsOnFace && EditorTool.SelectedFaces.Contains( face ) );
 				if( showLumels )
@@ -343,29 +335,17 @@ namespace Editor
 					if( EditorTool.CurrentLightmapID <= 0 || face.LightmapUVs.Count <= 0 )
 						shade = 0.75f;
 				}
+				
+				var textureID = TextureMap.GetID( face.PackName, face.TextureName );
+				GL.SetTexture( textureID );
+				GL.Color4f( shade, 1.0f );
 
-				if( string.IsNullOrEmpty( face.TextureName ) )
-				{
-					GL.SetTexture( 0 );
-					GL.Color4f( red * shade, green * shade, blue * shade, alpha );
-				}
-				else
-				{
-					var textureID = TextureMap.GetID( face.PackName, face.TextureName );
-					GL.SetTexture( textureID );
-					GL.Color4f( shade, alpha );
+				if( EditorTool.CurrentLightmapID > 0 && face.LightmapUVs.Count > 0 )
+					GL.SetTexture( EditorTool.CurrentLightmapID );
 
-					if( EditorTool.CurrentLightmapID > 0 && face.LightmapUVs.Count > 0 )
-						GL.SetTexture( EditorTool.CurrentLightmapID );
-				}
-
-				if( face.Hovered )
+				if( faceSelected || selected )
 				{
-					GL.Color4f( 1.0f, 0.5f, 0.5f, alpha );
-				}
-				else if( face.Selected )
-				{
-					GL.Color4f( 0.75f, 0.35f, 0.35f, alpha );
+					GL.Color4f( 0.75f, 0.35f, 0.35f, 1.0f );
 				}
 
 				GL.BeginTriangles();
