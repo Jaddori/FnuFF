@@ -61,5 +61,10 @@ namespace Editor.UndoRedo
 		{
 			return "Entity changed.";
 		}
+
+		public bool AffectsSelection()
+		{
+			return false;
+		}
 	}
 }

@@ -136,7 +136,11 @@
     <Compile Include="Triple.cs" />
     <Compile Include="UndoRedo\CommandEntityChanged.cs" />
     <Compile Include="UndoRedo\CommandEntityCreated.cs" />
+    <Compile Include="UndoRedo\CommandMultipleSolidsChanged.cs" />
+    <Compile Include="UndoRedo\CommandMultipleSolidsCreated.cs" />
     <Compile Include="UndoRedo\CommandNewLevel.cs" />
+    <Compile Include="UndoRedo\CommandSelectionDuplicated.cs" />
+    <Compile Include="UndoRedo\CommandSelectionMoved.cs" />
     <Compile Include="UndoRedo\CommandSolidChanged.cs" />
     <Compile Include="UndoRedo\CommandSolidCreated.cs" />
     <Compile Include="UndoRedo\CommandStack.cs" />

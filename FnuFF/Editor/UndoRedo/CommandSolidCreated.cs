@@ -39,5 +39,10 @@ namespace Editor.UndoRedo
 		{
 			return "Solid created.";
 		}
+
+		public bool AffectsSelection()
+		{
+			return true;
+		}
 	}
 }

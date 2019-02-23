@@ -12,5 +12,6 @@ namespace Editor.UndoRedo
 		void Redo();
 
 		string GetDescription();
+		bool AffectsSelection();
 	}
 }

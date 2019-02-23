@@ -39,9 +39,17 @@ namespace Editor
 			_commandStack = new CommandStack();
 			Solid.CommandStack = _commandStack;
 
-			_commandStack.OnDo += ( command ) => UpdateTitle();
-			_commandStack.OnUndo += ( command ) => UpdateTitle();
-			_commandStack.OnRedo += ( command ) => UpdateTitle();
+			var commandHandler = new CommandStack.CommandHandler(
+				command =>
+				{
+					UpdateTitle();
+					if( command.AffectsSelection() )
+						EditorTool.ClearSelection();
+				}
+			);
+			_commandStack.OnDo += (command) => UpdateTitle();
+			_commandStack.OnUndo += commandHandler;
+			_commandStack.OnRedo += commandHandler;
 
 			_level = new Level();
 

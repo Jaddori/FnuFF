@@ -79,8 +79,10 @@ namespace Editor
 		private Level.ChangeHandler _invalidateAction;
 		
 		private CommandStack _commandStack;
-		private List<CommandSolidChanged> _commandSolidsChanged;
-		private List<CommandEntityChanged> _commandEntitiesChanged;
+		//private List<CommandSolidChanged> _commandSolidsChanged;
+		//private List<CommandEntityChanged> _commandEntitiesChanged;
+		private CommandSelectionMoved _selectionMovedCommand;
+		private CommandMultipleSolidsChanged _multipleSolidsChangedCommand;
 
         public int Direction
         {
@@ -209,8 +211,8 @@ namespace Editor
 			_movingVertex = false;
 			_selectedVertices = new List<Tuple<int, int, int>>();
 
-			_commandSolidsChanged = new List<CommandSolidChanged>();
-			_commandEntitiesChanged = new List<CommandEntityChanged>();
+			//_commandSolidsChanged = new List<CommandSolidChanged>();
+			//_commandEntitiesChanged = new List<CommandEntityChanged>();
         }
 
 		private PointF SnapToGrid( PointF point )
@@ -561,24 +563,15 @@ namespace Editor
 								}
 								else
 								{
-									// TODO: Create CommandMultipleSolidChanged or add functionality in current command for multiple solids
-									foreach( var solid in selectedSolids )
-									{
-										var command = new CommandSolidChanged( solid );
-										command.Begin();
-
-										_commandSolidsChanged.Add( command );
-									}
-
-									foreach( var entity in selectedEntities )
-									{
-										var command = new CommandEntityChanged( entity );
-										command.Begin();
-
-										_commandEntitiesChanged.Add( command );
-									}
+									_selectionMovedCommand = new CommandSelectionMoved( selectedSolids, selectedEntities );
+									_selectionMovedCommand.Begin();
 								}
 							}
+						}
+						else // interaction with a handle
+						{
+							_multipleSolidsChangedCommand = new CommandMultipleSolidsChanged( selectedSolids );
+							_multipleSolidsChangedCommand.Begin();
 						}
 					}
 				}
@@ -695,16 +688,10 @@ namespace Editor
 					if( _handleIndex >= 0 )
 					{
 						_handleIndex = -1;
-
-						foreach( var command in _commandSolidsChanged )
-						{
-							command.End();
-
-							if( command.HasChanges )
-								_commandStack.Do( command );
-						}
-
-						_commandSolidsChanged.Clear();
+						
+						_multipleSolidsChangedCommand.End();
+						if( _multipleSolidsChangedCommand.HasChanges )
+							_commandStack.Do( _multipleSolidsChangedCommand );
 
 						Invalidate();
 						OnGlobalInvalidation?.Invoke();
@@ -713,19 +700,9 @@ namespace Editor
 					{
 						_movingSelection = false;
 						_duplactingSelection = false;
-
-						// TODO: Create command for creating multiple solids/entities
-						foreach( var solid in EditorTool.SelectedSolids )
-						{
-							var command = new CommandSolidCreated( _level.Solids, solid );
-							_commandStack.Do( command );
-						}
-
-						foreach( var entity in EditorTool.SelectedEntities )
-						{
-							var command = new CommandEntityCreated( _level.Entities, entity );
-							_commandStack.Do( command );
-						}
+						
+						var command = new CommandSelectionDuplicated( _level.Solids, _level.Entities, EditorTool.SelectedSolids, EditorTool.SelectedEntities );
+						_commandStack.Do( command );
 
 						Invalidate();
 						OnGlobalInvalidation?.Invoke();
@@ -734,34 +711,12 @@ namespace Editor
 					{
 						_movingSelection = false;
 
-						// TODO: Create CommandMoveSelection
-						var changesMade = false;
-						foreach( var command in _commandSolidsChanged )
+						_selectionMovedCommand.End();
+
+						if( _selectionMovedCommand.HasChanges )
 						{
-							command.End();
+							_commandStack.Do( _selectionMovedCommand );
 
-							if( command.HasChanges )
-							{
-								changesMade = true;
-								_commandStack.Do( command );
-							}
-						}
-						_commandSolidsChanged.Clear();
-
-						foreach( var command in _commandEntitiesChanged )
-						{
-							command.End();
-
-							if( command.HasChanges )
-							{
-								changesMade = true;
-								_commandStack.Do( command );
-							}
-						}
-						_commandEntitiesChanged.Clear();
-
-						if( changesMade )
-						{
 							Invalidate();
 							OnGlobalInvalidation?.Invoke();
 						}
@@ -1337,21 +1292,25 @@ namespace Editor
 
 						var normal = v2v0.Cross( v1v0 );
 						var clipPlane = new Plane( normal, globalStart );
+						
+						var command = new CommandMultipleSolidsChanged( selectedSolids );
+						command.Begin();
 
-						// TODO: Create command for clipping multiple solids
+						var clipped = false;
 						foreach( var solid in selectedSolids )
 						{
-							var command = new CommandSolidChanged( solid );
-							command.Begin();
-
 							if( solid.Clip( clipPlane ) )
-							{
-								command.End();
-								_commandStack.Do( command );
-							}
+								clipped = true;
 						}
 
-						OnGlobalInvalidation?.Invoke();
+						if( clipped )
+						{
+							command.End();
+							_commandStack.Do( command );
+
+							OnGlobalInvalidation?.Invoke();
+						}
+
 					}
 
 					Invalidate();

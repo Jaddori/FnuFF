@@ -100,21 +100,14 @@ namespace Editor
 
 		public int Snap( int gapSize, int value )
 		{
-			var gap = gapSize;// / _zoom;
+			var gap = gapSize;
 
-			//if( value < 0 )
-				//value -= gapSize; // TODO: Change to gap
-
-			//return (int)( (int)( value / gap ) * gap );
 			return (int)( Math.Round( (float)value / gap ) * gap );
 		}
 
 		public float Snap( int gapSize, float value )
 		{
-			var gap = gapSize;// / _zoom;
-
-			//if( value < 0 )
-				//value -= gapSize; // TODO: Change to gap
+			var gap = gapSize;
 
 			return (int)( Math.Round( value / gap ) * gap);
 		}

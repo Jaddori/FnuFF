@@ -69,5 +69,10 @@ namespace Editor.UndoRedo
 		{
 			return "Solid changed.";
 		}
+
+		public bool AffectsSelection()
+		{
+			return false;
+		}
 	}
 }

@@ -50,5 +50,10 @@ namespace Editor.UndoRedo
 				return "Entity deleted.";
 			return "Entity created.";
 		}
+
+		public bool AffectsSelection()
+		{
+			return true;
+		}
 	}
 }

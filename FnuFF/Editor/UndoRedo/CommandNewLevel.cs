@@ -20,5 +20,10 @@ namespace Editor.UndoRedo
 		{
 			return "- New Level -";
 		}
+
+		public bool AffectsSelection()
+		{
+			return false;
+		}
 	}
 }
