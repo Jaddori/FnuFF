@@ -42,12 +42,19 @@ namespace Editor.UndoRedo
 				_newFaces.Add( face.Copy() );
 
 			// check if we have any changes
-			_hasChanges = false;
-			var faceCount = _oldFaces.Count;
-			for( int i = 0; i < faceCount && !_hasChanges; i++ )
+			if( _oldFaces.Count != _newFaces.Count )
 			{
-				if( !_oldFaces[i].Equals( _newFaces[i] ) )
-					_hasChanges = true;
+				_hasChanges = true;
+			}
+			else
+			{
+				_hasChanges = false;
+				var faceCount = _oldFaces.Count;
+				for( int i = 0; i < faceCount && !_hasChanges; i++ )
+				{
+					if( !_oldFaces[i].Equals( _newFaces[i] ) )
+						_hasChanges = true;
+				}
 			}
 		}
 
