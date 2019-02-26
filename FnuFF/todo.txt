@@ -1,0 +1,11 @@
+Todo:
+
+Editor:
+-Check if start of ray is inside solid when raychecking in 3D view
+-More texture control functions (Fit, Left, Center, etc)
+-Fix clipping
+-Resizing complex geometry is broken
+-Remember size of previous selected geometry when creating new solids
+-Progress bar when exporting level (or removing the dialog entirely if it is fast enough)
+
+Game:
